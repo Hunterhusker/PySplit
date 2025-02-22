@@ -9,7 +9,7 @@ from Listeners.KeyboardListener import KeyboardListener
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 
-
+# JUST A TEST OF IF MY GIT ISSUE IS FIXED
 class Main(QWidget):
     StopTimer = Signal()
     StartTimer = Signal()
