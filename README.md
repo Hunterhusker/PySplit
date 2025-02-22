@@ -29,7 +29,7 @@ Contributors info
 
 ## License
 
-This project is licensed under the "ADD THIS WHEN I GET IT BACK" License - see the LICENSE.md file for details
+This project is licensed under the "LGPL-2.1" License - see the LICENSE.md file for details
 
 ## Acknowledgements
 
