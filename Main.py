@@ -8,6 +8,7 @@ from Dialogs.AssignButtonsDialog import AssignButtonsDialog
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
+from Widgets.TitleWidget import TitleWidget
 
 
 class Main(QWidget):
@@ -83,9 +84,6 @@ class Main(QWidget):
         # create a keyboard listener
         self.keyboard_listener = KeyboardListener()
 
-        # connect the slots to the signals that the keyboard listener can listen to
-        self.keyboard_listener.on_press.connect(self.update_key_label)
-
         # start the keyboard listener, it already runs the listener on its own thread so there is no need to add another thread
         self.keyboard_listener.run()
 
@@ -142,24 +140,6 @@ class Main(QWidget):
 
             tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
 
-    @Slot(Key)
-    def update_key_label(self, key):
-        try:
-            # Convert the key to a string and print it
-            text = key.char
-        except AttributeError:
-            # Handle special keys like shift, ctrl, etc.
-            text = key
-
-        if key == Key.shift_r:
-            #self.StopTimer.emit()
-            self.PauseTimer.emit()
-        elif key == Key.space:
-            #self.StartTimer.emit()
-            self.ResumeTimer.emit()
-
-        #self.TitleLabel.setText(f'Key Pressed: "{text}"')
-
     @Slot(str)
     def update_timer_label(self, time: int):
         s, ms = divmod(time, 1000)
@@ -185,48 +165,6 @@ class Main(QWidget):
 
         # accept the close event and actually close
         event.accept()
-
-
-class TitleWidget(QFrame):
-    def __init__(self, title, subtitle):
-        super().__init__()
-        locLayout = QVBoxLayout()
-
-        self.TitleLabel = QLabel(title, self)
-        self.TitleLabel.setObjectName('TitleLabel')
-
-        self.SubtitleLabel = QLabel(subtitle, self)
-        self.SubtitleLabel.setObjectName('SubLabel')
-
-        locLayout.addWidget(self.TitleLabel)
-        locLayout.addWidget(self.SubtitleLabel)
-
-        self.setObjectName('TitleFrame')
-        self.setStyleSheet("""
-            #TitleFrame { 
-                border-bottom: 1px solid white; 
-                border-top: none; 
-                border-left: none; 
-                border-right: none; 
-            }
-            
-            QLabel {
-                qproperty-alignment: AlignCenter;
-                font-family: Chakra Petch Medium;
-            }
-            
-            #TitleLabel {
-                color: white;
-                font-size: 14px;
-            }
-            
-            #SubLabel {
-                color: white;
-                font-size: 10px;
-            }
-        """)
-
-        self.setLayout(locLayout)
 
 
 if __name__ == "__main__":
