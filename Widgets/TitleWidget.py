@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QFrame
 
 
 class TitleWidget(QFrame):

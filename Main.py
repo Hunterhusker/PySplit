@@ -9,6 +9,7 @@ from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.TitleWidget import TitleWidget
+from Configurator.SettingsParser import SettingsParser
 
 
 class Main(QWidget):
@@ -35,6 +36,10 @@ class Main(QWidget):
         self.context_menu = QMenu(self)
         assignButtonsAction = self.context_menu.addAction('Assign Buttons')
         assignButtonsAction.triggered.connect(self.open_key_dialog)
+
+        # load the settings from the file
+        self.settings_parser = SettingsParser('settings.json')
+        self.settings_parser.parseSettings()
 
         # self.setStyleSheet("""
         #
@@ -100,18 +105,7 @@ class Main(QWidget):
         self.game_timer_thread.start()
 
         # create the timer controller from the config
-        # TODO: Read in the config from a file
-        event_map = {  # tmp static list that we can try and read from a file later
-            KeyPressObject(Key.space): 'STARTSPLIT',
-            KeyPressObject(KeyCode.from_char('\\')): 'UNSPLIT',
-            KeyPressObject(Key.shift_r): 'PAUSE',
-            KeyPressObject(Key.delete): 'STOP',
-            KeyPressObject(Key.backspace): 'RESET',
-            KeyPressObject(KeyCode.from_char(']')): 'SKIP',
-            KeyPressObject(Key.enter): 'RESUME',
-            KeyPressObject(Key.f7): 'LOCK'
-        }
-        self.timer_controller = TimerController(Listeners=[self.keyboard_listener], event_map=event_map)
+        self.timer_controller = TimerController(Listeners=[self.keyboard_listener], event_map=self.settings_parser.settings['inputs'])
 
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
@@ -158,7 +152,13 @@ class Main(QWidget):
         self.game_timer_thread.quit()
         self.game_timer_thread.wait()
 
-        json_str = json.dumps(self.timer_controller.export_mapping(), indent=4)
+        # update the settings with what we set
+        settings_json = {}
+        inputs_json = self.timer_controller.export_mapping()
+
+        settings_json['inputs'] = inputs_json
+
+        json_str = json.dumps(settings_json, indent=4)
 
         with open('settings.json', 'w') as f:
             f.write(json_str)
