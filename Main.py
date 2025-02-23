@@ -130,6 +130,8 @@ class Main(QWidget):
             # give the controller the new mapping
             self.timer_controller.update_mapping(dialog.event_map)
 
+            tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
+
     @Slot(Key)
     def update_key_label(self, key):
         try:
@@ -165,6 +167,11 @@ class Main(QWidget):
         # stop the timer thread
         self.game_timer_thread.quit()
         self.game_timer_thread.wait()
+
+        json_str = json.dumps(self.timer_controller.export_mapping(), indent=4)
+
+        with open('settings.json', 'w') as f:
+            f.write(json_str)
 
         # accept the close event and actually close
         event.accept()

@@ -48,24 +48,31 @@ class KeyboardListener(ABCListener, ABC):
 
 
 class KeyPressObject(ABCListenedObject):
-    def __init__(self, obj: Key):
-        self.source = 'pynput'
-        self.value = key_to_str(obj)
-        self.obj = obj
+    def __init__(self, obj: Key = None):
+        if obj is not None:
+            self.source = 'pynput'
+            self.value = key_to_str(obj)
+            self.obj = obj
 
-        if isinstance(obj, KeyCode):
-            self.type = 'simple'
+            if isinstance(obj, KeyCode):
+                self.type = 'simple'
 
-        else:
-            self.type = 'complex'
+            else:
+                self.type = 'complex'
+
+        else:  # if no obj is there, make it blank I guess
+            self.source = ''
+            self.value = ''
+            self.obj = ''
+            self.type = ''
 
     def __eq__(self, other):
         if isinstance(other, KeyPressObject):
             return self.obj == other.obj
-        elif isinstance(other, Key):
-            return self.obj.name == other.name
         elif isinstance(other, KeyCode):
             return self.obj.char == other.char
+        elif isinstance(other, Key):
+            return self.obj.name == other.name
 
         return False
 
