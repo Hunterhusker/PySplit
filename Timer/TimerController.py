@@ -30,6 +30,9 @@ class TimerController(QObject):
         if event_obj in self.event_map:  # if the input was mapped, then we should trigger off it
             self.ControlEvent.emit(self.event_map[event_obj])
 
+        else:
+            print('Not in map: ', event_obj)
+
     def update_mapping(self, event_map):
         """
         Takes in a mapping of objects that an added listener can output and maps them to a string that the timer can read for control commands
@@ -86,7 +89,7 @@ class TimerController(QObject):
         Returns:
             (dict[str, str]) : The JSON string representing the current inputs
         """
-        str_mapping = {key, key_to_str()}
+        pass  # str_mapping = {key, key_to_str()}
 
     def add_listener(self, listener: ABCListener):
         """
