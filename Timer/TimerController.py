@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Slot, Signal
 import json
 
 from Listeners.ABCListener import ABCListener
-from Listeners.KeyboardListener import key_to_str
+from Listeners.KeyboardListener import KeyPressObject
 
 
 class TimerController(QObject):
@@ -30,16 +30,13 @@ class TimerController(QObject):
         if event_obj in self.event_map:  # if the input was mapped, then we should trigger off it
             self.ControlEvent.emit(self.event_map[event_obj])
 
-        else:
-            print('Not in map: ', event_obj)
-
-    def update_mapping(self, event_map):
-        """
+    def update_mapping(self, event_map: dict[KeyPressObject, str]):
+        f"""
         Takes in a mapping of objects that an added listener can output and maps them to a string that the timer can read for control commands
             - will completely overwrite the
 
         Args:
-            event_map: (dict{object: str}) A dictionary keyed by the output the listener will give when it sees this
+            event_map: (dict[KeyPressObject, str]) A dictionary keyed by the output the listener will give when it sees this
         """
         self.event_map = event_map
 
@@ -89,7 +86,33 @@ class TimerController(QObject):
         Returns:
             (dict[str, str]) : The JSON string representing the current inputs
         """
-        pass  # str_mapping = {key, key_to_str()}
+        export_list = []
+
+        for mapping in self.event_map:
+            tmp = mapping.serialize()  # our mapped objs must be ABCListenedObjects so we can do this
+            tmp['event'] = self.event_map[mapping]
+
+            export_list.append(tmp)
+
+        return export_list
+
+    def import_mapping(self, serialized_event_map: list[dict[str, str]]):
+        """
+
+        Args:
+            serialized_event_map:
+
+        Returns:
+
+        """
+        new_map = {}
+
+        for mapping in serialized_event_map:
+            tmp = KeyPressObject().deserialize(serialized_event_map[mapping])
+
+            new_map[tmp] = mapping['event']
+
+        self.event_map = new_map
 
     def add_listener(self, listener: ABCListener):
         """
