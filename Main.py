@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy
+from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame
 from PySide6.QtCore import Slot, Signal, QThread
 from pynput.keyboard import Key, KeyCode
 import sys
@@ -35,33 +35,43 @@ class Main(QWidget):
         assignButtonsAction = self.context_menu.addAction('Assign Buttons')
         assignButtonsAction.triggered.connect(self.open_key_dialog)
 
+        # self.setStyleSheet("""
+        #
+        #
+        #     QLabel {
+        #         font-family: Chakra Petch Medium;
+        #         color: white;
+        #         font-size: 20;
+        #     }
+        # """)
+
         # set the styles on the objects
-        self.MainTimerLabel.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 35px;
-                font-family: Chakra Petch Medium;
-                qproperty-alignment: AlignCenter;
-            }
-        """)
-
-        self.Title.TitleLabel.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 20px;
-                font-family: Chakra Petch Medium;
-                qproperty-alignment: AlignCenter;
-            }
-        """)
-
-        self.Title.SubtitleLabel.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 15px;
-                font-family: Chakra Petch;
-                qproperty-alignment: AlignCenter;
-            }
-        """)
+        # self.MainTimerLabel.setStyleSheet("""
+        #     QLabel {
+        #         color: white;
+        #         font-size: 35px;
+        #         font-family: Chakra Petch Medium;
+        #         qproperty-alignment: AlignCenter;
+        #     }
+        # """)
+        #
+        # self.Title.TitleLabel.setStyleSheet("""
+        #     QLabel {
+        #         color: white;
+        #         font-size: 20px;
+        #         font-family: Chakra Petch Medium;
+        #         qproperty-alignment: AlignCenter;
+        #     }
+        # """)
+        #
+        # self.Title.SubtitleLabel.setStyleSheet("""
+        #     QLabel {
+        #         color: white;
+        #         font-size: 15px;
+        #         font-family: Chakra Petch;
+        #         qproperty-alignment: AlignCenter;
+        #     }
+        # """)
 
         layout.addWidget(self.Title)
         layout.addStretch()
@@ -177,16 +187,44 @@ class Main(QWidget):
         event.accept()
 
 
-class TitleWidget(QWidget):
+class TitleWidget(QFrame):
     def __init__(self, title, subtitle):
         super().__init__()
         locLayout = QVBoxLayout()
 
         self.TitleLabel = QLabel(title, self)
+        self.TitleLabel.setObjectName('TitleLabel')
+
         self.SubtitleLabel = QLabel(subtitle, self)
+        self.SubtitleLabel.setObjectName('SubLabel')
 
         locLayout.addWidget(self.TitleLabel)
         locLayout.addWidget(self.SubtitleLabel)
+
+        self.setObjectName('TitleFrame')
+        self.setStyleSheet("""
+            #TitleFrame { 
+                border-bottom: 1px solid white; 
+                border-top: none; 
+                border-left: none; 
+                border-right: none; 
+            }
+            
+            QLabel {
+                qproperty-alignment: AlignCenter;
+                font-family: Chakra Petch Medium;
+            }
+            
+            #TitleLabel {
+                color: white;
+                font-size: 14px;
+            }
+            
+            #SubLabel {
+                color: white;
+                font-size: 10px;
+            }
+        """)
 
         self.setLayout(locLayout)
 
