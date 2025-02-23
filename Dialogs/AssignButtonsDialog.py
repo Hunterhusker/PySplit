@@ -106,7 +106,7 @@ class KeyReassignmentLine(QWidget):
         self.event_object = event_object
         self.timer_event = timer_event
 
-        self.key_str = key_to_str(self.event_object)
+        self.key_str = event_object.value  # key_to_str(self.event_object)
 
         self.line_layout = QHBoxLayout()
 

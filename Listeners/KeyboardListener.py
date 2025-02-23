@@ -5,7 +5,7 @@ from PySide6.QtCore import Signal, Slot
 from Listeners.ABCListener import ABCListener, ABCListenedObject
 
 
-class KeyboardListener(ABCListener):
+class KeyboardListener(ABCListener, ABC):
     """
     Runs a keyboard listener in another thread that uses callbacks to emit our own "key_pressed" event to control the timer
     """
@@ -27,7 +27,7 @@ class KeyboardListener(ABCListener):
 
     def on_input_event(self, key):
         if self.listening:  # only emit the event if the listener is currently "on"
-            self.on_press.emit(key)
+            self.on_press.emit(KeyPressObject(key))
 
     @Slot()
     def pause_listening(self):
@@ -46,40 +46,70 @@ class KeyboardListener(ABCListener):
         """
         self.listener.stop()
 
-    def serialize_obj(self, obj):
-        if isinstance(obj, KeyCode):
-            return {
-                'source': 'Keyboard',
-                'type': 'KeyCode',
-                'value': obj.char
-            }
 
-        elif isinstance(obj, Key):
-            return {
-                'source': 'Keyboard',
-                'type': 'Key',
-                'value': obj.name
-            }
-
-        raise TypeError(f'{str(obj)} is not a valid pynput key object!')
-
-
-class KeyboardObject(ABCListenedObject):
+class KeyPressObject(ABCListenedObject):
     def __init__(self, obj: Key):
-        self.source = 'pynputKeyboard'
+        self.source = 'pynput'
         self.value = key_to_str(obj)
         self.obj = obj
 
-    def serialize(self):
+        if isinstance(obj, KeyCode):
+            self.type = 'simple'
+
+        else:
+            self.type = 'complex'
+
+    def __eq__(self, other):
+        if isinstance(other, KeyPressObject):
+            return self.obj == other.obj
+        elif isinstance(other, Key):
+            return self.obj.name == other.name
+        elif isinstance(other, KeyCode):
+            return self.obj.char == other.char
+
+        return False
+
+    def __hash__(self):
+        return self.obj.__hash__()
+
+    def __str__(self):
+        return f'KeyPressObj({self.value})'
+
+    def __repr__(self):
+        return f'KeyPressObj{{\'source\': {self.source}, \'type\': {self.type_str}, \'value\': {self.value}}}'
+
+    def serialize(self) -> dict[str, str]:
+        """
+        Converts the input object into a dictionary of strings that we can save to a file
+
+        Returns:
+
+        """
         return {
             'source': self.source,
             'type': self.type,
             'value': self.value
         }
 
-    def deserialize(self):
-        pass
+    def deserialize(self, obj: dict[str, str]):
+        """
+        Makes an input obj from the provided serialized data that is what we would expect to have generated that JSON
+          - useful for reading in an input from a JSON file and giving back the object that it represents
 
+        Args:
+            obj: (dict[str, str]) The serialized data that represents this input object
+
+        Returns:
+            (KeyPressObject) : A reference to the thing we just created
+        """
+        self.source = obj['source']
+        self.type = obj['type']
+        self.value = obj['value']
+
+        # also get the obj just cause
+        self.obj = str_to_key(self.value)
+
+        return self
 
 
 def key_to_str(key: Key) -> str:
@@ -92,7 +122,10 @@ def key_to_str(key: Key) -> str:
     Returns:
         (str): A string representing the key that was pressed
     """
-    if isinstance(key, KeyCode):
+    if isinstance(key, KeyPressObject):
+        key_str = key.value
+
+    elif isinstance(key, KeyCode):
         key_str = key.char
 
     elif isinstance(key, Key):

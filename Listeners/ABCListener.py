@@ -62,6 +62,22 @@ class ABCListenedObject(ABC):
         ...
 
     @abstractmethod
+    def __eq__(self, other):
+        ...
+
+    @abstractmethod
+    def __str__(self):
+        ...
+
+    @abstractmethod
+    def __repr__(self):
+        ...
+
+    @abstractmethod
+    def __hash__(self):  # needed
+        ...
+
+    @abstractmethod
     def serialize(self):
         ...
 

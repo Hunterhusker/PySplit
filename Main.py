@@ -5,7 +5,7 @@ import sys
 import json
 
 from Dialogs.AssignButtonsDialog import AssignButtonsDialog
-from Listeners.KeyboardListener import KeyboardListener
+from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 
@@ -94,14 +94,14 @@ class Main(QWidget):
         # create the timer controller from the config
         # TODO: Read in the config from a file
         event_map = {  # tmp static list that we can try and read from a file later
-            Key.space: 'STARTSPLIT',
-            KeyCode.from_char('\\'): 'UNSPLIT',
-            Key.shift_r: 'PAUSE',
-            Key.delete: 'STOP',
-            Key.backspace: 'RESET',
-            KeyCode.from_char(']'): 'SKIP',
-            Key.enter: 'RESUME',
-            Key.f7: 'LOCK'
+            KeyPressObject(Key.space): 'STARTSPLIT',
+            KeyPressObject(KeyCode.from_char('\\')): 'UNSPLIT',
+            KeyPressObject(Key.shift_r): 'PAUSE',
+            KeyPressObject(Key.delete): 'STOP',
+            KeyPressObject(Key.backspace): 'RESET',
+            KeyPressObject(KeyCode.from_char(']')): 'SKIP',
+            KeyPressObject(Key.enter): 'RESUME',
+            KeyPressObject(Key.f7): 'LOCK'
         }
         self.timer_controller = TimerController(Listeners=[self.keyboard_listener], event_map=event_map)
 
@@ -165,12 +165,6 @@ class Main(QWidget):
         # stop the timer thread
         self.game_timer_thread.quit()
         self.game_timer_thread.wait()
-
-        # make the current settings
-        event_map = self.timer_controller.event_map
-        jsonMap = json.dumps(event_map)
-
-        print(jsonMap)
 
         # accept the close event and actually close
         event.accept()
