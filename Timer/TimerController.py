@@ -11,7 +11,7 @@ class TimerController(QObject):
     """
     ControlEvent = Signal(str)
 
-    def __init__(self, Listeners: list[ABCListener], event_map: dict[object]):
+    def __init__(self, Listeners: list[ABCListener], event_map):
         super().__init__()  # do the basic init
 
         # save our listeners to a list just in case
@@ -22,16 +22,25 @@ class TimerController(QObject):
         # subscribe to all the on_press events from the different listeners
         self.add_listeners(Listeners)
 
-        # update the input mapping
-        self.update_mapping(event_map)
+        # find the format of the input map
+        if type(event_map) == dict:
+            self.update_mapping(event_map)
+        else:
+            # update the input mapping
+            self.import_mapping(event_map)
 
     @Slot(object)
     def input_event(self, event_obj):
         if event_obj in self.event_map:  # if the input was mapped, then we should trigger off it
-            self.ControlEvent.emit(self.event_map[event_obj])
+            event = self.event_map[event_obj]
+
+            if event == 'LOCK':  # the lock event is local and should be pressable w/o the listening turned on
+                self.toggle_listening()
+            elif self.listening:  # as long as we're listening then we should do this (and if it is not the lock command as that is local to the controller)
+                self.ControlEvent.emit(event)
 
     def update_mapping(self, event_map: dict[KeyPressObject, str]):
-        f"""
+        """
         Takes in a mapping of objects that an added listener can output and maps them to a string that the timer can read for control commands
             - will completely overwrite the
 
@@ -98,17 +107,14 @@ class TimerController(QObject):
 
     def import_mapping(self, serialized_event_map: list[dict[str, str]]):
         """
-
+        For importing the serialized event map data, not the built and ready event map
         Args:
-            serialized_event_map:
-
-        Returns:
-
+            serialized_event_map: (list[dict[str, str]]) the serialized version of the event map, more than likely loaded from the file
         """
         new_map = {}
 
         for mapping in serialized_event_map:
-            tmp = KeyPressObject().deserialize(serialized_event_map[mapping])
+            tmp = KeyPressObject().deserialize(mapping)
 
             new_map[tmp] = mapping['event']
 
@@ -154,3 +160,7 @@ class TimerController(QObject):
     def resume_listeners(self):
         if not self.listening:
             self.listening = True
+
+    @Slot()
+    def toggle_listening(self):
+        self.listening = not self.listening
