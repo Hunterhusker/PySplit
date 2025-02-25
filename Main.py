@@ -39,7 +39,7 @@ class Main(QWidget):
 
         # load the settings from the file
         self.settings_parser = SettingsParser('settings.json')
-        self.settings_parser.parseSettings()
+        self.settings_parser.parse_settings()
 
         # self.setStyleSheet("""
         #

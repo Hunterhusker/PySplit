@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox
 from PySide6.QtCore import Slot, Signal
 from pynput.keyboard import Key
 import copy
@@ -48,6 +48,18 @@ class AssignButtonsDialog(QDialog):
         self.assignStop = KeyReassignmentLine(listener=listener, event_object=keys[values.index('STOP')], timer_event='STOP', label='Stop:')
         self.assignLock = KeyReassignmentLine(listener=listener, event_object=keys[values.index('LOCK')], timer_event='LOCK', label='Lock:')
 
+        # also save a copy of the widgets so we can reference them by their event
+        self.widgets = {
+            'PAUSE': self.assignPause,
+            'RESUME': self.assignResume,
+            'RESET': self.assignReset,
+            'STARTSPLIT': self.assignStartSplit,
+            'SKIP': self.assignSkipSplit,
+            'UNSPLIT': self.assignUnsplit,
+            'STOP': self.assignStop,
+            'LOCK': self.assignLock
+        }
+
         # add all the stuff here
         self.layout.addWidget(self.assignStartSplit)
         self.layout.addWidget(self.assignUnsplit)
@@ -80,13 +92,29 @@ class AssignButtonsDialog(QDialog):
         keys = list(self.event_map.keys())
         values = list(self.event_map.values())
 
-        if timer_event in values:
-            idx = values.index(timer_event)  # find the loc of the old event
-            keys[idx] = key  # overwrite the mapping
+        if key not in self.event_map:  # if the pressed object hasn't already been assigned
+            if timer_event in values:
+                idx = values.index(timer_event)  # find the loc of the old event
+                keys[idx] = key  # overwrite the mapping
+
+            else:
+                keys.append(key)
+                values.append(timer_event)
 
         else:
-            keys.append(key)
-            values.append(timer_event)
+            # find what this should be and set it back
+            idx = values.index(timer_event)
+
+            old_key = keys[idx]
+
+            widget = self.widgets[timer_event]  # find the widget that gave this event
+
+            widget.assign_key(old_key)
+
+            dlg = QMessageBox(self)
+            dlg.setWindowTitle("Reassignment Failed!")
+            dlg.setText("That key is already in use!")
+            dlg.exec()
 
         self.event_map = dict(zip(keys, values))  # remake the map and set it
 
@@ -106,7 +134,10 @@ class KeyReassignmentLine(QWidget):
         self.event_object = event_object
         self.timer_event = timer_event
 
-        self.key_str = event_object.value  # key_to_str(self.event_object)
+        if hasattr(event_object, 'value'):
+            self.key_str = event_object.value
+        else:
+            self.key_str = '...'
 
         self.line_layout = QHBoxLayout()
 
@@ -130,6 +161,12 @@ class KeyReassignmentLine(QWidget):
         # hookup the slots and signals
         self.triggerButton.clicked.connect(self.toggle_listening)
 
+    def assign_key(self, obj):
+        self.event_object = obj
+        self.key_str = key_to_str(self.event_object)
+
+        self.triggerButton.setText(self.key_str)
+
     @Slot()
     def toggle_listening(self):
         if self.listening:
@@ -146,12 +183,16 @@ class KeyReassignmentLine(QWidget):
 
             self.triggerButton.setText('...')  # TODO: setup a QTimer to count down from 5 and then untoggle
 
-    @Slot(Key)
-    def listen_for_key(self, key):
-        self.event_object = key
-        self.key_str = key_to_str(key)
+    @Slot(object)
+    def listen_for_key(self, event_object):
+        self.event_object = event_object
+
+        if hasattr(self.event_object, 'value'):
+            self.key_str = self.event_object.value
+        else:
+            self.key_str = '...'
 
         # emit the change to the outer class
-        self.key_assign.emit(key, self.timer_event)
+        self.key_assign.emit(self.event_object, self.timer_event)
 
         self.toggle_listening()  # auto-stop listening to key presses
