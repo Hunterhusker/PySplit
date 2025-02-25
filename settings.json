@@ -2,7 +2,7 @@
     "inputs": [
         {
             "source": "pynput",
-            "type": "simple",
+            "type": "complex",
             "value": "space",
             "event": "STARTSPLIT"
         },

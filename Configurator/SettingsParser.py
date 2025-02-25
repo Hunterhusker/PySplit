@@ -1,5 +1,4 @@
-from PySide6.QtCore import Slot, Signal, QThread, QObject
-import sys
+from PySide6.QtCore import Slot, Signal, QObject
 import json
 
 
@@ -15,18 +14,15 @@ class SettingsParser(QObject):
         self.filePath = filePath
         self.settings = {}
 
-    def parseSettings(self):
-        settings = {}
-
-        with open(self.filePath) as f:
+    def parse_settings(self):
+        with open(self.filePath, 'r') as f:
             file_contents = f.read()
 
         settings = json.loads(file_contents)
         self.settings = settings  # also save it here so we can reference it and update it later?
 
-        print(self.settings)  # temp print of the settings we loaded
-
         self.settings_loaded.emit(settings)  # emit the load so that things can subscribe to the loading event
 
     def write_settings(self, settingsDict):
-        ...
+        with open(self.filePath, 'w') as f:
+            f.write(settingsDict)

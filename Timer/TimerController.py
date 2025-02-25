@@ -116,6 +116,9 @@ class TimerController(QObject):
         for mapping in serialized_event_map:
             tmp = KeyPressObject().deserialize(mapping)
 
+            if tmp.value == '':  # deal with unbound keys
+                tmp.value = None
+
             new_map[tmp] = mapping['event']
 
         self.event_map = new_map
