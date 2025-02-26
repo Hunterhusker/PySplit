@@ -17,11 +17,11 @@ class TitleWidget(QFrame):
 
         self.setObjectName('TitleFrame')
         self.setStyleSheet("""
-            #TitleFrame { 
-                border-bottom: 1px solid white; 
-                border-top: none; 
-                border-left: none; 
-                border-right: none; 
+            #TitleFrame {
+                border-bottom: 1px solid white;
+                border-top: none;
+                border-left: none;
+                border-right: none;
             }
 
             QLabel {

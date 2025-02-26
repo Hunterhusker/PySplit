@@ -48,5 +48,8 @@
             "value": "f7",
             "event": "LOCK"
         }
-    ]
+    ],
+    "style": {
+        "title": "\n            #TitleFrame { \n                border-bottom: 1px solid white; \n                border-top: none; \n                border-left: none; \n                border-right: none; \n            }\n\n            QLabel {\n                qproperty-alignment: AlignCenter;\n                font-family: Chakra Petch Medium;\n            }\n\n            #TitleLabel {\n                color: white;\n                font-size: 14px;\n            }\n\n            #SubLabel {\n                color: white;\n                font-size: 10px;\n            }\n        "
+    }
 }

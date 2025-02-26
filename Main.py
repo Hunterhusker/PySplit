@@ -41,43 +41,7 @@ class Main(QWidget):
         self.settings_parser = SettingsParser('settings.json')
         self.settings_parser.parse_settings()
 
-        # self.setStyleSheet("""
-        #
-        #
-        #     QLabel {
-        #         font-family: Chakra Petch Medium;
-        #         color: white;
-        #         font-size: 20;
-        #     }
-        # """)
-
-        # set the styles on the objects
-        # self.MainTimerLabel.setStyleSheet("""
-        #     QLabel {
-        #         color: white;
-        #         font-size: 35px;
-        #         font-family: Chakra Petch Medium;
-        #         qproperty-alignment: AlignCenter;
-        #     }
-        # """)
-        #
-        # self.Title.TitleLabel.setStyleSheet("""
-        #     QLabel {
-        #         color: white;
-        #         font-size: 20px;
-        #         font-family: Chakra Petch Medium;
-        #         qproperty-alignment: AlignCenter;
-        #     }
-        # """)
-        #
-        # self.Title.SubtitleLabel.setStyleSheet("""
-        #     QLabel {
-        #         color: white;
-        #         font-size: 15px;
-        #         font-family: Chakra Petch;
-        #         qproperty-alignment: AlignCenter;
-        #     }
-        # """)
+        self.Title.setStyleSheet(self.settings_parser.settings['style']['title'])
 
         layout.addWidget(self.Title)
         layout.addStretch()
@@ -157,6 +121,9 @@ class Main(QWidget):
         inputs_json = self.timer_controller.export_mapping()
 
         settings_json['inputs'] = inputs_json
+        settings_json['style'] = {}
+
+        settings_json['style']['title'] = self.Title.styleSheet()
 
         json_str = json.dumps(settings_json, indent=4)
 
