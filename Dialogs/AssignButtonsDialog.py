@@ -100,6 +100,22 @@ class AssignButtonsDialog(QDialog):
         self.assignStop.key_assign.connect(self.assign_mapping)
         self.assignLock.key_assign.connect(self.assign_mapping)
 
+        # set some style params on this guy too
+        self.setStyleSheet("""
+            AssignButtonsDialog {
+                background-color: #212326;
+            }
+            
+            QPushButton {
+                font-family: Pixelify Sans Regular;
+                background-color: #212326;
+            }
+            
+            QLabel {
+                font-family: "Pixelify Sans";
+            }
+        """)
+
     @Slot(object, str)
     def assign_mapping(self, key, timer_event):
         keys = list(self.event_map.keys())

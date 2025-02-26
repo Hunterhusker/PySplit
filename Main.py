@@ -41,7 +41,7 @@ class Main(QWidget):
         self.settings_parser = SettingsParser('settings.json')
         self.settings_parser.parse_settings()
 
-        self.Title.setStyleSheet(self.settings_parser.settings['style']['title'])
+        #self.Title.setStyleSheet(self.settings_parser.settings['style']['title'])
 
         layout.addWidget(self.Title)
         layout.addStretch()
