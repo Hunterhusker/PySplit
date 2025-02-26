@@ -1,10 +1,10 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QFrame
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 
 
 class TitleWidget(QFrame):
     def __init__(self, title, subtitle):
         super().__init__()
-        locLayout = QVBoxLayout()
+        self.layout = QVBoxLayout()
 
         self.TitleLabel = QLabel(title, self)
         self.TitleLabel.setObjectName('TitleLabel')
@@ -12,8 +12,21 @@ class TitleWidget(QFrame):
         self.SubtitleLabel = QLabel(subtitle, self)
         self.SubtitleLabel.setObjectName('SubLabel')
 
-        locLayout.addWidget(self.TitleLabel)
-        locLayout.addWidget(self.SubtitleLabel)
+        self.layout.addWidget(self.TitleLabel)
+        self.layout.addWidget(self.SubtitleLabel)
+
+        self.attemptCounterHBox = QHBoxLayout()
+
+        self.triesTodayLabel = QLabel('0', self)
+        self.triesTodayLabel.setObjectName('triesTodayLabel')
+
+        self.triesTotalLabel = QLabel('10', self)
+        self.triesTotalLabel.setObjectName('triesTotalLabel')
+
+        self.attemptCounterHBox.addWidget(self.triesTodayLabel)
+        self.attemptCounterHBox.addWidget(self.triesTotalLabel)
+
+        self.layout.addLayout(self.attemptCounterHBox)
 
         self.setObjectName('TitleFrame')
         self.setStyleSheet("""
@@ -25,19 +38,30 @@ class TitleWidget(QFrame):
             }
 
             QLabel {
-                qproperty-alignment: AlignCenter;
-                font-family: Chakra Petch Medium;
+                font-family: "Chakra Petch;
             }
 
             #TitleLabel {
+                qproperty-alignment: AlignCenter;
                 color: white;
                 font-size: 14px;
             }
 
             #SubLabel {
+                qproperty-alignment: AlignCenter;
                 color: white;
                 font-size: 10px;
             }
+            
+            #triesTodayLabel {
+                qproperty-alignment: AlignLeft;
+                font-size: 12px;
+            }
+            
+            #triesTotalLabel {
+                qproperty-alignment: AlignRight;
+                font-size: 12px;
+            }
         """)
 
-        self.setLayout(locLayout)
+        self.setLayout(self.layout)
