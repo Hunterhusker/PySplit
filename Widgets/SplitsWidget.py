@@ -1,0 +1,1 @@
+# TODO: make this show all the splits (or at least the amount chosen to show here) along with config options for font, colors, etc
