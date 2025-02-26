@@ -30,6 +30,8 @@ class AssignButtonsDialog(QDialog):
         self.dialogButtons.addButton(QDialogButtonBox.Ok)
         self.dialogButtons.addButton(QDialogButtonBox.Cancel)
 
+        self.dialogButtons.setCenterButtons(True)
+
         # link the buttons to what they need to do
         self.dialogButtons.accepted.connect(self.accept)
         self.dialogButtons.rejected.connect(self.reject)
@@ -61,16 +63,27 @@ class AssignButtonsDialog(QDialog):
         }
 
         # add all the stuff here
-        self.layout.addWidget(self.assignStartSplit)
-        self.layout.addWidget(self.assignUnsplit)
-        self.layout.addWidget(self.assignPause)
-        self.layout.addWidget(self.assignResume)
+        self.rowOne = QHBoxLayout()
+        self.rowTwo = QHBoxLayout()
+        self.rowThree = QHBoxLayout()
+        self.rowFour = QHBoxLayout()
 
-        self.layout.addWidget(self.assignStop)
-        self.layout.addWidget(self.assignReset)
-        self.layout.addWidget(self.assignSkipSplit)
+        self.rowOne.addWidget(self.assignStartSplit)
+        self.rowOne.addWidget(self.assignUnsplit)
 
-        self.layout.addWidget(self.assignLock)
+        self.rowTwo.addWidget(self.assignPause)
+        self.rowTwo.addWidget(self.assignResume)
+
+        self.rowThree.addWidget(self.assignStop)
+        self.rowThree.addWidget(self.assignReset)
+
+        self.rowFour.addWidget(self.assignSkipSplit)
+        self.rowFour.addWidget(self.assignLock)
+
+        self.layout.addLayout(self.rowOne)
+        self.layout.addLayout(self.rowTwo)
+        self.layout.addLayout(self.rowThree)
+        self.layout.addLayout(self.rowFour)
 
         self.layout.addWidget(self.dialogButtons)
 
