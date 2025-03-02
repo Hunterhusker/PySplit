@@ -1,5 +1,6 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox
-from PySide6.QtCore import Slot, Signal
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, \
+    QMessageBox, QFrame
+from PySide6.QtCore import Slot, Signal, Qt
 from pynput.keyboard import Key
 import copy
 
@@ -29,8 +30,6 @@ class AssignButtonsDialog(QDialog):
         # create buttons for the button dialog
         self.dialogButtons.addButton(QDialogButtonBox.Ok)
         self.dialogButtons.addButton(QDialogButtonBox.Cancel)
-
-        self.dialogButtons.setCenterButtons(True)
 
         # link the buttons to what they need to do
         self.dialogButtons.accepted.connect(self.accept)
@@ -62,28 +61,37 @@ class AssignButtonsDialog(QDialog):
             'LOCK': self.assignLock
         }
 
-        # add all the stuff here
-        self.rowOne = QHBoxLayout()
-        self.rowTwo = QHBoxLayout()
-        self.rowThree = QHBoxLayout()
-        self.rowFour = QHBoxLayout()
+        # # add all the stuff here
+        # self.rowOne = QHBoxLayout()
+        # self.rowTwo = QHBoxLayout()
+        # self.rowThree = QHBoxLayout()
+        # self.rowFour = QHBoxLayout()
+        #
+        # self.rowOne.addWidget(self.assignStartSplit)
+        # self.rowOne.addWidget(self.assignUnsplit)
+        #
+        # self.rowTwo.addWidget(self.assignPause)
+        # self.rowTwo.addWidget(self.assignResume)
+        #
+        # self.rowThree.addWidget(self.assignStop)
+        # self.rowThree.addWidget(self.assignReset)
+        #
+        # self.rowFour.addWidget(self.assignSkipSplit)
+        # self.rowFour.addWidget(self.assignLock)
+        #
+        # self.layout.addLayout(self.rowOne)
+        # self.layout.addLayout(self.rowTwo)
+        # self.layout.addLayout(self.rowThree)
+        # self.layout.addLayout(self.rowFour)
 
-        self.rowOne.addWidget(self.assignStartSplit)
-        self.rowOne.addWidget(self.assignUnsplit)
-
-        self.rowTwo.addWidget(self.assignPause)
-        self.rowTwo.addWidget(self.assignResume)
-
-        self.rowThree.addWidget(self.assignStop)
-        self.rowThree.addWidget(self.assignReset)
-
-        self.rowFour.addWidget(self.assignSkipSplit)
-        self.rowFour.addWidget(self.assignLock)
-
-        self.layout.addLayout(self.rowOne)
-        self.layout.addLayout(self.rowTwo)
-        self.layout.addLayout(self.rowThree)
-        self.layout.addLayout(self.rowFour)
+        self.layout.addWidget(self.assignStartSplit)
+        self.layout.addWidget(self.assignUnsplit)
+        self.layout.addWidget(self.assignPause)
+        self.layout.addWidget(self.assignResume)
+        self.layout.addWidget(self.assignStop)
+        self.layout.addWidget(self.assignReset)
+        self.layout.addWidget(self.assignSkipSplit)
+        self.layout.addWidget(self.assignLock)
 
         self.layout.addWidget(self.dialogButtons)
 
@@ -103,16 +111,7 @@ class AssignButtonsDialog(QDialog):
         # set some style params on this guy too
         self.setStyleSheet("""
             AssignButtonsDialog {
-                background-color: #212326;
-            }
-            
-            QPushButton {
-                font-family: Pixelify Sans Regular;
-                background-color: #212326;
-            }
-            
-            QLabel {
-                font-family: "Pixelify Sans";
+                background-color: #2b2b2b;
             }
         """)
 
@@ -148,7 +147,7 @@ class AssignButtonsDialog(QDialog):
         self.event_map = dict(zip(keys, values))  # remake the map and set it
 
 
-class KeyReassignmentLine(QWidget):
+class KeyReassignmentLine(QFrame):
     """
     A single key reassignment widget to use multiple instances of to update the input mapping with
     """
@@ -162,6 +161,14 @@ class KeyReassignmentLine(QWidget):
         self.listener = listener
         self.event_object = event_object
         self.timer_event = timer_event
+
+        self.setMaximumHeight(40)
+        self.setMinimumHeight(25)
+
+        self.setStyleSheet("""
+            background-color: #323232;
+            border-radius: 5px;
+        """)
 
         if hasattr(event_object, 'value'):
             self.key_str = event_object.value
@@ -179,11 +186,18 @@ class KeyReassignmentLine(QWidget):
 
         # create and style the button
         self.triggerButton = QPushButton(self.key_str)
-        # TODO: style the button
+        self.triggerButton.setFixedSize(80, 25)
+        self.triggerButton.setStyleSheet("""
+            QPushButton {
+                color: #a3a4ab;
+                background-color: #4c5052;
+            }
+        """)
 
         # add the elements to the widget
         self.line_layout.addWidget(self.event_label)
         self.line_layout.addWidget(self.triggerButton)
+        self.line_layout.setContentsMargins(10, 10, 10, 10)
 
         self.setLayout(self.line_layout)
 
