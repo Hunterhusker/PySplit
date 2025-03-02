@@ -48,7 +48,7 @@ class Main(QWidget):
         layout.addWidget(self.MainTimerLabel)
 
         self.setLayout(layout)
-        self.setGeometry(100, 100, 300, 200)
+        self.setGeometry(800, 800, 300, 200)
 
         # create a keyboard listener
         self.keyboard_listener = KeyboardListener()
@@ -89,6 +89,7 @@ class Main(QWidget):
         event_map = self.timer_controller.get_mapping()
 
         dialog = AssignButtonsDialog(event_map=event_map, listener=self.keyboard_listener)
+        dialog.setGeometry(900, 900, 300, dialog.height())
 
         clickedOk = dialog.exec()  # open the popup and wait for it to close
 
