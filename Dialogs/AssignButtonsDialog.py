@@ -1,7 +1,5 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, \
-    QMessageBox, QFrame
-from PySide6.QtCore import Slot, Signal, Qt
-from pynput.keyboard import Key
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox, QFrame
+from PySide6.QtCore import Slot, Signal
 import copy
 
 from Listeners.ABCListener import ABCListener
@@ -26,10 +24,14 @@ class AssignButtonsDialog(QDialog):
 
         # set up our standard dialog buttons
         self.dialogButtons = QDialogButtonBox()
+        self.dialogButtons.setCenterButtons(True)
 
         # create buttons for the button dialog
         self.dialogButtons.addButton(QDialogButtonBox.Ok)
         self.dialogButtons.addButton(QDialogButtonBox.Cancel)
+
+        for button in self.dialogButtons.buttons():
+            button.setFixedSize(80, 25)
 
         # link the buttons to what they need to do
         self.dialogButtons.accepted.connect(self.accept)
@@ -40,13 +42,13 @@ class AssignButtonsDialog(QDialog):
         values = list(self.event_map.values())
 
         # create the button assignment widgets
+        self.assignStartSplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('STARTSPLIT')], timer_event='STARTSPLIT', label='Start\\Split:')
+        self.assignUnsplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('UNSPLIT')], timer_event='UNSPLIT', label='Un-Split:')
         self.assignPause = KeyReassignmentLine(listener=listener, event_object=keys[values.index('PAUSE')], timer_event='PAUSE', label='Pause:')
         self.assignResume = KeyReassignmentLine(listener=listener, event_object=keys[values.index('RESUME')], timer_event='RESUME', label='Resume:')
         self.assignReset = KeyReassignmentLine(listener=listener, event_object=keys[values.index('RESET')], timer_event='RESET', label='Reset:')
-        self.assignStartSplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('STARTSPLIT')], timer_event='STARTSPLIT', label='Start\\Split:')
-        self.assignSkipSplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('SKIP')], timer_event='SKIP', label='Skip Split:')
-        self.assignUnsplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('UNSPLIT')], timer_event='UNSPLIT', label='Un-Split:')
         self.assignStop = KeyReassignmentLine(listener=listener, event_object=keys[values.index('STOP')], timer_event='STOP', label='Stop:')
+        self.assignSkipSplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('SKIP')], timer_event='SKIP', label='Skip Split:')
         self.assignLock = KeyReassignmentLine(listener=listener, event_object=keys[values.index('LOCK')], timer_event='LOCK', label='Lock:')
 
         # also save a copy of the widgets so we can reference them by their event
@@ -61,29 +63,6 @@ class AssignButtonsDialog(QDialog):
             'LOCK': self.assignLock
         }
 
-        # # add all the stuff here
-        # self.rowOne = QHBoxLayout()
-        # self.rowTwo = QHBoxLayout()
-        # self.rowThree = QHBoxLayout()
-        # self.rowFour = QHBoxLayout()
-        #
-        # self.rowOne.addWidget(self.assignStartSplit)
-        # self.rowOne.addWidget(self.assignUnsplit)
-        #
-        # self.rowTwo.addWidget(self.assignPause)
-        # self.rowTwo.addWidget(self.assignResume)
-        #
-        # self.rowThree.addWidget(self.assignStop)
-        # self.rowThree.addWidget(self.assignReset)
-        #
-        # self.rowFour.addWidget(self.assignSkipSplit)
-        # self.rowFour.addWidget(self.assignLock)
-        #
-        # self.layout.addLayout(self.rowOne)
-        # self.layout.addLayout(self.rowTwo)
-        # self.layout.addLayout(self.rowThree)
-        # self.layout.addLayout(self.rowFour)
-
         self.layout.addWidget(self.assignStartSplit)
         self.layout.addWidget(self.assignUnsplit)
         self.layout.addWidget(self.assignPause)
@@ -93,10 +72,14 @@ class AssignButtonsDialog(QDialog):
         self.layout.addWidget(self.assignSkipSplit)
         self.layout.addWidget(self.assignLock)
 
+        # add a stretch to keep stuff sized right
+        self.layout.addStretch()
+
         self.layout.addWidget(self.dialogButtons)
 
         # link it all up so that this displays
         self.setLayout(self.layout)
+        self.layout.setSpacing(3)
 
         # connect up our slots to their signals
         self.assignPause.key_assign.connect(self.assign_mapping)
@@ -112,6 +95,13 @@ class AssignButtonsDialog(QDialog):
         self.setStyleSheet("""
             AssignButtonsDialog {
                 background-color: #2b2b2b;
+            }
+            
+            QPushButton {
+                color: #a3a4ab;
+                background-color: #4c5052;
+                border: 2px solid #4c5052;
+                border-radius: 5px;
             }
         """)
 
@@ -162,8 +152,7 @@ class KeyReassignmentLine(QFrame):
         self.event_object = event_object
         self.timer_event = timer_event
 
-        self.setMaximumHeight(40)
-        self.setMinimumHeight(25)
+        self.setFixedHeight(45)
 
         self.setStyleSheet("""
             background-color: #323232;
