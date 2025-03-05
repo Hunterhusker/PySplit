@@ -8,6 +8,8 @@ from Dialogs.AssignButtonsDialog import AssignButtonsDialog
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
+from Widgets.SingleSplitWidget import SingleSplitWidget
+from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TitleWidget import TitleWidget
 from Configurator.SettingsParser import SettingsParser
 
@@ -26,6 +28,8 @@ class Main(QWidget):
         self.setWindowTitle('PySplit v0.0')
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
         self.Title = TitleWidget('Super Mario World', '11 Exit Glitchless')
         self.Title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
@@ -41,9 +45,13 @@ class Main(QWidget):
         self.settings_parser = SettingsParser('settings.json')
         self.settings_parser.parse_settings()
 
+        # Create the configurator and hook everything to it
+
         #self.Title.setStyleSheet(self.settings_parser.settings['style']['title'])
+        self.splits = SplitsWidget()
 
         layout.addWidget(self.Title)
+        layout.addWidget(self.splits)
         layout.addStretch()
         layout.addWidget(self.MainTimerLabel)
 
@@ -77,6 +85,19 @@ class Main(QWidget):
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
         self.Quit.connect(self.keyboard_listener.quit)
+
+        self.setStyleSheet("""
+            Main {
+                background-color: #2b2b2b;
+            }
+            
+            QPushButton {
+                color: #a3a4ab;
+                background-color: #4c5052;
+                border: 2px solid #4c5052;
+                border-radius: 5px;
+            }
+        """)
 
     def contextMenuEvent(self, event):
         self.context_menu.exec(event.globalPos())
