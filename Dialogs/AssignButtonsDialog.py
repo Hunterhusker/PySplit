@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox, QFrame
-from PySide6.QtCore import Slot, Signal
+from PySide6.QtCore import Slot, Signal, Qt
 import copy
 
 from Listeners.ABCListener import ABCListener
@@ -152,7 +152,7 @@ class KeyReassignmentLine(QFrame):
         self.event_object = event_object
         self.timer_event = timer_event
 
-        self.setFixedHeight(45)
+        self.setFixedHeight(35)
 
         self.setStyleSheet("""
             background-color: #323232;
@@ -186,9 +186,13 @@ class KeyReassignmentLine(QFrame):
         # add the elements to the widget
         self.line_layout.addWidget(self.event_label)
         self.line_layout.addWidget(self.triggerButton)
-        self.line_layout.setContentsMargins(10, 10, 10, 10)
+        self.line_layout.setContentsMargins(10, 0, 10, 0)
 
         self.setLayout(self.line_layout)
+
+        # align our items in the line
+        self.line_layout.setAlignment(self.triggerButton, Qt.AlignRight | Qt.AlignVCenter)
+        self.line_layout.setAlignment(self.event_label, Qt.AlignLeft | Qt.AlignVCenter)
 
         # hookup the slots and signals
         self.triggerButton.clicked.connect(self.toggle_listening)
