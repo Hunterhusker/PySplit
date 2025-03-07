@@ -1,6 +1,5 @@
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame
 from PySide6.QtCore import Slot, Signal, QThread
-from pynput.keyboard import Key, KeyCode
 import sys
 import json
 
@@ -8,10 +7,11 @@ from Dialogs.AssignButtonsDialog import AssignButtonsDialog
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
-from Widgets.SingleSplitWidget import SingleSplitWidget
 from Widgets.SplitsWidget import SplitsWidget
+from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
 from Configurator.SettingsParser import SettingsParser
+from helpers.TimerFormat import format_wall_clock_from_ms
 
 
 class Main(QWidget):
@@ -34,8 +34,9 @@ class Main(QWidget):
         self.Title = TitleWidget('Super Mario World', '11 Exit Glitchless')
         self.Title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
 
-        self.MainTimerLabel = QLabel("NA", self)
-        self.MainTimerLabel.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        # self.MainTimerLabel = QLabel("NA", self)
+        # self.MainTimerLabel.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        self.MainTimerWidget = TimerWidget()
 
         self.context_menu = QMenu(self)
         assignButtonsAction = self.context_menu.addAction('Assign Buttons')
@@ -53,7 +54,7 @@ class Main(QWidget):
         layout.addWidget(self.Title)
         layout.addWidget(self.splits)
         layout.addStretch()
-        layout.addWidget(self.MainTimerLabel)
+        layout.addWidget(self.MainTimerWidget)
 
         self.setLayout(layout)
         self.setGeometry(800, 800, 300, 200)
@@ -70,7 +71,8 @@ class Main(QWidget):
         self.game_timer.moveToThread(self.game_timer_thread)
 
         # connect the game timer signals to the desired slots
-        self.game_timer.update.connect(self.update_timer_label)
+        self.game_timer.update.connect(self.MainTimerWidget.update_time)
+        self.game_timer.update.connect(self.splits.update_split)
         self.game_timer_thread.started.connect(self.game_timer.run)
         self.game_timer_thread.destroyed.connect(self.game_timer.stop_timer)
 
@@ -81,6 +83,7 @@ class Main(QWidget):
 
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
+        self.timer_controller.ControlEvent.connect(self.splits.handle_control)
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
@@ -120,15 +123,11 @@ class Main(QWidget):
 
             tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
 
-    @Slot(str)
+    @Slot(int)
     def update_timer_label(self, time: int):
-        s, ms = divmod(time, 1000)
-        m, s = divmod(s, 60)
-        h, m = divmod(m, 60)
+        time_string = format_wall_clock_from_ms(time)
 
-        time_string = f'{h:02}:{m:02}:{s:02}.{ms:03}'
-
-        self.MainTimerLabel.setText(f'{time_string}')
+        #self.MainTimerLabel.setText(f'{time_string}')
 
     def closeEvent(self, event):
         # emit a close so the threads clean up themselves

@@ -20,8 +20,8 @@ class SplitsWidget(QWidget):
         self.index = 0  # a way to keep place in our list
 
         # create the splits
-        split1 = SingleSplitWidget('test split', 123, 456)
-        split2 = SingleSplitWidget('test split', 123, 456)
+        split1 = SingleSplitWidget('test1', 123, 456)
+        split2 = SingleSplitWidget('test2', 456, 789)
 
         # add them to the list
         self.splits.append(split1)
@@ -53,3 +53,13 @@ class SplitsWidget(QWidget):
     @Slot(int)
     def update_split(self, curr_time: int):
         return self.splits[self.index].update_split(curr_time)
+
+    @Slot(str)
+    def handle_control(self, event: str):
+        current_split = self.get_current_split()
+
+        # pass the control on to the split itself
+        current_split.handle_control(str)
+
+        if event == 'STARTSPLIT':  # if we are splitting, then we ought to move on to the next one
+            self.increment_split(1)
