@@ -28,16 +28,16 @@ class SingleSplitWidget(QFrame):
         # create the labels we need
         self.split_name_label = QLabel(split_name, self)
         self.split_saved_time_label = QLabel(format_wall_clock_from_ms(best_time_ms), self)
-        #self.over_under_time_label = QLabel('Test', self)
+        self.over_under_time_label = QLabel('', self)
 
         # add them to the layout
         self.layout.addWidget(self.split_name_label)
-        #self.layout.addWidget(self.over_under_time_label)
+        self.layout.addWidget(self.over_under_time_label)
         self.layout.addWidget(self.split_saved_time_label)
 
         # align the items in the layout
         self.layout.setAlignment(self.split_name_label, Qt.AlignLeft | Qt.AlignVCenter)
-        #self.layout.setAlignment(self.over_under_time_label, Qt.AlignCenter)
+        self.layout.setAlignment(self.over_under_time_label, Qt.AlignRight)
         self.layout.setAlignment(self.split_saved_time_label, Qt.AlignRight | Qt.AlignVCenter)
 
         # set this as a little lighter grey so they look nice
@@ -58,7 +58,8 @@ class SingleSplitWidget(QFrame):
         self.current_time = curr_time_ms
 
         # as a test put the current time as the saved time of the split
-        self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time))
+        self.over_under_time_label.setText(format_wall_clock_from_ms(self.current_time - self.best_time_ms))
+        #self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time))
 
     @Slot()
     def export_data(self):

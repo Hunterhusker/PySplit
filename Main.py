@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu,
 from PySide6.QtCore import Slot, Signal, QThread
 import sys
 import json
+from time import sleep
 
 from Dialogs.AssignButtonsDialog import AssignButtonsDialog
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
@@ -34,8 +35,6 @@ class Main(QWidget):
         self.Title = TitleWidget('Super Mario World', '11 Exit Glitchless')
         self.Title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
 
-        # self.MainTimerLabel = QLabel("NA", self)
-        # self.MainTimerLabel.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         self.MainTimerWidget = TimerWidget()
 
         self.context_menu = QMenu(self)
@@ -123,15 +122,10 @@ class Main(QWidget):
 
             tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
 
-    @Slot(int)
-    def update_timer_label(self, time: int):
-        time_string = format_wall_clock_from_ms(time)
-
-        #self.MainTimerLabel.setText(f'{time_string}')
-
     def closeEvent(self, event):
         # emit a close so the threads clean up themselves
         self.Quit.emit()  # emit a quit signal
+        sleep(0.125)  # wait for the quits to go through, not my proudest work, but it works
 
         # stop the timer thread
         self.game_timer_thread.quit()
