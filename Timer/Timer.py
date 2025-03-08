@@ -65,9 +65,6 @@ class Timer(QObject):
 
             self.update.emit(0)  # just started so it should be 0
 
-        else:
-            pass  # TODO: Add the split functionality
-
     @Slot()
     def reset_timer(self):
         self.update_timer.stop()

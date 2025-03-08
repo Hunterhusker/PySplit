@@ -7,6 +7,8 @@ class SplitsWidget(QWidget):
     """
     Assembler Widget that holds a list of all the splits we have in the run and listens to the controller for input
     """
+    FinishedSignal = Signal()
+
     def __init__(self):
         super().__init__()
 
@@ -18,10 +20,11 @@ class SplitsWidget(QWidget):
         # we'll want to keep track of these
         self.splits = []
         self.index = 0  # a way to keep place in our list
+        self.curr_time = 0.0
 
         # create the splits
-        split1 = SingleSplitWidget('test1', 123, 456)
-        split2 = SingleSplitWidget('test2', 456, 789)
+        split1 = SingleSplitWidget('test1', 1230, 1230)
+        split2 = SingleSplitWidget('test2', 3330, 3330)
 
         # add them to the list
         self.splits.append(split1)
@@ -52,6 +55,7 @@ class SplitsWidget(QWidget):
 
     @Slot(int)
     def update_split(self, curr_time: int):
+        self.curr_time = curr_time
         return self.splits[self.index].update_split(curr_time)
 
     @Slot(str)
@@ -62,4 +66,14 @@ class SplitsWidget(QWidget):
         current_split.handle_control(str)
 
         if event == 'STARTSPLIT':  # if we are splitting, then we ought to move on to the next one
-            self.increment_split(1)
+            if self.curr_time != 0.0 and self.index != len(self.splits) - 1:
+                self.increment_split(1)
+
+            elif self.index == len(self.splits) - 1:
+                self.FinishedSignal.emit()
+
+        elif event == 'RESET':
+            pass
+
+        elif event == 'STOP':
+            pass
