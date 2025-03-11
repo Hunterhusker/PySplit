@@ -15,6 +15,10 @@ class TimerWidget(QWidget):
 
         self.layout.addWidget(self.MainTimerLabel)
 
+        self.setStyleSheet("""
+            color: #bbbbbb;
+        """)
+
         self.setLayout(self.layout)
 
     @Slot(int)

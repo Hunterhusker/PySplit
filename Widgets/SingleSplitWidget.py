@@ -43,6 +43,7 @@ class SingleSplitWidget(QFrame):
         # set this as a little lighter grey so they look nice
         self.setStyleSheet("""
             background-color: #323232;
+            color: #bbbbbb;
         """)
 
         self.setLayout(self.layout)  # set the layout on the frame
@@ -57,9 +58,19 @@ class SingleSplitWidget(QFrame):
         """
         self.current_time = curr_time_ms
 
-        # as a test put the current time as the saved time of the split
-        self.over_under_time_label.setText(format_wall_clock_from_ms(self.current_time - self.best_time_ms))
-        #self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time))
+        time_delta = self.current_time - self.best_time_ms
+
+        if time_delta >= -1000.0:
+            time_delta_str = format_wall_clock_from_ms(time_delta)
+
+            if time_delta >= 0:
+                time_delta_str = "+" + time_delta_str
+
+            # as a test put the current time as the saved time of the split
+            self.over_under_time_label.setText(time_delta_str)
+
+        else:
+            self.over_under_time_label.setText('')
 
     @Slot()
     def export_data(self):

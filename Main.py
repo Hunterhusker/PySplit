@@ -84,6 +84,9 @@ class Main(QWidget):
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
         self.timer_controller.ControlEvent.connect(self.splits.handle_control)
 
+        # also connect the extra control events from the splits to the timer
+        self.splits.SplitControlSignal.connect(self.game_timer.handle_control)
+
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
         self.Quit.connect(self.keyboard_listener.quit)
@@ -91,6 +94,7 @@ class Main(QWidget):
         self.setStyleSheet("""
             Main {
                 background-color: #2b2b2b;
+                color: #bbbbbb;
             }
             
             QPushButton {
