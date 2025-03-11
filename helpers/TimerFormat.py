@@ -9,6 +9,12 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     Returns:
         (str) The wallclock time from the elapsed milliseconds as a string
     """
+    result = ''
+
+    if millis < 0:
+        millis = millis * -1
+        result += '-'
+
     s, ms = divmod(millis, 1000)
     m, s = divmod(s, 60)
     h, m = divmod(m, 60)
@@ -22,4 +28,4 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     m = f'{m:02}:' if m != 0 else ''
     h = f'{h:02}:' if h != 0 else ''
 
-    return "".join([h, m, base])
+    return result + "".join([h, m, base])

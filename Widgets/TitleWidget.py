@@ -34,7 +34,7 @@ class TitleWidget(QFrame):
         self.setObjectName('TitleFrame')
         self.setStyleSheet("""
             #TitleFrame {
-                border-bottom: 1px solid white;
+                border-bottom: 1px solid #bbbbbb;
                 border-top: none;
                 border-left: none;
                 border-right: none;
@@ -42,17 +42,16 @@ class TitleWidget(QFrame):
 
             QLabel {
                 font-family: "Chakra Petch;
+                color: #bbbbbb;
             }
 
             #TitleLabel {
                 qproperty-alignment: AlignCenter;
-                color: white;
                 font-size: 14px;
             }
 
             #SubLabel {
                 qproperty-alignment: AlignCenter;
-                color: white;
                 font-size: 12px;
             }
             
