@@ -21,7 +21,7 @@ class SingleSplitWidget(QFrame):
         self.split_name = split_name
         self.best_time_ms = best_time_ms
         self.pb_time_ms = pb_time_ms
-        self.current_time = 0
+        self.current_time_ms = 0
 
         self.layout = QHBoxLayout()
 
@@ -56,9 +56,9 @@ class SingleSplitWidget(QFrame):
         Args:
             curr_time_ms: (int) the current amount of time taken up to this point (from start of timer to now, not start of split)
         """
-        self.current_time = curr_time_ms
+        self.current_time_ms = curr_time_ms
 
-        time_delta = self.current_time - self.best_time_ms
+        time_delta = self.current_time_ms - self.best_time_ms
 
         if time_delta >= -1000.0:
             time_delta_str = format_wall_clock_from_ms(time_delta)
@@ -71,6 +71,15 @@ class SingleSplitWidget(QFrame):
 
         else:
             self.over_under_time_label.setText('')
+
+    def reset_split(self):
+        """
+        Resets the split data to how it would have been when first loaded
+        """
+        self.over_under_time_label.setText('')  # clear the time delta
+        self.split_saved_time_label.setText(format_wall_clock_from_ms(self.best_time_ms))
+
+        self.current_time_ms = 0
 
     @Slot()
     def export_data(self):
@@ -91,4 +100,5 @@ class SingleSplitWidget(QFrame):
         """
         if event == 'STARTSPLIT':
             # update the saved time to the current time
-            self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time))
+            if self.current_time_ms > 0:
+                self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
