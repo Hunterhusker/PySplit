@@ -98,7 +98,7 @@ class AssignButtonsDialog(QDialog):
             }
             
             QPushButton {
-                color: #a3a4ab;
+                color: #bbbbbb;
                 background-color: #4c5052;
                 border: 2px solid #4c5052;
                 border-radius: 5px;
@@ -178,7 +178,7 @@ class KeyReassignmentLine(QFrame):
         self.triggerButton.setFixedSize(80, 25)
         self.triggerButton.setStyleSheet("""
             QPushButton {
-                color: #a3a4ab;
+                color: #bbbbbb;
                 background-color: #4c5052;
             }
         """)

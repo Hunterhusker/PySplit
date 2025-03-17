@@ -1,22 +1,43 @@
 from PySide6.QtCore import QObject, Signal
-
-from Configurator.SettingsParser import SettingsParser
+import json
 
 
 class Configurator(QObject):
-    StyleConfigure = Signal(str, dict)  # emit a signal with the configuration to change
-    InputConfigure = Signal(dict)
+    Configure = Signal(dict)  # emit the settings when
 
-    def __init__(self, filePath: str):
-        # the configurator will need to be able to read settings in for us
-        self.settingsParser = SettingsParser(filePath)
-        self.settingsParser.parse_settings()  # on initial creation we should read the settings and publish them
+    def __init__(self, file_path: str):
+        super().__init__()
+        self.file_path = file_path
 
-        self.settings = self.settingsParser.settings
+        self.settings = {}  # define it here so that pycharm knows to intellisense it
 
-    def configure(self):
-        self.settingsParser.parse_settings()
-        self.settings = self.settingsParser.settings
+        self.read_settings()
 
-    def saveConfiguration(self):
+    def read_settings(self):
+        """
+        Read in the settings as JSON file to the internal settings dictionary
+        """
+        with open(self.file_path, 'r') as f:
+            file_contents = f.read()
+
+        settings = json.loads(file_contents)
+        self.settings = settings  # also save it here so we can reference it and update it later?
+
+        self.Configure.emit(self.settings)  # send the settings update
+
+    def write_settings(self):
+        """
+        Writes the contents of the current settings to the settings file
+        """
+        with open(self.file_path, 'w') as f:
+            f.write(self.settings)
+
+    def update_setting(self, key: str, settings: dict):
+        """
+
+
+        Args:
+            key:
+            settings:
+        """
         pass

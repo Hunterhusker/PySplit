@@ -11,8 +11,7 @@ from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
-from Configurator.SettingsParser import SettingsParser
-from helpers.TimerFormat import format_wall_clock_from_ms
+from Configurator.Configurator import Configurator
 
 
 class Main(QWidget):
@@ -42,13 +41,14 @@ class Main(QWidget):
         assignButtonsAction.triggered.connect(self.open_key_dialog)
 
         # load the settings from the file
-        self.settings_parser = SettingsParser('settings.json')
-        self.settings_parser.parse_settings()
+        # self.settings_parser = SettingsParser('settings.json')
+        # self.settings_parser.parse_settings()
+        self.configurator = Configurator('conf/settings.json')
 
         # Create the configurator and hook everything to it
 
         #self.Title.setStyleSheet(self.settings_parser.settings['style']['title'])
-        self.splits = SplitsWidget()
+        self.splits = SplitsWidget('')
 
         layout.addWidget(self.Title)
         layout.addWidget(self.splits)
@@ -56,7 +56,7 @@ class Main(QWidget):
         layout.addWidget(self.MainTimerWidget)
 
         self.setLayout(layout)
-        self.setGeometry(800, 800, 300, 200)
+        self.setGeometry(800, 800, 200, 200)
 
         # create a keyboard listener
         self.keyboard_listener = KeyboardListener()
@@ -78,14 +78,16 @@ class Main(QWidget):
         self.game_timer_thread.start()
 
         # create the timer controller from the config
-        self.timer_controller = TimerController(Listeners=[self.keyboard_listener], event_map=self.settings_parser.settings['inputs'])
+        self.timer_controller = TimerController(Listeners=[self.keyboard_listener], event_map=self.configurator.settings['inputs'])
 
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
         self.timer_controller.ControlEvent.connect(self.splits.handle_control)
 
         # also connect the extra control events from the splits to the timer
-        self.splits.SplitControlSignal.connect(self.game_timer.handle_control)
+        #self.splits.SplitControlSignal.connect(self.game_timer.handle_control)
+        self.splits.SplitFinish.connect(self.game_timer.stop_timer)
+        self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
@@ -116,7 +118,7 @@ class Main(QWidget):
         event_map = self.timer_controller.get_mapping()
 
         dialog = AssignButtonsDialog(event_map=event_map, listener=self.keyboard_listener)
-        dialog.setGeometry(900, 900, 300, 450)
+        dialog.setGeometry(900, 900, 275, 375)
 
         clickedOk = dialog.exec()  # open the popup and wait for it to close
 
@@ -140,13 +142,13 @@ class Main(QWidget):
         inputs_json = self.timer_controller.export_mapping()
 
         settings_json['inputs'] = inputs_json
-        settings_json['style'] = {}
-
-        settings_json['style']['title'] = self.Title.styleSheet()
+        # settings_json['style'] = {}
+        #
+        # settings_json['style']['title'] = self.Title.styleSheet()
 
         json_str = json.dumps(settings_json, indent=4)
 
-        with open('settings.json', 'w') as f:
+        with open('conf/settings.json', 'w') as f:
             f.write(json_str)
 
         # accept the close event and actually close
