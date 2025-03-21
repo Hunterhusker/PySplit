@@ -60,7 +60,9 @@ class SplitsWidget(QWidget):
     @Slot(int)
     def update_split(self, curr_time: int):
         self.curr_time = curr_time
-        return self.splits[self.index].update_split(curr_time)
+
+        if self.started:
+            self.splits[self.index].update_split(curr_time)
 
     @Slot(str)
     def handle_control(self, event: str):
@@ -73,11 +75,14 @@ class SplitsWidget(QWidget):
             self.splits[self.index].handle_control(event)
 
             if not self.started and not self.done:
+                self.index = 0
+
                 self.started = True
                 self.done = False
 
             elif not self.started and self.done:
-                self.reset_splits()
+                self.index = 0
+
                 self.started = True
                 self.done = False
 
@@ -85,12 +90,12 @@ class SplitsWidget(QWidget):
                 if self.index == len(self.splits) - 1:
                     self.SplitFinish.emit()
 
-                    #self.update_splits()  # maintain the integrity of the split data
+                    for sp in self.splits:
+                        sp.finalize_split()
 
                     # maintain state
                     self.started = False
                     self.done = True
-                    self.index = 0
 
                 else:
                     self.increment_split(1)
@@ -104,7 +109,12 @@ class SplitsWidget(QWidget):
                 sp.reset_split()
 
         elif event == 'STOP':
-            pass
+            self.index = 0
+            self.started = False
+            self.done = False
+
+            for sp in self.splits:
+                sp.finalize_split()
 
     def export_splits(self):
         pass
@@ -136,9 +146,6 @@ class SplitsWidget(QWidget):
 
         # for each split, if the current time is better than the best, reset it
         for sp in self.splits:
-            sp.current_time_ms = 0
-            sp.over_under_time_label.setText('')
-
             if sp.current_time_ms < sp.best_time_ms:
                 sp.best_time_ms = sp.current_time_ms
 

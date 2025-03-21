@@ -70,6 +70,7 @@ class SingleSplitWidget(QFrame):
             self.over_under_time_label.setText(time_delta_str)
 
         else:
+            pass
             self.over_under_time_label.setText('')
 
     def reset_split(self):
@@ -78,6 +79,16 @@ class SingleSplitWidget(QFrame):
         """
         self.over_under_time_label.setText('')  # clear the time delta
         self.split_saved_time_label.setText(format_wall_clock_from_ms(self.best_time_ms))
+
+        self.current_time_ms = 0
+
+    def finalize_split(self):
+        """
+        Saves any golds and starts the split over
+        """
+        if self.current_time_ms < self.best_time_ms and self.current_time_ms != 0:
+            self.best_time_ms = self.current_time_ms
+            self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
 
         self.current_time_ms = 0
 
@@ -93,12 +104,12 @@ class SingleSplitWidget(QFrame):
 
     @Slot(str)
     def handle_control(self, event: str):
-        """
-
-        Args:
-            event:
-        """
         if event == 'STARTSPLIT':
-            # update the saved time to the current time
-            if self.current_time_ms > 0:
+            if self.current_time_ms < self.best_time_ms and self.current_time_ms != 0:
                 self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
+
+        elif event == 'RESET':
+            self.reset_split()
+
+        elif event == 'STOP':
+            self.finalize_split()
