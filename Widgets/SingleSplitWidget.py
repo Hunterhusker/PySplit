@@ -108,6 +108,15 @@ class SingleSplitWidget(QFrame):
             if self.current_time_ms < self.best_time_ms and self.current_time_ms != 0:
                 self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
 
+            time_delta = self.current_time_ms - self.best_time_ms
+            time_delta_str = format_wall_clock_from_ms(time_delta)
+
+            if time_delta >= 0:
+                time_delta_str = "+" + time_delta_str
+
+            # as a test put the current time as the saved time of the split
+            self.over_under_time_label.setText(time_delta_str)
+
         elif event == 'RESET':
             self.reset_split()
 
