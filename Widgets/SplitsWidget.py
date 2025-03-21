@@ -123,10 +123,14 @@ class SplitsWidget(QWidget):
         # create the splits
         split1 = SingleSplitWidget('test1', 1230, 1230)
         split2 = SingleSplitWidget('test2', 3330, 3330)
+        split3 = SingleSplitWidget('test3', 5550, 5550)
+        split4 = SingleSplitWidget('test4', 8880, 8880)
 
         # add them to the list
         self.splits.append(split1)
         self.splits.append(split2)
+        self.splits.append(split3)
+        self.splits.append(split4)
 
     def reset_splits(self):
         self.index = 0
