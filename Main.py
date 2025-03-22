@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame
-from PySide6.QtCore import Slot, Signal, QThread
+from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame, QScrollArea
+from PySide6.QtCore import Slot, Signal, QThread, Qt
 import sys
 import json
 from time import sleep
@@ -9,6 +9,7 @@ from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
+from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
 from Configurator.Configurator import Configurator
@@ -31,7 +32,7 @@ class Main(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        self.Title = TitleWidget('Super Mario World', '11 Exit Glitchless')
+        self.Title = TitleWidget('Game', 'SubTitle')
         self.Title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
 
         self.MainTimerWidget = TimerWidget()
@@ -41,22 +42,18 @@ class Main(QWidget):
         assignButtonsAction.triggered.connect(self.open_key_dialog)
 
         # load the settings from the file
-        # self.settings_parser = SettingsParser('settings.json')
-        # self.settings_parser.parse_settings()
         self.configurator = Configurator('conf/settings.json')
 
-        # Create the configurator and hook everything to it
-
-        #self.Title.setStyleSheet(self.settings_parser.settings['style']['title'])
         self.splits = SplitsWidget('')
+        self.splitStats = TimeStatsWidget()
 
         layout.addWidget(self.Title)
         layout.addWidget(self.splits)
-        layout.addStretch()
         layout.addWidget(self.MainTimerWidget)
+        layout.addWidget(self.splitStats)
 
         self.setLayout(layout)
-        self.setGeometry(800, 800, 200, 200)
+        self.setGeometry(800, 800, 225, 200)
 
         # create a keyboard listener
         self.keyboard_listener = KeyboardListener()
@@ -85,7 +82,6 @@ class Main(QWidget):
         self.timer_controller.ControlEvent.connect(self.splits.handle_control)
 
         # also connect the extra control events from the splits to the timer
-        #self.splits.SplitControlSignal.connect(self.game_timer.handle_control)
         self.splits.SplitFinish.connect(self.game_timer.stop_timer)
         self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
@@ -94,10 +90,8 @@ class Main(QWidget):
         self.Quit.connect(self.keyboard_listener.quit)
 
         self.setStyleSheet("""
-            Main {
-                background-color: #2b2b2b;
-                color: #bbbbbb;
-            }
+            background-color: #2b2b2b;
+            color: #bbbbbb;
             
             QPushButton {
                 color: #a3a4ab;

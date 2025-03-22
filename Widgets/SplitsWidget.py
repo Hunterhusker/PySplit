@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout
-from PySide6.QtCore import Slot, Signal
+from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
+from PySide6.QtCore import Slot, Signal, Qt
 from Widgets.SingleSplitWidget import SingleSplitWidget
 
 
@@ -14,10 +14,24 @@ class SplitsWidget(QWidget):
     def __init__(self, json: str):
         super().__init__()
 
+        self.visible_splits = 3
+
         # some basic layout setup to keep stuff off the top and bottom but not the sides
         self.layout = QVBoxLayout()
-        self.layout.setSpacing(2)
-        self.layout.setContentsMargins(0, 5, 0, 5)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
+        # create the widget we would like to be able to scroll on
+        self.scrollWidget = QWidget()
+        self.scrollWidgetLayout = QVBoxLayout()
+        self.scrollWidgetLayout.setSpacing(2)
+        self.scrollWidgetLayout.setContentsMargins(0, 2, 0, 0)
+
+        # create the internal scroll area
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setFrameStyle(QFrame.NoFrame)
 
         # we'll want to keep track of these
         self.splits = []
@@ -30,10 +44,18 @@ class SplitsWidget(QWidget):
 
         self.load_splits(json)
 
-        # add those to the layout
+        # add the splits to the
         for split in self.splits:
-            self.layout.addWidget(split)
+            self.scrollWidgetLayout.addWidget(split)
 
+        self.scrollWidget.setLayout(self.scrollWidgetLayout)
+
+        self.scrollArea.setWidget(self.scrollWidget)
+        self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits)
+
+        print((self.splits[0].height() + 2) * self.visible_splits)
+
+        self.layout.addWidget(self.scrollArea)
         self.setLayout(self.layout)
 
     def get_current_split(self):
@@ -42,6 +64,8 @@ class SplitsWidget(QWidget):
     @Slot(int)
     def increment_split(self, inc: int):
         self.index += inc
+        sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+        sb.setValue((self.splits[self.index].height() + 2) * self.index)
 
         if self.index >= len(self.splits):  # don't let it leave the array
             self.index = len(self.splits) - 1
@@ -51,6 +75,8 @@ class SplitsWidget(QWidget):
     @Slot(int)
     def decrement_split(self, inc: int):
         self.index -= inc
+        sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+        sb.setValue((self.splits[self.index].height() + 2) * self.index)
 
         if self.index < 0:  # don't let it leave the array
             self.index = 0
@@ -74,17 +100,17 @@ class SplitsWidget(QWidget):
         if event == 'STARTSPLIT':  # if we are splitting, then we ought to move on to the next one
             self.splits[self.index].handle_control(event)
 
-            if not self.started and not self.done:
+            if not self.started:
                 self.index = 0
+                sb = self.scrollArea.verticalScrollBar()
+                sb.setValue(0)
 
                 self.started = True
                 self.done = False
 
-            elif not self.started and self.done:
-                self.index = 0
-
-                self.started = True
-                self.done = False
+                if self.done:
+                    for sp in self.splits:
+                        sp.over_under_time_label.setText('')
 
             elif not self.done:
                 if self.index == len(self.splits) - 1:
@@ -104,6 +130,9 @@ class SplitsWidget(QWidget):
             self.index = 0
             self.started = False
             self.done = False
+
+            sb = self.scrollArea.verticalScrollBar()
+            sb.setValue(0)
 
             for sp in self.splits:
                 sp.reset_split()
