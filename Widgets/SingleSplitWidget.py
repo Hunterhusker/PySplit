@@ -47,6 +47,7 @@ class SingleSplitWidget(QFrame):
         """)
 
         self.setLayout(self.layout)  # set the layout on the frame
+        self.setFixedHeight(30)
 
     @Slot(int)
     def update_split(self, curr_time_ms: int):
