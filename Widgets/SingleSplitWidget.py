@@ -67,11 +67,14 @@ class SingleSplitWidget(QFrame):
             if time_delta >= 0:
                 time_delta_str = "+" + time_delta_str
 
-            # as a test put the current time as the saved time of the split
             self.over_under_time_label.setText(time_delta_str)
 
+            if time_delta <= 0:
+                self.over_under_time_label.setStyleSheet('color: green;')
+            else:
+                self.over_under_time_label.setStyleSheet('color: red;')
+
         else:
-            pass
             self.over_under_time_label.setText('')
 
     def reset_split(self):
@@ -80,6 +83,7 @@ class SingleSplitWidget(QFrame):
         """
         self.over_under_time_label.setText('')  # clear the time delta
         self.split_saved_time_label.setText(format_wall_clock_from_ms(self.best_time_ms))
+        self.split_saved_time_label.setStyleSheet('color: #bbbbbb')
 
         self.current_time_ms = 0
 
@@ -108,6 +112,13 @@ class SingleSplitWidget(QFrame):
         if event == 'STARTSPLIT':
             if self.current_time_ms < self.best_time_ms and self.current_time_ms != 0:
                 self.split_saved_time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
+                self.split_saved_time_label.setStyleSheet('color: gold;')
+
+            elif self.current_time_ms != 0 and self.current_time_ms >= self.best_time_ms:
+                self.split_saved_time_label.setStyleSheet('color: red;')
+
+            else:
+                self.split_saved_time_label.setStyleSheet('color: green;')
 
             time_delta = self.current_time_ms - self.best_time_ms
             time_delta_str = format_wall_clock_from_ms(time_delta)
@@ -117,6 +128,11 @@ class SingleSplitWidget(QFrame):
 
             # as a test put the current time as the saved time of the split
             self.over_under_time_label.setText(time_delta_str)
+
+            if time_delta <= 0:
+                self.over_under_time_label.setStyleSheet('color: gold;')
+            else:
+                self.over_under_time_label.setStyleSheet('color: red;')
 
         elif event == 'RESET':
             self.reset_split()
