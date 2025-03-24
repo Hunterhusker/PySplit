@@ -24,7 +24,7 @@ class SplitsWidget(QWidget):
         self.scrollWidget = QWidget()
         self.scrollWidgetLayout = QVBoxLayout()
         self.scrollWidgetLayout.setSpacing(2)
-        self.scrollWidgetLayout.setContentsMargins(0, 2, 0, 0)
+        self.scrollWidgetLayout.setContentsMargins(0, 2, 0, 2)
 
         # create the internal scroll area
         self.scrollArea = QScrollArea()
@@ -51,9 +51,7 @@ class SplitsWidget(QWidget):
         self.scrollWidget.setLayout(self.scrollWidgetLayout)
 
         self.scrollArea.setWidget(self.scrollWidget)
-        self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits)
-
-        print((self.splits[0].height() + 2) * self.visible_splits)
+        self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
 
         self.layout.addWidget(self.scrollArea)
         self.setLayout(self.layout)
@@ -65,7 +63,7 @@ class SplitsWidget(QWidget):
     def increment_split(self, inc: int):
         self.index += inc
         sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-        sb.setValue((self.splits[self.index].height() + 2) * self.index)
+        sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
 
         if self.index >= len(self.splits):  # don't let it leave the array
             self.index = len(self.splits) - 1
@@ -105,12 +103,14 @@ class SplitsWidget(QWidget):
                 sb = self.scrollArea.verticalScrollBar()
                 sb.setValue(0)
 
-                self.started = True
-                self.done = False
-
                 if self.done:
                     for sp in self.splits:
                         sp.over_under_time_label.setText('')
+                        sp.over_under_time_label.setStyleSheet('color: #bbbbbb;')
+                        sp.split_saved_time_label.setStyleSheet('color: #bbbbbb;')
+
+                self.started = True
+                self.done = False
 
             elif not self.done:
                 if self.index == len(self.splits) - 1:
