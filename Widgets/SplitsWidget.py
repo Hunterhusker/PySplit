@@ -105,9 +105,9 @@ class SplitsWidget(QWidget):
 
                 if self.done:
                     for sp in self.splits:
-                        sp.over_under_time_label.setText('')
-                        sp.over_under_time_label.setStyleSheet('color: #bbbbbb;')
-                        sp.split_saved_time_label.setStyleSheet('color: #bbbbbb;')
+                        sp.delta_label.setText('')
+                        sp.delta_label.setStyleSheet('color: #bbbbbb;')
+                        sp.time_label.setStyleSheet('color: #bbbbbb;')
 
                 self.started = True
                 self.done = False
@@ -150,10 +150,10 @@ class SplitsWidget(QWidget):
 
     def load_splits(self, json: str):
         # create the splits
-        split1 = SingleSplitWidget('test1', 1230, 1230)
-        split2 = SingleSplitWidget('test2', 3330, 3330)
-        split3 = SingleSplitWidget('test3', 5550, 5550)
-        split4 = SingleSplitWidget('test4', 8880, 8880)
+        split1 = SingleSplitWidget('test1', 1230, 1230, True)
+        split2 = SingleSplitWidget('test2', 3330, 3330, True)
+        split3 = SingleSplitWidget('test3', 5550, 5550, True)
+        split4 = SingleSplitWidget('test4', 8880, 8880, True)
 
         # add them to the list
         self.splits.append(split1)
@@ -179,8 +179,8 @@ class SplitsWidget(QWidget):
 
         # for each split, if the current time is better than the best, reset it
         for sp in self.splits:
-            if sp.current_time_ms < sp.best_time_ms:
-                sp.best_time_ms = sp.current_time_ms
+            if sp.current_time_ms < sp.gold_time_ms:
+                sp.gold_time_ms = sp.current_time_ms
 
             if sp.current_time_ms < sp.pb_time_ms:
                 sp.pb_time_ms = sp.current_time_ms
