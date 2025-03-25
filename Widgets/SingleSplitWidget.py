@@ -6,7 +6,7 @@ from helpers.TimerFormat import format_wall_clock_from_ms
 
 
 class SingleSplitWidget(QFrame):
-    def __init__(self, split_name: str, gold_time_ms: int, pb_time_ms: int, displayPb: bool):
+    def __init__(self, split_name: str, gold_time_ms: int, pb_time_ms: int, gold_segment_ms: int, pb_segment_ms: int, displayPb: bool):
         """
         An individual split that can display the times from the PB and the comparison  time
 
@@ -21,6 +21,8 @@ class SingleSplitWidget(QFrame):
         self.split_name = split_name
         self.gold_time_ms = gold_time_ms
         self.pb_time_ms = pb_time_ms
+        self.gold_segment_ms = gold_segment_ms
+        self.pb_segment_ms = pb_segment_ms
 
         self.current_time_ms = 0
         self.displayPb = displayPb
@@ -67,7 +69,7 @@ class SingleSplitWidget(QFrame):
         """
         self.current_time_ms = curr_time_ms
 
-        time_delta = self.current_time_ms - self.gold_time_ms
+        time_delta = self.current_time_ms - self.display_time_ms
 
         if time_delta >= -1000.0:
             time_delta_str = format_wall_clock_from_ms(time_delta)
@@ -90,7 +92,7 @@ class SingleSplitWidget(QFrame):
         Resets the split data to how it would have been when first loaded
         """
         self.delta_label.setText('')  # clear the time delta
-        self.time_label.setText(format_wall_clock_from_ms(self.gold_time_ms))
+        self.time_label.setText(format_wall_clock_from_ms(self.display_time_ms))
         self.time_label.setStyleSheet('color: #bbbbbb')
 
         self.current_time_ms = 0
@@ -113,26 +115,30 @@ class SingleSplitWidget(QFrame):
         Returns:
             (dict[str, any]): A dictionary of this split's data as valid JSON that we can store in a splits file
         """
-        pass
+        return f"""{{
+            "text": "{self.split_name}",
+            "pb_time_ms": {self.pb_time_ms},
+            "gold_time_ms": {self.gold_time_ms}
+        }}"""
 
     @Slot(str)
     def handle_control(self, event: str):
-        if event == 'STARTSPLIT':
-            if self.current_time_ms < self.gold_time_ms and self.current_time_ms != 0:
-                self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
-                self.time_label.setStyleSheet('color: gold;')
-
-            elif self.current_time_ms != 0 and self.current_time_ms >= self.gold_time_ms:
-                self.time_label.setStyleSheet('color: red;')
-
-            else:
-                self.time_label.setStyleSheet('color: green;')
-
+        if event == 'STARTSPLIT' and self.current_time_ms != 0:
             time_delta = self.current_time_ms - self.gold_time_ms
             time_delta_str = format_wall_clock_from_ms(time_delta)
 
             if time_delta >= 0:
                 time_delta_str = "+" + time_delta_str
+
+            if self.current_time_ms < self.gold_time_ms:
+                self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
+                self.time_label.setStyleSheet('color: gold;')
+
+            elif self.current_time_ms >= self.gold_time_ms:
+                self.time_label.setStyleSheet('color: red;')
+
+            else:
+                self.time_label.setStyleSheet('color: green;')
 
             # as a test put the current time as the saved time of the split
             self.delta_label.setText(time_delta_str)
