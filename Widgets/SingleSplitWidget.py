@@ -19,17 +19,25 @@ class SingleSplitWidget(QFrame):
 
         # save the variables we will need
         self.split_name = split_name
+
+        # track the saved times
         self.gold_time_ms = gold_time_ms
         self.pb_time_ms = pb_time_ms
+
+        # track our best saved segments
         self.gold_segment_ms = gold_segment_ms
         self.pb_segment_ms = pb_segment_ms
 
+        # setup values for the current state of the split
         self.current_time_ms = 0
+        self.current_segment_ms = 0
+        self.current_start_time = 0
+
+        # whether to display the PB or not
         self.displayPb = displayPb
 
         if displayPb:
             self.display_time_ms = self.pb_time_ms
-
         else:
             self.display_time_ms = self.gold_time_ms
 
@@ -67,11 +75,14 @@ class SingleSplitWidget(QFrame):
         Args:
             curr_time_ms: (int) the current amount of time taken up to this point (from start of timer to now, not start of split)
         """
+        segment_time = curr_time_ms - self.current_start_time  # get the current change
+        self.current_segment_ms = segment_time  # add the current change to the current segment value to get the size of the segment
+
         self.current_time_ms = curr_time_ms
 
         time_delta = self.current_time_ms - self.display_time_ms
 
-        if time_delta >= -1000.0:
+        if time_delta >= -1000.0 and False:
             time_delta_str = format_wall_clock_from_ms(time_delta)
 
             if time_delta >= 0:
@@ -83,6 +94,9 @@ class SingleSplitWidget(QFrame):
                 self.delta_label.setStyleSheet('color: green;')
             else:
                 self.delta_label.setStyleSheet('color: red;')
+
+        elif True:
+            self.delta_label.setText(format_wall_clock_from_ms(self.current_segment_ms))
 
         else:
             self.delta_label.setText('')
@@ -96,6 +110,7 @@ class SingleSplitWidget(QFrame):
         self.time_label.setStyleSheet('color: #bbbbbb')
 
         self.current_time_ms = 0
+        self.current_segment_ms = 0
 
     def finalize_split(self):
         """
@@ -105,7 +120,9 @@ class SingleSplitWidget(QFrame):
             self.gold_time_ms = self.current_time_ms
             self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
 
+        # reset the current state to 0 since this split is done
         self.current_time_ms = 0
+        self.current_segment_ms = 0
 
     @Slot()
     def export_data(self):
@@ -116,9 +133,11 @@ class SingleSplitWidget(QFrame):
             (dict[str, any]): A dictionary of this split's data as valid JSON that we can store in a splits file
         """
         return f"""{{
-            "text": "{self.split_name}",
+            "split_name": "{self.split_name}",
             "pb_time_ms": {self.pb_time_ms},
-            "gold_time_ms": {self.gold_time_ms}
+            "gold_time_ms": {self.gold_time_ms},
+            "pb_segment_ms": {self.pb_segment_ms},
+            "gold_segment_ms": {self.gold_segment_ms}
         }}"""
 
     @Slot(str)

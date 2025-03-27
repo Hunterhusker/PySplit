@@ -61,7 +61,12 @@ class SplitsWidget(QWidget):
 
     @Slot(int)
     def increment_split(self, inc: int):
+        curr_time = self.splits[self.index].current_time_ms
+
         self.index += inc
+
+        self.splits[self.index].current_start_time = curr_time
+
         sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
         sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
 
@@ -150,10 +155,10 @@ class SplitsWidget(QWidget):
 
     def load_splits(self, json: str):
         # create the splits
-        split1 = SingleSplitWidget('test1', 1230, 1230, 1230, 1230, True)
-        split2 = SingleSplitWidget('test2', 3330, 3330, 3330 - 1230, 3330 - 1230, True)
-        split3 = SingleSplitWidget('test3', 5550, 5550, 5550 - 3330, 5550 - 3330, True)
-        split4 = SingleSplitWidget('test4', 8880, 8880, 8880 - 5550, 8880 - 5550, True)
+        split1 = SingleSplitWidget('test1', 1230, 1430, 1230, 1430, True)
+        split2 = SingleSplitWidget('test2', 3330, 3630, 3330 - 1230, 3630 - 1430, True)
+        split3 = SingleSplitWidget('test3', 5550, 6650, 5550 - 3330, 6650 - 3630, True)
+        split4 = SingleSplitWidget('test4', 8880, 8880, 8880 - 5550, 8880 - 6650, True)
 
         # add them to the list
         self.splits.append(split1)
