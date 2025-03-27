@@ -82,7 +82,7 @@ class SingleSplitWidget(QFrame):
 
         time_delta = self.current_time_ms - self.display_time_ms
 
-        if time_delta >= -1000.0 and False:
+        if time_delta >= -1000.0:
             time_delta_str = format_wall_clock_from_ms(time_delta)
 
             if time_delta >= 0:
@@ -94,9 +94,6 @@ class SingleSplitWidget(QFrame):
                 self.delta_label.setStyleSheet('color: green;')
             else:
                 self.delta_label.setStyleSheet('color: red;')
-
-        elif True:
-            self.delta_label.setText(format_wall_clock_from_ms(self.current_segment_ms))
 
         else:
             self.delta_label.setText('')
@@ -144,29 +141,26 @@ class SingleSplitWidget(QFrame):
     @Slot(str)
     def handle_control(self, event: str):
         if event == 'STARTSPLIT' and self.current_time_ms != 0:
-            time_delta = self.current_time_ms - self.gold_time_ms
+            time_delta = self.current_time_ms - self.display_time_ms
             time_delta_str = format_wall_clock_from_ms(time_delta)
 
             if time_delta >= 0:
                 time_delta_str = "+" + time_delta_str
 
+            self.delta_label.setText(time_delta_str)  # update the +/- time delta label
+
             if self.current_time_ms < self.gold_time_ms:
                 self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
                 self.time_label.setStyleSheet('color: gold;')
+                self.delta_label.setStyleSheet('color: gold;')
 
-            elif self.current_time_ms >= self.gold_time_ms:
+            elif self.current_time_ms >= self.pb_time_ms:
                 self.time_label.setStyleSheet('color: red;')
+                self.delta_label.setStyleSheet('color: red;')
 
             else:
                 self.time_label.setStyleSheet('color: green;')
-
-            # as a test put the current time as the saved time of the split
-            self.delta_label.setText(time_delta_str)
-
-            if time_delta <= 0:
-                self.delta_label.setStyleSheet('color: gold;')
-            else:
-                self.delta_label.setStyleSheet('color: red;')
+                self.delta_label.setStyleSheet('color: green;')
 
         elif event == 'RESET':
             self.reset_split()
