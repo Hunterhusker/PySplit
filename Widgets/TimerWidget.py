@@ -34,6 +34,7 @@ class TimerWidget(QFrame):
                 border-top: none;
                 border-left: none;
                 border-right: none;
+                font-size: 24px;
             }
         """)
 
