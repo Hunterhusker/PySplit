@@ -3,7 +3,8 @@ import json
 
 
 class Configurator(QObject):
-    Configure = Signal(dict)  # emit the settings when
+    Configure = Signal(dict)  # emit the settings
+    ConfigureGame = Signal(dict)  # emit the game configuration
 
     def __init__(self, file_path: str):
         super().__init__()
@@ -31,6 +32,12 @@ class Configurator(QObject):
         """
         with open(self.file_path, 'w') as f:
             f.write(self.settings)
+
+    def read_game_settings(self):
+        pass
+
+    def write_game_settings(self):
+        pass
 
     def update_setting(self, key: str, settings: dict):
         """
