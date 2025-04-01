@@ -145,6 +145,9 @@ class Main(QWidget):
         with open('conf/settings.json', 'w') as f:
             f.write(json_str)
 
+        tmp = self.splits.export_splits(indent='    ')
+        print(tmp)
+
         # accept the close event and actually close
         event.accept()
 

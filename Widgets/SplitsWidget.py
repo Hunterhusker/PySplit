@@ -150,8 +150,16 @@ class SplitsWidget(QWidget):
             for sp in self.splits:
                 sp.finalize_split()
 
-    def export_splits(self):
-        pass
+    def export_splits(self, indent: str = '    ', depth: int = 0):
+        tmp = f'{indent * depth}"splits": [\n'
+
+        for i in range(len(self.splits)):
+            tmp += self.splits[i].export_data(indent=indent, depth=depth + 1)
+
+            if i != len(self.splits) - 1:  # if not the last split, add a comma
+                tmp += ',\n'
+
+        return tmp + f'\n{indent * depth}],\n'
 
     def load_splits(self, json: str):
         # create the splits

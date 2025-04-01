@@ -123,20 +123,21 @@ class SingleSplitWidget(QFrame):
             self.current_segment_ms = 0
 
     @Slot()
-    def export_data(self):
+    def export_data(self, indent: str = '    ', depth: int = 1):
         """
         A method to turn the data for this single split into JSON and output it as a dictionary
 
         Returns:
             (dict[str, any]): A dictionary of this split's data as valid JSON that we can store in a splits file
         """
-        return f"""{{
-            "split_name": "{self.split_name}",
-            "pb_time_ms": {self.pb_time_ms},
-            "gold_time_ms": {self.gold_time_ms},
-            "pb_segment_ms": {self.pb_segment_ms},
-            "gold_segment_ms": {self.gold_segment_ms}
-        }}"""
+        # indentation gets weird here due to the multiline string, but it stays a one-liner so whatever
+        return f"""{indent * depth}{{
+{indent * (depth + 1)}"split_name": "{self.split_name}",
+{indent * (depth + 1)}"pb_time_ms": {self.pb_time_ms},
+{indent * (depth + 1)}"gold_time_ms": {self.gold_time_ms},
+{indent * (depth + 1)}"pb_segment_ms": {self.pb_segment_ms},
+{indent * (depth + 1)}"gold_segment_ms": {self.gold_segment_ms}
+{indent * depth}}}"""
 
     @Slot(str)
     def handle_control(self, event: str):
