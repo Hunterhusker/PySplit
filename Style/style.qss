@@ -1,0 +1,73 @@
+QWidget {
+    background-color: $primary-background;
+    color: $text-color;
+}
+
+QFrame {
+    background-color: $primary-background;
+    color: $text-color;
+}
+
+QPushButton {
+    color: $button-text-color;
+    background-color: $button-background-color;
+    border: 2px solid $button-border-color;
+    border-radius: 5px;
+}
+
+#TimeFrame {
+    border-bottom: 1px solid $border;
+    border-top: 1px solid $border;
+    border-left: none;
+    border-right: none;
+}
+
+#TimeLabel {
+    border-bottom: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-size: 24px;
+}
+
+#SingleSplit {
+    background-color: $secondary-background;
+    color: $font-color;
+}
+
+#SingleSplit QLabel {
+    color: $font-color;
+    background-color: $secondary-background;
+}
+
+#TitleFrame {
+    border-bottom: 1px solid $border;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+#TitleFrame QLabel {
+    font-family: "Chakra Petch;
+    color: $text-color;
+}
+
+#TitleFrame #TitleLabel {
+    qproperty-alignment: AlignCenter;
+    font-size: 14px;
+}
+
+#TitleFrame #SubLabel {
+    qproperty-alignment: AlignCenter;
+    font-size: 12px;
+}
+
+#TitleFrame #triesTodayLabel {
+    qproperty-alignment: AlignLeft;
+    font-size: 12px;
+}
+
+#TitleFrame #triesTotalLabel {
+    qproperty-alignment: AlignRight;
+    font-size: 12px;
+}
