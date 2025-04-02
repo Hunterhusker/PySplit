@@ -21,22 +21,22 @@ class TimerWidget(QFrame):
         self.layout.setAlignment(self.MainTimerLabel, Qt.AlignRight)
 
         self.setObjectName('TimeFrame')
-        self.setStyleSheet("""
-            #TimeFrame {
-                border-bottom: 1px solid #bbbbbb;
-                border-top: 1px solid #bbbbbb;
-                border-left: none;
-                border-right: none;
-            }
-            
-            #TimeLabel {
-                border-bottom: none;
-                border-top: none;
-                border-left: none;
-                border-right: none;
-                font-size: 24px;
-            }
-        """)
+        # self.setStyleSheet("""
+        #     #TimeFrame {
+        #         border-bottom: 1px solid #bbbbbb;
+        #         border-top: 1px solid #bbbbbb;
+        #         border-left: none;
+        #         border-right: none;
+        #     }
+        #
+        #     #TimeLabel {
+        #         border-bottom: none;
+        #         border-top: none;
+        #         border-left: none;
+        #         border-right: none;
+        #         font-size: 24px;
+        #     }
+        # """)
 
         self.setLayout(self.layout)
 

@@ -32,38 +32,38 @@ class TitleWidget(QFrame):
         self.layout.addLayout(self.attemptCounterHBox)
 
         self.setObjectName('TitleFrame')
-        self.setStyleSheet("""
-            #TitleFrame {
-                border-bottom: 1px solid #bbbbbb;
-                border-top: none;
-                border-left: none;
-                border-right: none;
-            }
-
-            QLabel {
-                font-family: "Chakra Petch;
-                color: #bbbbbb;
-            }
-
-            #TitleLabel {
-                qproperty-alignment: AlignCenter;
-                font-size: 14px;
-            }
-
-            #SubLabel {
-                qproperty-alignment: AlignCenter;
-                font-size: 12px;
-            }
-            
-            #triesTodayLabel {
-                qproperty-alignment: AlignLeft;
-                font-size: 12px;
-            }
-            
-            #triesTotalLabel {
-                qproperty-alignment: AlignRight;
-                font-size: 12px;
-            }
-        """)
+        # self.setStyleSheet("""
+        #     #TitleFrame {
+        #         border-bottom: 1px solid #bbbbbb;
+        #         border-top: none;
+        #         border-left: none;
+        #         border-right: none;
+        #     }
+        #
+        #     QLabel {
+        #         font-family: "Chakra Petch;
+        #         color: #bbbbbb;
+        #     }
+        #
+        #     #TitleLabel {
+        #         qproperty-alignment: AlignCenter;
+        #         font-size: 14px;
+        #     }
+        #
+        #     #SubLabel {
+        #         qproperty-alignment: AlignCenter;
+        #         font-size: 12px;
+        #     }
+        #
+        #     #triesTodayLabel {
+        #         qproperty-alignment: AlignLeft;
+        #         font-size: 12px;
+        #     }
+        #
+        #     #triesTotalLabel {
+        #         qproperty-alignment: AlignRight;
+        #         font-size: 12px;
+        #     }
+        # """)
 
         self.setLayout(self.layout)

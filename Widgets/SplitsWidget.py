@@ -67,8 +67,9 @@ class SplitsWidget(QWidget):
 
         self.splits[self.index].current_start_time = curr_time
 
-        sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-        sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
+        if self.index >= self.visible_splits:
+            sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+            sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
 
         if self.index >= len(self.splits):  # don't let it leave the array
             self.index = len(self.splits) - 1
@@ -79,7 +80,7 @@ class SplitsWidget(QWidget):
     def decrement_split(self, inc: int):
         self.index -= inc
         sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-        sb.setValue((self.splits[self.index].height() + 2) * self.index)
+        sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
 
         if self.index < 0:  # don't let it leave the array
             self.index = 0
@@ -130,6 +131,19 @@ class SplitsWidget(QWidget):
 
                 else:
                     self.increment_split(1)
+
+        elif event == 'UNSPLIT' and self.started and not self.done:
+            if self.index != 0:
+                self.decrement_split(1)
+                sp = self.splits[self.index + 1]
+
+                sp.current_time_ms = 0
+
+                sp.delta_label.setText('')
+                sp.delta_label.setStyleSheet('color: #bbbbbb;')
+                sp.time_label.setStyleSheet('color: #bbbbbb;')
+
+                self.splits[self.index].time_label.setStyleSheet('color: #bbbbbb;')
 
         elif event == 'RESET':
             self.index = 0

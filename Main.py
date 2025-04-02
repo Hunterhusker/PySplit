@@ -4,7 +4,7 @@ import sys
 import json
 from time import sleep
 
-from Dialogs.AssignButtonsDialog import AssignButtonsDialog
+from Popups.AssignButtonsDialog import AssignButtonsDialog
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
@@ -89,18 +89,6 @@ class Main(QWidget):
         self.Quit.connect(self.game_timer.quit)
         self.Quit.connect(self.keyboard_listener.quit)
 
-        self.setStyleSheet("""
-            background-color: #2b2b2b;
-            color: #bbbbbb;
-            
-            QPushButton {
-                color: #a3a4ab;
-                background-color: #4c5052;
-                border: 2px solid #4c5052;
-                border-radius: 5px;
-            }
-        """)
-
     def contextMenuEvent(self, event):
         self.context_menu.exec(event.globalPos())
 
@@ -154,6 +142,82 @@ class Main(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    app.setStyleSheet("""
+        QWidget {
+            background-color: #2b2b2b;
+            color: #bbbbbb;
+        }
+
+        QFrame {
+            background-color: #2b2b2b;
+            color: #bbbbbb;
+        }
+
+        QPushButton {
+            color: #a3a4ab;
+            background-color: #4c5052;
+            border: 2px solid #4c5052;
+            border-radius: 5px;
+        }
+
+        #TimeFrame {
+            border-bottom: 1px solid #bbbbbb;
+            border-top: 1px solid #bbbbbb;
+            border-left: none;
+            border-right: none;
+        }
+
+        #TimeLabel {
+            border-bottom: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-size: 24px;
+        }
+
+        #SingleSplit {
+            background-color: #323232;
+            color: #bbbbbb;
+        }
+
+        #SingleSplit QLabel {
+            color: #bbbbbb;
+            background-color: #323232;
+        }
+
+        #TitleFrame {
+            border-bottom: 1px solid #bbbbbb;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        #TitleFrame QLabel {
+            font-family: "Chakra Petch;
+            color: #bbbbbb;
+        }
+
+        #TitleFrame #TitleLabel {
+            qproperty-alignment: AlignCenter;
+            font-size: 14px;
+        }
+
+        #TitleFrame #SubLabel {
+            qproperty-alignment: AlignCenter;
+            font-size: 12px;
+        }
+
+        #TitleFrame #triesTodayLabel {
+            qproperty-alignment: AlignLeft;
+            font-size: 12px;
+        }
+
+        #TitleFrame #triesTotalLabel {
+            qproperty-alignment: AlignRight;
+            font-size: 12px;
+        }
+        """)
 
     window = Main()
     window.show()

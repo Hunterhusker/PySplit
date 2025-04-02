@@ -59,10 +59,12 @@ class SingleSplitWidget(QFrame):
         self.layout.setAlignment(self.time_label, Qt.AlignRight | Qt.AlignVCenter)
 
         # set this as a little lighter grey so they look nice
-        self.setStyleSheet("""
-            background-color: #323232;
-            color: #bbbbbb;
-        """)
+        # self.setStyleSheet("""
+        #     background-color: #323232;
+        #     color: #bbbbbb;
+        # """)
+
+        self.setObjectName('SingleSplit')
 
         self.setLayout(self.layout)  # set the layout on the frame
         self.setFixedHeight(30)
