@@ -1,7 +1,11 @@
 primary-background:#2b2b2b
 secondary-background:#323232
-border:#bbbbbb
+border-color:#bbbbbb
 text-color:#bbbbbb
 button-background-color:#4c5052
 button-border-color:#4c5052
 button-text-color:#a3a4ab
+timer-size:24px
+subtitle-size:12px
+title-size:14px
+main-font:""

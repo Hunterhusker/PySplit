@@ -16,8 +16,8 @@ QPushButton {
 }
 
 #TimeFrame {
-    border-bottom: 1px solid $border;
-    border-top: 1px solid $border;
+    border-bottom: 1px solid $border-color;
+    border-top: 1px solid $border-color;
     border-left: none;
     border-right: none;
 }
@@ -27,47 +27,47 @@ QPushButton {
     border-top: none;
     border-left: none;
     border-right: none;
-    font-size: 24px;
+    font-size: $timer-size;
 }
 
 #SingleSplit {
     background-color: $secondary-background;
-    color: $font-color;
+    color: $text-color;
 }
 
 #SingleSplit QLabel {
-    color: $font-color;
+    color: $text-color;
     background-color: $secondary-background;
 }
 
 #TitleFrame {
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid $border-color;
     border-top: none;
     border-left: none;
     border-right: none;
 }
 
 #TitleFrame QLabel {
-    font-family: "Chakra Petch;
+    font-family: $main-font;
     color: $text-color;
 }
 
 #TitleFrame #TitleLabel {
     qproperty-alignment: AlignCenter;
-    font-size: 14px;
+    font-size: title-size;
 }
 
 #TitleFrame #SubLabel {
     qproperty-alignment: AlignCenter;
-    font-size: 12px;
+    font-size: $subtitle-size;
 }
 
 #TitleFrame #triesTodayLabel {
     qproperty-alignment: AlignLeft;
-    font-size: 12px;
+    font-size: $subtitle-size;
 }
 
 #TitleFrame #triesTotalLabel {
     qproperty-alignment: AlignRight;
-    font-size: 12px;
+    font-size: $subtitle-size;
 }
