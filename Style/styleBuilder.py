@@ -1,46 +1,91 @@
 import copy
 
+from PySide6.QtCore import Signal
+
 
 class StyleBuilder:
-    def __init__(self):
-        self.colors = {}
-        self.rawStyleSheet = ""
+    UpdateStyle = Signal(str)
 
-        self.styleSheet = ""
+    def __init__(self, style_path, vars_path):
+        self.style_path = style_path
+        self.vars_path = vars_path
 
-        self.load_colors()
+        self.variable_map = {}
+        self.raw_style_sheet = ""
+
+        self.formatted_style_sheet = ""
+
+        self.load_vars()
         self.load_style()
 
-    def load_colors(self):
-        with open('colors.qvars', 'r') as f:
+    def load_vars(self):
+        with open(self.vars_path, 'r') as f:
             lines = f.readlines()
 
         for line in lines:
             l_temp = line.replace('\n', '')  # remove the newlines
             k, v = l_temp.split(':')
 
-            self.colors[k] = v
+            self.variable_map[k] = v
 
-    def set_colors(self):
-        pass
+    def set_vars(self, variable_map):
+        self.variable_map = variable_map
 
-    def export_colors(self):
-        pass
+    def export_vars(self):
+        """
+        Build the variable map and save it to the file
+        """
+        tmp = ''
+
+        for k, v in self.variable_map.items():
+            tmp += f'{k}:{v}'
+
+        with open(self.vars_path, 'w') as f:
+            f.write(tmp)
 
     def load_style(self):
-        with open('style.qss', 'r') as f:
+        with open(self.style_path, 'r') as f:
             tmp = f.read()
 
-        self.rawStyleSheet = copy.deepcopy(tmp)
+        self.raw_style_sheet = tmp
+
+        self.format_style()
+
+    def set_style(self, styleSheet):
+        self.formatted_style_sheet = styleSheet
+
+    def format_style(self):
+        tmp = copy.deepcopy(self.raw_style_sheet)
 
         # replace all the colors
-        for k in self.colors.keys():
-            tmp.replace(k, self.colors[k])
+        for k, v in self.variable_map.items():
+            tmp = tmp.replace('$' + k, v)
 
-        self.styleSheet = tmp
-
-    def set_style(self):
-        pass
+        self.formatted_style_sheet = tmp
 
     def export_style(self):
-        pass
+        with open(self.style_path, 'w') as f:
+            f.write(self.raw_style_sheet)
+
+    def update_style(self, style_sheet: str = None, var_map: dict[str: str] = None):
+        """
+        Takes in new stylesheet data, or nothing, applies it to itself, and then emits a signal to refresh the style
+
+        Args:
+            style_sheet: (str, optional) the raw style sheet that we want to update the style to
+            var_map: (dict[str: str], optional) the mapping of the variables that we want to update our SASS with
+
+        Emits:
+            UpdateStyle: A signal that you can subscribe to know when the style sheet changes
+        """
+        if style_sheet is not None:
+            self.set_style(style_sheet)
+
+        if var_map is not None:
+            self.set_vars(var_map)
+
+        print()
+
+        self.format_style()  # format the sheet with the updated data
+
+        #self.UpdateStyle.emit(self.formatted_style_sheet)  # emit the changed sheet

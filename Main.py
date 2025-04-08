@@ -1,3 +1,4 @@
+from PySide6.QtGui import QFontDatabase
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame, QScrollArea
 from PySide6.QtCore import Slot, Signal, QThread, Qt
 import sys
@@ -6,6 +7,7 @@ from time import sleep
 
 from Popups.AssignButtonsDialog import AssignButtonsDialog
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
+from Popups.SettingsWindow import SettingsWindow
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
@@ -41,8 +43,17 @@ class Main(QWidget):
         assignButtonsAction = self.context_menu.addAction('Assign Buttons')
         assignButtonsAction.triggered.connect(self.open_key_dialog)
 
+        settingsButtonAction = self.context_menu.addAction('Settings')
+        settingsButtonAction.triggered.connect(self.open_settings_popup)
+
         # load the settings from the file
-        self.configurator = Configurator('conf/settings.json')
+        self.configurator = Configurator('conf/settings.json', 'Style/style.qss', 'Style/vars.qvars')
+
+        # use the configurations from the file
+        self.configurator.ConfigureStyle.connect(self.set_style)
+        self.configurator.style.update_style()
+
+        self.setStyleSheet(self.configurator.style.formatted_style_sheet)
 
         self.splits = SplitsWidget('')
         self.splitStats = TimeStatsWidget()
@@ -110,6 +121,40 @@ class Main(QWidget):
 
             tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
 
+    def open_settings_popup(self):
+        """
+        Opens the keybinding assignment dialog popup and lets you reassign any key
+        """
+        dialog = SettingsWindow()
+        dialog.setGeometry(900, 900, 275, 375)
+
+        clickedOk = dialog.exec()  # open the popup and wait for it to close
+
+        if clickedOk:
+            # give the controller the new mapping
+            self.timer_controller.update_mapping(dialog.event_map)
+
+            tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
+
+    @Slot(str)
+    def set_style(self, style):
+        """
+        Sets the global stylesheet for the application
+
+        Args:
+            style: (str) the style sheet data, probably read from file
+        """
+        self.setStyleSheet(style)
+
+    def get_style(self):
+        """
+        Gets the current global stylesheet so that we can read it in and edit it as we need
+
+        Returns:
+            (str): The stylesheet data that the app is currently using
+        """
+        return self.styleSheet()
+
     def closeEvent(self, event):
         # emit a close so the threads clean up themselves
         self.Quit.emit()  # emit a quit signal
@@ -142,82 +187,6 @@ class Main(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    app.setStyleSheet("""
-        QWidget {
-            background-color: #2b2b2b;
-            color: #bbbbbb;
-        }
-
-        QFrame {
-            background-color: #2b2b2b;
-            color: #bbbbbb;
-        }
-
-        QPushButton {
-            color: #a3a4ab;
-            background-color: #4c5052;
-            border: 2px solid #4c5052;
-            border-radius: 5px;
-        }
-
-        #TimeFrame {
-            border-bottom: 1px solid #bbbbbb;
-            border-top: 1px solid #bbbbbb;
-            border-left: none;
-            border-right: none;
-        }
-
-        #TimeLabel {
-            border-bottom: none;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            font-size: 24px;
-        }
-
-        #SingleSplit {
-            background-color: #323232;
-            color: #bbbbbb;
-        }
-
-        #SingleSplit QLabel {
-            color: #bbbbbb;
-            background-color: #323232;
-        }
-
-        #TitleFrame {
-            border-bottom: 1px solid #bbbbbb;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-        }
-
-        #TitleFrame QLabel {
-            font-family: "Chakra Petch;
-            color: #bbbbbb;
-        }
-
-        #TitleFrame #TitleLabel {
-            qproperty-alignment: AlignCenter;
-            font-size: 14px;
-        }
-
-        #TitleFrame #SubLabel {
-            qproperty-alignment: AlignCenter;
-            font-size: 12px;
-        }
-
-        #TitleFrame #triesTodayLabel {
-            qproperty-alignment: AlignLeft;
-            font-size: 12px;
-        }
-
-        #TitleFrame #triesTotalLabel {
-            qproperty-alignment: AlignRight;
-            font-size: 12px;
-        }
-        """)
 
     window = Main()
     window.show()
