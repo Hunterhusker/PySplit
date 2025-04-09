@@ -1,4 +1,5 @@
 import copy
+import json
 
 from PySide6.QtCore import Signal
 
@@ -89,3 +90,26 @@ class StyleBuilder:
         self.format_style()  # format the sheet with the updated data
 
         #self.UpdateStyle.emit(self.formatted_style_sheet)  # emit the changed sheet
+
+    def update_style_from_paths(self, style_path: str = None, vars_path: str = None):
+        """
+        Calls the update method but by first reading the data from the files
+
+        Args:
+            style_path: (str) the path to the file containing the style info
+            vars_path: (str) the path to the file containing the variable declarations
+
+        Returns:
+            None
+        """
+        if style_path is not None:
+            self.style_path = style_path
+
+            with open(style_path, 'r') as f:
+                self.raw_style_sheet = f.read()
+
+        if vars_path is not None:
+            self.vars_path = vars_path
+            self.load_vars()
+
+        self.update_style(self.raw_style_sheet, self.variable_map)

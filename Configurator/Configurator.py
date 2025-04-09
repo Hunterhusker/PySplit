@@ -12,13 +12,16 @@ class Configurator(QObject):
     def __init__(self, file_path: str, style_path: str, var_path: str):
         super().__init__()
         self.file_path = file_path
+        self.style_path = style_path
+        self.var_path = var_path
 
         self.settings = {}  # define it here so that pycharm knows to intellisense it
 
+        # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
+        self.style = StyleBuilder(style_path, var_path)
+
         self.read_settings()
 
-        # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
-        self.style = StyleBuilder('Style/style.qss', 'Style/vars.qvars')
         self.ConfigureStyle.connect(self.style.UpdateStyle)  # no need to duplicate these methods, just hook up the signal to pass it on
 
     def read_settings(self):
@@ -29,9 +32,14 @@ class Configurator(QObject):
             file_contents = f.read()
 
         settings = json.loads(file_contents)
+
+        settings['style_path'] = self.style_path
+        settings['var_path'] = self.var_path
+
         self.settings = settings  # also save it here so we can reference it and update it later?
 
-        self.Configure.emit(self.settings)  # send the settings update
+        # update the style builder with the new paths
+        self.style.update_style_from_paths(self.style_path, self.var_path)
 
     def write_settings(self):
         """
