@@ -25,6 +25,7 @@ class Main(QWidget):
     ReadTimer = Signal()
 
     Quit = Signal()
+    SaveSettings = Signal()
 
     def __init__(self):
         super().__init__()
@@ -126,7 +127,7 @@ class Main(QWidget):
         Opens the keybinding assignment dialog popup and lets you reassign any key
         """
         dialog = SettingsWindow()
-        dialog.setGeometry(900, 900, 275, 375)
+        dialog.setGeometry(900, 900, 600, 300)
 
         clickedOk = dialog.exec()  # open the popup and wait for it to close
 
@@ -164,22 +165,25 @@ class Main(QWidget):
         self.game_timer_thread.quit()
         self.game_timer_thread.wait()
 
+        # save the configurations to their files
+        #self.configurator.write_settings()
+
         # update the settings with what we set
-        settings_json = {}
-        inputs_json = self.timer_controller.export_mapping()
-
-        settings_json['inputs'] = inputs_json
-        # settings_json['style'] = {}
+        # settings_json = {}
+        # inputs_json = self.timer_controller.export_mapping()
         #
-        # settings_json['style']['title'] = self.Title.styleSheet()
-
-        json_str = json.dumps(settings_json, indent=4)
-
-        with open('conf/settings.json', 'w') as f:
-            f.write(json_str)
-
-        tmp = self.splits.export_splits(indent='    ')
-        print(tmp)
+        # settings_json['inputs'] = inputs_json
+        # # settings_json['style'] = {}
+        # #
+        # # settings_json['style']['title'] = self.Title.styleSheet()
+        #
+        # json_str = json.dumps(settings_json, indent=4)
+        #
+        # # with open('conf/settings.json', 'w') as f:
+        # #     f.write(json_str)
+        #
+        # tmp = self.splits.export_splits(indent='    ')
+        # print(tmp)
 
         # accept the close event and actually close
         event.accept()
