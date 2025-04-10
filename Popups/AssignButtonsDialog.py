@@ -140,11 +140,6 @@ class KeyReassignmentLine(QFrame):
 
         self.setFixedHeight(35)
 
-        self.setStyleSheet("""
-            background-color: #323232;
-            border-radius: 5px;
-        """)
-
         if hasattr(event_object, 'value'):
             self.key_str = event_object.value
         else:
@@ -162,12 +157,6 @@ class KeyReassignmentLine(QFrame):
         # create and style the button
         self.triggerButton = QPushButton(self.key_str)
         self.triggerButton.setFixedSize(80, 25)
-        self.triggerButton.setStyleSheet("""
-            QPushButton {
-                color: #bbbbbb;
-                background-color: #4c5052;
-            }
-        """)
 
         # add the elements to the widget
         self.line_layout.addWidget(self.event_label)
