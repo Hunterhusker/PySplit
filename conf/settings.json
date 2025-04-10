@@ -1,0 +1,54 @@
+{
+    "style_path": "conf/style.qss",
+    "var_path": "conf/vars.qvars",
+    "inputs": [
+        {
+            "source": "pynput",
+            "type": "complex",
+            "value": "space",
+            "event": "STARTSPLIT"
+        },
+        {
+            "source": "pynput",
+            "type": "simple",
+            "value": "\\",
+            "event": "UNSPLIT"
+        },
+        {
+            "source": "pynput",
+            "type": "complex",
+            "value": "shift_r",
+            "event": "PAUSE"
+        },
+        {
+            "source": "pynput",
+            "type": "complex",
+            "value": "delete",
+            "event": "STOP"
+        },
+        {
+            "source": "pynput",
+            "type": "complex",
+            "value": "backspace",
+            "event": "RESET"
+        },
+        {
+            "source": "pynput",
+            "type": "simple",
+            "value": "]",
+            "event": "SKIP"
+        },
+        {
+            "source": "pynput",
+            "type": "complex",
+            "value": "enter",
+            "event": "RESUME"
+        },
+        {
+            "source": "pynput",
+            "type": "complex",
+            "value": "f7",
+            "event": "LOCK"
+        }
+    ]
+}
