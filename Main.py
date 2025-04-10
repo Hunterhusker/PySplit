@@ -48,13 +48,13 @@ class Main(QWidget):
         settingsButtonAction.triggered.connect(self.open_settings_popup)
 
         # load the settings from the file
-        self.configurator = Configurator('conf/settings.json', 'Style/style.qss', 'Style/vars.qvars')
+        self.configurator = Configurator('conf/settings.json')
 
         # use the configurations from the file
         self.configurator.ConfigureStyle.connect(self.set_style)
-        self.configurator.style.update_style()
+        #self.configurator.style.update_style()
 
-        self.setStyleSheet(self.configurator.style.formatted_style_sheet)
+        #self.setStyleSheet(self.configurator.style.formatted_style_sheet)
 
         self.splits = SplitsWidget('')
         self.splitStats = TimeStatsWidget()
@@ -193,6 +193,11 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = Main()
+
+    # use main's style configurations to get the initial stylesheet
+    style = window.configurator.style.formatted_style_sheet
+    app.setStyleSheet(style)
+
     window.show()
 
     sys.exit(app.exec())
