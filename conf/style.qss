@@ -54,7 +54,7 @@ QPushButton {
 
 #TitleFrame #TitleLabel {
     qproperty-alignment: AlignCenter;
-    font-size: title-size;
+    font-size: $title-size;
 }
 
 #TitleFrame #SubLabel {
@@ -70,4 +70,14 @@ QPushButton {
 #TitleFrame #triesTotalLabel {
     qproperty-alignment: AlignRight;
     font-size: $subtitle-size;
+}
+
+#KeyReassignmentLine {
+    background-color: $secondary-background;
+    border-radius: 2px;
+}
+
+#KeyAssignmentLabel {
+    color: $text-color;
+    background-color: $secondary-background;
 }

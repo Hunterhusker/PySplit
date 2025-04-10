@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal
 import json
 
-from Style.styleBuilder import StyleBuilder
+from Configurator.Style.styleBuilder import StyleBuilder
 
 
 class Configurator(QObject):

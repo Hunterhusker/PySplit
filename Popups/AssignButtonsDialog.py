@@ -152,9 +152,9 @@ class KeyReassignmentLine(QFrame):
             label = timer_event
 
         self.event_label = QLabel(label)
-        # TODO: style the label
+        self.event_label.setObjectName('KeyAssignmentLabel')
 
-        # create and style the button
+        # create the button
         self.triggerButton = QPushButton(self.key_str)
         self.triggerButton.setFixedSize(80, 25)
 
@@ -171,6 +171,9 @@ class KeyReassignmentLine(QFrame):
 
         # hookup the slots and signals
         self.triggerButton.clicked.connect(self.toggle_listening)
+
+        # name this thing so we can globally style it different from the rest
+        self.setObjectName('KeyReassignmentLine')
 
     def assign_key(self, obj):
         self.event_object = obj
