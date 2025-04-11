@@ -1,4 +1,5 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox, QFrame
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox, \
+    QFrame, QWidget
 from PySide6.QtCore import Slot, Signal, Qt
 import copy
 
@@ -6,15 +7,15 @@ from Listeners.ABCListener import ABCListener
 from Listeners.KeyboardListener import key_to_str
 
 
-class AssignButtonsDialog(QDialog):
+class AssignButtonsDialog(QWidget):
     """
     A custom dialog box that we will use the remap the keys and buttons to control the splitter
     """
-    def __init__(self, event_map: dict[str, object], listener: ABCListener):
-        super().__init__()
+    def __init__(self, event_map: dict[str, object], listener: ABCListener, parent: QWidget = None):
+        super().__init__(parent)
 
         # basic window setup
-        self.setWindowTitle('Assign Hotkeys!')
+        # self.setWindowTitle('Assign Hotkeys!')
         self.layout = QVBoxLayout()
 
         self.event_map = copy.deepcopy(event_map)  # save a copy of the event map
@@ -22,20 +23,20 @@ class AssignButtonsDialog(QDialog):
         # get the listener from the main page so we can listen to it
         self.listener = listener
 
-        # set up our standard dialog buttons
-        self.dialogButtons = QDialogButtonBox()
-        self.dialogButtons.setCenterButtons(True)
-
-        # create buttons for the button dialog
-        self.dialogButtons.addButton(QDialogButtonBox.Ok)
-        self.dialogButtons.addButton(QDialogButtonBox.Cancel)
-
-        for button in self.dialogButtons.buttons():
-            button.setFixedSize(80, 25)
-
-        # link the buttons to what they need to do
-        self.dialogButtons.accepted.connect(self.accept)
-        self.dialogButtons.rejected.connect(self.reject)
+        # # set up our standard dialog buttons
+        # self.dialogButtons = QDialogButtonBox()
+        # self.dialogButtons.setCenterButtons(True)
+        #
+        # # create buttons for the button dialog
+        # self.dialogButtons.addButton(QDialogButtonBox.Ok)
+        # self.dialogButtons.addButton(QDialogButtonBox.Cancel)
+        #
+        # for button in self.dialogButtons.buttons():
+        #     button.setFixedSize(80, 25)
+        #
+        # # link the buttons to what they need to do
+        # self.dialogButtons.accepted.connect(self.accept)
+        # self.dialogButtons.rejected.connect(self.reject)
 
         # pull apart the event mapping, so I can build my assignment GUI
         keys = list(self.event_map.keys())
@@ -75,7 +76,7 @@ class AssignButtonsDialog(QDialog):
         # add a stretch to keep stuff sized right
         self.layout.addStretch()
 
-        self.layout.addWidget(self.dialogButtons)
+        #self.layout.addWidget(self.dialogButtons)
 
         # link it all up so that this displays
         self.setLayout(self.layout)

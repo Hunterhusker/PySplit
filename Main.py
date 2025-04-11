@@ -41,20 +41,18 @@ class Main(QWidget):
         self.MainTimerWidget = TimerWidget()
 
         self.context_menu = QMenu(self)
-        assignButtonsAction = self.context_menu.addAction('Assign Buttons')
-        assignButtonsAction.triggered.connect(self.open_key_dialog)
 
         settingsButtonAction = self.context_menu.addAction('Settings')
         settingsButtonAction.triggered.connect(self.open_settings_popup)
+
+        lockTimerButtonAction = self.context_menu.addAction('Lock')
+        lockTimerButtonAction.triggered.connect(self.lock_action)
 
         # load the settings from the file
         self.configurator = Configurator('conf/settings.json')
 
         # use the configurations from the file
         self.configurator.ConfigureStyle.connect(self.set_style)
-        #self.configurator.style.update_style()
-
-        #self.setStyleSheet(self.configurator.style.formatted_style_sheet)
 
         self.splits = SplitsWidget('')
         self.splitStats = TimeStatsWidget()
@@ -126,16 +124,25 @@ class Main(QWidget):
         """
         Opens the keybinding assignment dialog popup and lets you reassign any key
         """
-        dialog = SettingsWindow()
+        dialog = SettingsWindow(self)
         dialog.setGeometry(900, 900, 600, 300)
+
+        # lock the splitter
+        self.timer_controller.listening = False
 
         clickedOk = dialog.exec()  # open the popup and wait for it to close
 
         if clickedOk:
             # give the controller the new mapping
-            self.timer_controller.update_mapping(dialog.event_map)
+            self.timer_controller.update_mapping(dialog.keyWidget.event_map)
 
             tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
+
+        # unlock the splitter
+        self.timer_controller.listening = True
+
+    def lock_action(self):
+        self.timer_controller.toggle_listening()
 
     @Slot(str)
     def set_style(self, style):
@@ -167,23 +174,6 @@ class Main(QWidget):
 
         # save the configurations to their files
         #self.configurator.write_settings()
-
-        # update the settings with what we set
-        # settings_json = {}
-        # inputs_json = self.timer_controller.export_mapping()
-        #
-        # settings_json['inputs'] = inputs_json
-        # # settings_json['style'] = {}
-        # #
-        # # settings_json['style']['title'] = self.Title.styleSheet()
-        #
-        # json_str = json.dumps(settings_json, indent=4)
-        #
-        # # with open('conf/settings.json', 'w') as f:
-        # #     f.write(json_str)
-        #
-        # tmp = self.splits.export_splits(indent='    ')
-        # print(tmp)
 
         # accept the close event and actually close
         event.accept()
