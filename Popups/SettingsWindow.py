@@ -1,28 +1,68 @@
 from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox, QFrame, QWidget, QTabWidget
 from PySide6.QtCharts import QLineSeries, QChart, QChartView
-import numpy
-from PySide6.QtCore import Slot, Signal, Qt, QPointF
+from PySide6.QtCore import Slot, Signal, Qt, QPointF, QObject
+
+from Listeners import ABCListener
+from Popups.AssignButtonsDialog import AssignButtonsDialog
 
 
 class SettingsWindow(QDialog):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
-        tabs = QTabWidget()
-        tabs.addTab(TempWidget("One"), "Tab1")
-        tabs.addTab(TempWidget("Two"), "Tab2")
-        tabs.addTab(TempXYWidget(), "Tab3")
+        self.layout = QVBoxLayout()
 
-        # store the tabs for later
-        self.tabs = tabs
+        self.keyWidget = AssignButtonsDialog(parent.timer_controller.get_mapping(), parent.keyboard_listener)
 
-        self.layout = QHBoxLayout()
+        self.tabs = QTabWidget()
+        self.tabs.addTab(TempWidget("One"), "Tab1")
+        self.tabs.addTab(TempXYWidget(), "Tab2")
+        self.tabs.addTab(self.keyWidget, 'Key Bindings')
+
+        # set up our standard dialog buttons
+        self.dialogButtons = QDialogButtonBox()
+        #self.dialogButtons.setCenterButtons(True)
+
+        # create buttons for the button dialog
+        self.dialogButtons.addButton(QDialogButtonBox.Ok)
+        self.dialogButtons.addButton(QDialogButtonBox.Apply)
+        self.dialogButtons.addButton(QDialogButtonBox.Cancel)
+
+        for button in self.dialogButtons.buttons():
+            button.setFixedSize(80, 25)
+
+        # link the buttons to what they need to do
+        # self.dialogButtons.accepted.connect(self.accept)
+        # self.dialogButtons.rejected.connect(self.reject)
+
+        self.dialogButtons.clicked.connect(self.button_event)
 
         self.layout.addWidget(self.tabs)
+        self.layout.addWidget(self.dialogButtons)
 
         self.setLayout(self.layout)
         self.setWindowTitle('Settings')
+
+    def apply_settings(self):
+        """
+        Applies the settings to the application, since each page will know what to emit
+        """
+        pass
+
+    def button_event(self, button: QPushButton):
+        role = self.dialogButtons.buttonRole(button)
+
+        if role == QDialogButtonBox.AcceptRole:
+            self.apply_settings()  # apply as normal
+            self.accept()  # accept the changes lol
+
+        elif role == QDialogButtonBox.RejectRole:
+            self.reject()
+
+        elif role == QDialogButtonBox.ApplyRole:
+            self.apply_settings()
+            print('here is where you can add code to apply settings changes w/o closing the page!!')
 
 
 class TempWidget(QWidget):
