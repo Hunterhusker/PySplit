@@ -42,11 +42,17 @@ class Main(QWidget):
 
         self.context_menu = QMenu(self)
 
-        settingsButtonAction = self.context_menu.addAction('Settings')
-        settingsButtonAction.triggered.connect(self.open_settings_popup)
+        self.settings_action = self.context_menu.addAction('Settings')
+        self.settings_action.triggered.connect(self.open_settings_popup)
 
-        lockTimerButtonAction = self.context_menu.addAction('Lock')
-        lockTimerButtonAction.triggered.connect(self.lock_action)
+        self.lock_timer_action = self.context_menu.addAction('Lock')
+        self.lock_timer_action.setCheckable(True)
+        self.lock_timer_action.setChecked(False)
+        self.lock_timer_action.toggled.connect(self.lock_action)
+        #lockTimerAction.triggered.connect(self.lock_action)
+
+        self.exit_action = self.context_menu.addAction('Exit')
+        self.exit_action.triggered.connect(QApplication.instance().quit)
 
         # load the settings from the file
         self.configurator = Configurator('conf/settings.json')
@@ -141,8 +147,14 @@ class Main(QWidget):
         # unlock the splitter
         self.timer_controller.listening = True
 
-    def lock_action(self):
+    def lock_action(self, checked: bool):
         self.timer_controller.toggle_listening()
+
+        if checked:
+            self.lock_timer_action.setText('Unlock')
+
+        else:
+            self.lock_timer_action.setText('Lock')
 
     @Slot(str)
     def set_style(self, style):
