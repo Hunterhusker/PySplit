@@ -5,7 +5,6 @@ import sys
 import json
 from time import sleep
 
-from Popups.AssignButtonsDialog import AssignButtonsDialog
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Popups.SettingsWindow import SettingsWindow
 from Timer.Timer import Timer
@@ -49,7 +48,6 @@ class Main(QWidget):
         self.lock_timer_action.setCheckable(True)
         self.lock_timer_action.setChecked(False)
         self.lock_timer_action.toggled.connect(self.lock_action)
-        #lockTimerAction.triggered.connect(self.lock_action)
 
         self.exit_action = self.context_menu.addAction('Exit')
         self.exit_action.triggered.connect(QApplication.instance().quit)
@@ -107,24 +105,6 @@ class Main(QWidget):
 
     def contextMenuEvent(self, event):
         self.context_menu.exec(event.globalPos())
-
-    def open_key_dialog(self):
-        """
-        Opens the keybinding assignment dialog popup and lets you reassign any key
-        """
-        # get the current mapping
-        event_map = self.timer_controller.get_mapping()
-
-        dialog = AssignButtonsDialog(event_map=event_map, listener=self.keyboard_listener)
-        dialog.setGeometry(900, 900, 275, 375)
-
-        clickedOk = dialog.exec()  # open the popup and wait for it to close
-
-        if clickedOk:
-            # give the controller the new mapping
-            self.timer_controller.update_mapping(dialog.event_map)
-
-            tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
 
     def open_settings_popup(self):
         """
@@ -195,6 +175,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = Main()
+    # window.setWindowFlags(Qt.FramelessWindowHint)  # uncomment this to make the top bar hide, but then you can't
 
     # use main's style configurations to get the initial stylesheet
     style = window.configurator.style.formatted_style_sheet
