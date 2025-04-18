@@ -1,56 +1,44 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox, \
-    QFrame, QWidget
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox, QFrame, QWidget
 from PySide6.QtCore import Slot, Signal, Qt
 import copy
 
-from Listeners.ABCListener import ABCListener
 from Listeners.KeyboardListener import key_to_str
 
+from typing import TYPE_CHECKING
 
-class AssignButtonsDialog(QWidget):
+if TYPE_CHECKING:
+    from Main import Main
+
+
+class AssignButtonsTab(QWidget):
     """
     A custom dialog box that we will use the remap the keys and buttons to control the splitter
     """
-    def __init__(self, event_map: dict[str, object], listener: ABCListener, parent: QWidget = None):
+    def __init__(self, mainWindow: 'Main', parent: QWidget = None):
         super().__init__(parent)
 
         # basic window setup
         # self.setWindowTitle('Assign Hotkeys!')
         self.layout = QVBoxLayout()
 
-        self.event_map = copy.deepcopy(event_map)  # save a copy of the event map
+        self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
 
         # get the listener from the main page so we can listen to it
-        self.listener = listener
-
-        # # set up our standard dialog buttons
-        # self.dialogButtons = QDialogButtonBox()
-        # self.dialogButtons.setCenterButtons(True)
-        #
-        # # create buttons for the button dialog
-        # self.dialogButtons.addButton(QDialogButtonBox.Ok)
-        # self.dialogButtons.addButton(QDialogButtonBox.Cancel)
-        #
-        # for button in self.dialogButtons.buttons():
-        #     button.setFixedSize(80, 25)
-        #
-        # # link the buttons to what they need to do
-        # self.dialogButtons.accepted.connect(self.accept)
-        # self.dialogButtons.rejected.connect(self.reject)
+        self.listener = mainWindow.keyboard_listener
 
         # pull apart the event mapping, so I can build my assignment GUI
         keys = list(self.event_map.keys())
         values = list(self.event_map.values())
 
         # create the button assignment widgets
-        self.assignStartSplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('STARTSPLIT')], timer_event='STARTSPLIT', label='Start\\Split:')
-        self.assignUnsplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('UNSPLIT')], timer_event='UNSPLIT', label='Un-Split:')
-        self.assignPause = KeyReassignmentLine(listener=listener, event_object=keys[values.index('PAUSE')], timer_event='PAUSE', label='Pause:')
-        self.assignResume = KeyReassignmentLine(listener=listener, event_object=keys[values.index('RESUME')], timer_event='RESUME', label='Resume:')
-        self.assignReset = KeyReassignmentLine(listener=listener, event_object=keys[values.index('RESET')], timer_event='RESET', label='Reset:')
-        self.assignStop = KeyReassignmentLine(listener=listener, event_object=keys[values.index('STOP')], timer_event='STOP', label='Stop:')
-        self.assignSkipSplit = KeyReassignmentLine(listener=listener, event_object=keys[values.index('SKIP')], timer_event='SKIP', label='Skip Split:')
-        self.assignLock = KeyReassignmentLine(listener=listener, event_object=keys[values.index('LOCK')], timer_event='LOCK', label='Lock:')
+        self.assignStartSplit = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('STARTSPLIT')], timer_event='STARTSPLIT', label='Start\\Split:')
+        self.assignUnsplit = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('UNSPLIT')], timer_event='UNSPLIT', label='Un-Split:')
+        self.assignPause = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('PAUSE')], timer_event='PAUSE', label='Pause:')
+        self.assignResume = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('RESUME')], timer_event='RESUME', label='Resume:')
+        self.assignReset = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('RESET')], timer_event='RESET', label='Reset:')
+        self.assignStop = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('STOP')], timer_event='STOP', label='Stop:')
+        self.assignSkipSplit = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('SKIP')], timer_event='SKIP', label='Skip Split:')
+        self.assignLock = KeyReassignmentLine(listener=self.listener, event_object=keys[values.index('LOCK')], timer_event='LOCK', label='Lock:')
 
         # also save a copy of the widgets so we can reference them by their event
         self.widgets = {
@@ -75,8 +63,6 @@ class AssignButtonsDialog(QWidget):
 
         # add a stretch to keep stuff sized right
         self.layout.addStretch()
-
-        #self.layout.addWidget(self.dialogButtons)
 
         # link it all up so that this displays
         self.setLayout(self.layout)
