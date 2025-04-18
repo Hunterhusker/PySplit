@@ -1,10 +1,8 @@
-from PySide6.QtGui import QPainter
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QDialog, QDialogButtonBox, QPushButton, QMessageBox, QFrame, QWidget, QTabWidget
-from PySide6.QtCharts import QLineSeries, QChart, QChartView
-from PySide6.QtCore import Slot, Signal, Qt, QPointF, QObject
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QDialog, QDialogButtonBox, QPushButton, QWidget, QTabWidget
+from PySide6.QtCore import Slot, Signal, QObject, Qt
 
-from Listeners import ABCListener
-from Popups.AssignButtonsDialog import AssignButtonsDialog
+from Popups.AssignButtonsTab import AssignButtonsTab
+from Popups.StyleTab import StyleTab
 
 
 class SettingsWindow(QDialog):
@@ -13,11 +11,11 @@ class SettingsWindow(QDialog):
 
         self.layout = QVBoxLayout()
 
-        self.keyWidget = AssignButtonsDialog(parent.timer_controller.get_mapping(), parent.keyboard_listener)
+        self.keyWidget = AssignButtonsTab(mainWindow=parent)
+        self.styleWidget = StyleTab(mainWindow=parent)
 
         self.tabs = QTabWidget()
-        self.tabs.addTab(TempWidget("One"), "Tab1")
-        self.tabs.addTab(TempXYWidget(), "Tab2")
+        self.tabs.addTab(self.styleWidget, 'Style')
         self.tabs.addTab(self.keyWidget, 'Key Bindings')
 
         # set up our standard dialog buttons
@@ -31,6 +29,8 @@ class SettingsWindow(QDialog):
 
         for button in self.dialogButtons.buttons():
             button.setFixedSize(80, 25)
+            button.setAutoDefault(False)
+            button.setDefault(False)
 
         # link the buttons to what they need to do
         # self.dialogButtons.accepted.connect(self.accept)
@@ -50,6 +50,13 @@ class SettingsWindow(QDialog):
         """
         pass
 
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            # Ignore Return/Enter to prevent dialog accept
+            event.ignore()
+        else:
+            super().keyPressEvent(event)
+
     def button_event(self, button: QPushButton):
         role = self.dialogButtons.buttonRole(button)
 
@@ -62,36 +69,3 @@ class SettingsWindow(QDialog):
 
         elif role == QDialogButtonBox.ApplyRole:
             self.apply_settings()
-            print('here is where you can add code to apply settings changes w/o closing the page!!')
-
-
-class TempWidget(QWidget):
-    def __init__(self, text: str = '', parent: QWidget = None):
-        super().__init__(parent)
-        self.layout = QVBoxLayout()
-
-        self.lbl = QLabel(text, self)
-
-        self.layout.addWidget(self.lbl)
-
-        self.setLayout(self.layout)
-
-
-class TempXYWidget(QWidget):
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-        self.layout = QVBoxLayout()
-
-        series = QLineSeries()
-        series.append([QPointF(0, 0), QPointF(1, 1), QPointF(2, 4), QPointF(3, 9), QPointF(4, 16)])
-
-        chart = QChart()
-        chart.addSeries(series)
-        chart.createDefaultAxes()
-
-        self.chart_view = QChartView(chart)
-        self.chart_view.setRenderHint(QPainter.Antialiasing)
-
-        self.layout.addWidget(self.chart_view)
-
-        self.setLayout(self.layout)
