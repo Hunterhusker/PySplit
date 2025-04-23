@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox, QFrame, QWidget
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox, QFrame, QWidget, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
 import copy
 
@@ -20,6 +20,17 @@ class AssignButtonsTab(QWidget):
         # basic window setup
         # self.setWindowTitle('Assign Hotkeys!')
         self.layout = QVBoxLayout()
+
+        self.scrollWidget = QWidget()
+        self.scrollWidgetLayout = QVBoxLayout()
+        self.scrollWidgetLayout.setSpacing(3)
+        self.scrollWidgetLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setFrameStyle(QFrame.NoFrame)
 
         self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
 
@@ -52,17 +63,23 @@ class AssignButtonsTab(QWidget):
             'LOCK': self.assignLock
         }
 
-        self.layout.addWidget(self.assignStartSplit)
-        self.layout.addWidget(self.assignUnsplit)
-        self.layout.addWidget(self.assignPause)
-        self.layout.addWidget(self.assignResume)
-        self.layout.addWidget(self.assignStop)
-        self.layout.addWidget(self.assignReset)
-        self.layout.addWidget(self.assignSkipSplit)
-        self.layout.addWidget(self.assignLock)
+        self.scrollWidgetLayout.addWidget(self.assignStartSplit)
+        self.scrollWidgetLayout.addWidget(self.assignUnsplit)
+        self.scrollWidgetLayout.addWidget(self.assignPause)
+        self.scrollWidgetLayout.addWidget(self.assignResume)
+        self.scrollWidgetLayout.addWidget(self.assignStop)
+        self.scrollWidgetLayout.addWidget(self.assignReset)
+        self.scrollWidgetLayout.addWidget(self.assignSkipSplit)
+        self.scrollWidgetLayout.addWidget(self.assignLock)
 
         # add a stretch to keep stuff sized right
-        self.layout.addStretch()
+        self.scrollWidgetLayout.addStretch()
+
+        self.scrollWidget.setLayout(self.scrollWidgetLayout)
+        self.scrollArea.setWidget(self.scrollWidget)
+
+        self.scrollWidget.setLayout(self.scrollWidgetLayout)
+        self.layout.addWidget(self.scrollArea)
 
         # link it all up so that this displays
         self.setLayout(self.layout)
