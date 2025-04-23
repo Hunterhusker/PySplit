@@ -36,6 +36,8 @@ class Main(QWidget):
 
         self.Title = TitleWidget('Game', 'SubTitle')
         self.Title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
+        self._start_pos = None
 
         self.MainTimerWidget = TimerWidget()
 
@@ -170,12 +172,22 @@ class Main(QWidget):
         # accept the close event and actually close
         event.accept()
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self._start_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+
+    def mouseMoveEvent(self, event):
+        if self._start_pos is not None and event.buttons() & Qt.LeftButton:
+            self.move(event.globalPosition().toPoint() - self._start_pos)
+
+    def mouseReleaseEvent(self, event):
+        self._start_pos = None
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = Main()
-    # window.setWindowFlags(Qt.FramelessWindowHint)  # uncomment this to make the top bar hide, but then you can't
 
     # use main's style configurations to get the initial stylesheet
     style = window.configurator.style.formatted_style_sheet
