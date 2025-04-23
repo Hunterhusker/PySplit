@@ -113,7 +113,7 @@ class Main(QWidget):
         Opens the keybinding assignment dialog popup and lets you reassign any key
         """
         dialog = SettingsWindow(self)
-        dialog.setGeometry(900, 900, 600, 300)
+        dialog.setGeometry(900, 900, 400, 400)
 
         # lock the splitter
         self.timer_controller.listening = False
