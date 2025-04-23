@@ -19,6 +19,14 @@ QTabWidget {
     border: none;
 }
 
+QMenu::item {
+    background-color: $primary-background;
+}
+
+QMenu::item:selected {
+    background-color: $secondary-background;
+}
+
 #TimeFrame {
     border-bottom: 1px solid $border-color;
     border-top: 1px solid $border-color;
