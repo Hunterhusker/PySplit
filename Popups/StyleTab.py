@@ -1,9 +1,5 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox, QFrame, QWidget, QLineEdit
-from PySide6.QtCore import Slot, Signal, Qt
-import copy
-
-from Listeners.ABCListener import ABCListener
-from Listeners.KeyboardListener import key_to_str
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea
+from PySide6.QtCore import Slot, Qt
 
 from typing import TYPE_CHECKING
 
@@ -19,15 +15,32 @@ class StyleTab(QWidget):
 
         self.layout = QVBoxLayout()
 
+        self.scrollWidget = QWidget()
+        self.scrollWidgetLayout = QVBoxLayout()
+        self.scrollWidgetLayout.setSpacing(3)
+        self.scrollWidgetLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setFrameStyle(QFrame.NoFrame)
+
         self.inputs = []
 
         for k, v in self.var_map.items():
             tmp = StyleSettingLine(k, v)
 
             self.inputs.append(tmp)
-            self.layout.addWidget(tmp)
+            self.scrollWidgetLayout.addWidget(tmp)
 
-        self.layout.addStretch()
+        self.scrollWidgetLayout.addStretch()
+
+        self.scrollWidget.setLayout(self.scrollWidgetLayout)
+        self.scrollArea.setWidget(self.scrollWidget)
+
+        self.scrollWidget.setLayout(self.scrollWidgetLayout)
+        self.layout.addWidget(self.scrollArea)
 
         self.setLayout(self.layout)
 
@@ -40,12 +53,17 @@ class StyleSettingLine(QFrame):
 
         self.label = QLabel(label, self)
         self.label.setObjectName('KeyAssignmentLabel')
+        self.setFixedHeight(35)
 
         self.textInput = QLineEdit()
         self.textInput.setText(value)
+        self.textInput.setFixedSize(125, 25)
 
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.textInput)
+
+        self.layout.setAlignment(self.textInput, Qt.AlignRight | Qt.AlignVCenter)
+        self.layout.setAlignment(self.label, Qt.AlignLeft | Qt.AlignVCenter)
 
         self.setLayout(self.layout)
         self.setObjectName('KeyReassignmentLine')
