@@ -138,6 +138,8 @@ class Main(QWidget):
         else:
             self.lock_timer_action.setText('Lock')
 
+        self.context_menu.show()  # try and keep the menu open
+
     @Slot(str)
     def set_style(self, style):
         """
