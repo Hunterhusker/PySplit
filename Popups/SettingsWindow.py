@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QDialog, QDialogButtonBox, QPushButton, QWidget, QTabWidget
-from PySide6.QtCore import Slot, Signal, QObject, Qt
+from PySide6.QtWidgets import QVBoxLayout, QDialog, QDialogButtonBox, QPushButton, QWidget, QTabWidget
+from PySide6.QtCore import Qt
 
 from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.StyleTab import StyleTab
@@ -20,7 +20,6 @@ class SettingsWindow(QDialog):
 
         # set up our standard dialog buttons
         self.dialogButtons = QDialogButtonBox()
-        #self.dialogButtons.setCenterButtons(True)
 
         # create buttons for the button dialog
         self.dialogButtons.addButton(QDialogButtonBox.Ok)
@@ -31,10 +30,6 @@ class SettingsWindow(QDialog):
             button.setFixedSize(80, 25)
             button.setAutoDefault(False)
             button.setDefault(False)
-
-        # link the buttons to what they need to do
-        # self.dialogButtons.accepted.connect(self.accept)
-        # self.dialogButtons.rejected.connect(self.reject)
 
         self.dialogButtons.clicked.connect(self.button_event)
 
