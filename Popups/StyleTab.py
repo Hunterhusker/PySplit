@@ -24,6 +24,7 @@ class StyleTab(QWidget):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scrollArea.setFrameStyle(QFrame.NoFrame)
+        self.scrollArea.setViewportMargins(0, 0, 5, 0)
 
         self.inputs = []
 
