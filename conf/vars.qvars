@@ -1,5 +1,8 @@
 primary-background:#2b2b2b
 secondary-background:#323232
+item-background-color:#4c5052
+hover-background-color:#5c6163
+pressed-background-color:#6b7073
 border-color:#bbbbbb
 text-color:#bbbbbb
 button-background-color:#4c5052
