@@ -30,6 +30,7 @@ class AssignButtonsTab(QWidget):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scrollArea.setFrameStyle(QFrame.NoFrame)
+        self.scrollArea.setViewportMargins(0, 0, 5, 0)
 
         self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
 
