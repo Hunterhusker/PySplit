@@ -34,6 +34,64 @@ QLineEdit {
     border-radius: 2px;
 }
 
+QScrollBar:vertical {
+    border: none;
+    border-radius: 0px;
+    background-color: $secondary-background;
+    width: 14px;
+    margin: 14px 0px 14px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: $item-background-color;
+    min-height: 30px;
+    border-radius: 7px;
+}
+
+QScrollBar::handle:vertical:hover{
+	background-color: $hover-background-color;
+}
+
+QScrollBar::handle:vertical:pressed {
+	background-color: $pressed-background-color;
+}
+
+QScrollBar::sub-line:vertical {
+	border: none;
+	background-color: $item-background-color;
+	height: 14px;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+	subcontrol-position: top;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical:hover {
+	background-color: $hover-background-color;
+}
+
+QScrollBar::sub-line:vertical:pressed {
+	background-color: $pressed-background-color;
+}
+
+QScrollBar::add-line:vertical {
+	border: none;
+	background-color: $item-background-color;
+	height: 14px;
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
+	subcontrol-position: bottom;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:vertical:hover {
+	background-color: $hover-background-color;
+}
+
+QScrollBar::add-line:vertical:pressed {
+	background-color: $pressed-background-color;
+}
+
 #TimeFrame {
     border-bottom: 1px solid $border-color;
     border-top: 1px solid $border-color;
