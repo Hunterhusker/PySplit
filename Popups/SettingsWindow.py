@@ -43,7 +43,11 @@ class SettingsWindow(QDialog):
         """
         Applies the settings to the application, since each page will know what to emit
         """
-        pass
+        # get the current tab
+        idx = self.tabs.currentIndex()
+        currWidget = self.tabs.currentWidget()
+
+        print(f'Curr: {idx}: {str(currWidget)}')
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):

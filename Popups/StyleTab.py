@@ -1,15 +1,17 @@
+from abc import ABC
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea
 from PySide6.QtCore import Slot, Qt
-
 from typing import TYPE_CHECKING
+
+from Popups.ABCSettingTab import ABCSettingTab
 
 if TYPE_CHECKING:
     from Main import Main
 
 
-class StyleTab(QWidget):
+class StyleTab(ABCSettingTab):
     def __init__(self, mainWindow: 'Main' = None):
-        super().__init__(parent=mainWindow)
+        super().__init__()
 
         self.var_map = mainWindow.configurator.style.variable_map
 
@@ -43,6 +45,9 @@ class StyleTab(QWidget):
         self.layout.addWidget(self.scrollArea)
 
         self.setLayout(self.layout)
+
+    def apply(self):
+        pass
 
 
 class StyleSettingLine(QFrame):
