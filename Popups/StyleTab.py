@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class StyleTab(ABCSettingTab):
     def __init__(self, mainWindow: 'Main' = None):
-        super().__init__()
+        super().__init__(parent=mainWindow)
 
         self.var_map = mainWindow.configurator.style.variable_map
 
