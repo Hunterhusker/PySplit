@@ -1,16 +1,16 @@
+import copy
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox, QFrame, QWidget, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
-import copy
+from typing import TYPE_CHECKING
 
 from Listeners.KeyboardListener import key_to_str
-
-from typing import TYPE_CHECKING
+from Popups.ABCSettingTab import ABCSettingTab
 
 if TYPE_CHECKING:
     from Main import Main
 
 
-class AssignButtonsTab(QWidget):
+class AssignButtonsTab(ABCSettingTab):
     """
     A custom dialog box that we will use the remap the keys and buttons to control the splitter
     """
@@ -125,6 +125,9 @@ class AssignButtonsTab(QWidget):
             dlg.exec()
 
         self.event_map = dict(zip(keys, values))  # remake the map and set it
+
+    def apply(self):
+        pass
 
 
 class KeyReassignmentLine(QFrame):
