@@ -136,14 +136,14 @@ class Main(QWidget):
         self.context_menu.show()  # try and keep the menu open
 
     @Slot(str)
-    def set_style(self, style):
+    def set_style(self, stylesheet):
         """
         Sets the global stylesheet for the application
 
         Args:
-            style: (str) the style sheet data, probably read from file
+            stylesheet: (str) the style sheet data, probably read from file
         """
-        self.setStyleSheet(style)
+        self.setStyleSheet(stylesheet)
 
     def get_style(self):
         """
