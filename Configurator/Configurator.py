@@ -7,7 +7,6 @@ from Configurator.Style.styleBuilder import StyleBuilder
 class Configurator(QObject):
     Configure = Signal(dict)  # emit the settings
     ConfigureGame = Signal(dict)  # emit the game configuration
-    ConfigureStyle = Signal(dict)  # emit changes to the style
 
     def __init__(self, file_path: str):
         super().__init__()
@@ -19,8 +18,6 @@ class Configurator(QObject):
 
         # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
         self.style = StyleBuilder(self.settings['style_path'], self.settings['var_path'])
-
-        self.ConfigureStyle.connect(self.style.UpdateStyle)  # no need to duplicate these methods, just hook up the signal to pass it on
 
     def read_settings(self):
         """

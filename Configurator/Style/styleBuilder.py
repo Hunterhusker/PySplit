@@ -1,13 +1,15 @@
 import copy
 import json
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QObject
 
 
-class StyleBuilder:
+class StyleBuilder(QObject):
     UpdateStyle = Signal(str)
 
     def __init__(self, style_path, vars_path):
+        super().__init__()
+
         self.style_path = style_path
         self.vars_path = vars_path
 
@@ -85,11 +87,9 @@ class StyleBuilder:
         if var_map is not None:
             self.set_vars(var_map)
 
-        print()
-
         self.format_style()  # format the sheet with the updated data
 
-        #self.UpdateStyle.emit(self.formatted_style_sheet)  # emit the changed sheet
+        self.UpdateStyle.emit(self.variable_map)
 
     def update_style_from_paths(self, style_path: str = None, vars_path: str = None):
         """

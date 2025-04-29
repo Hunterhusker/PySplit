@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, Qt
+from PySide6.QtCore import Slot, Qt, Signal
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea
 from typing import TYPE_CHECKING
 
@@ -12,7 +12,8 @@ class StyleTab(ABCSettingTab):
     def __init__(self, mainWindow: 'Main' = None):
         super().__init__(parent=mainWindow)
 
-        self.var_map = mainWindow.configurator.style.variable_map
+        self.main = mainWindow
+        self.var_map = self.main.configurator.style.variable_map
 
         self.layout = QVBoxLayout()
 
@@ -30,10 +31,11 @@ class StyleTab(ABCSettingTab):
         self.inputs = []
 
         for k, v in self.var_map.items():
-            tmp = StyleSettingLine(k, v)
+            tmp = StyleSettingLine(k, v, self)  # pass itself in so the key line can update the parent
 
             self.inputs.append(tmp)
             self.scrollWidgetLayout.addWidget(tmp)
+            tmp.UpdateKey.connect(self.update_key)
 
         self.scrollWidgetLayout.addStretch()
 
@@ -45,17 +47,26 @@ class StyleTab(ABCSettingTab):
 
         self.setLayout(self.layout)
 
+    @Slot(str, str)
+    def update_key(self, key: str, value: str = ""):
+        self.var_map[key] = value
+
     def apply(self):
-        pass
+        self.main.configurator.style.update_style(var_map=self.var_map)
 
 
 class StyleSettingLine(QFrame):
-    def __init__(self, label: str, value: str):
-        super().__init__()
+    UpdateKey = Signal(str, str)
+
+    def __init__(self, key: str, value: str, parent: StyleTab):
+        super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()  # like the key lines we want a label and then a value
+        self.parent = parent  # save the parent so we can pass var updates upstream
 
-        self.label = QLabel(label, self)
+        self.key = key
+
+        self.label = QLabel(key, self)
         self.label.setObjectName('KeyAssignmentLabel')
         self.setFixedHeight(35)
 
@@ -79,3 +90,5 @@ class StyleSettingLine(QFrame):
     def textChanged(self):
         print(f'lineEditText: {self.textInput.text()}')
 
+        # pass the change up to the parent
+        self.UpdateKey.emit(self.key, self.textInput.text())
