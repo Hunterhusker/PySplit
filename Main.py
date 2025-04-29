@@ -58,7 +58,7 @@ class Main(QWidget):
         self.configurator = Configurator('conf/settings.json')
 
         # use the configurations from the file
-        self.configurator.ConfigureStyle.connect(self.set_style)
+        self.configurator.style.UpdateStyle.connect(self.set_style)
 
         self.splits = SplitsWidget('')
         self.splitStats = TimeStatsWidget()
