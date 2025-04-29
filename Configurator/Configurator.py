@@ -37,12 +37,6 @@ class Configurator(QObject):
         with open(self.file_path, 'w') as f:
             f.write(self.settings)
 
-    def read_game_settings(self):
-        pass
-
-    def write_game_settings(self):
-        pass
-
     def update_setting(self, key: str, settings: dict):
         """
 
