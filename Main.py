@@ -106,25 +106,20 @@ class Main(QWidget):
         self.Quit.connect(self.keyboard_listener.quit)
 
     def contextMenuEvent(self, event):
-        self.context_menu.exec(event.globalPos())
+        if not self.game_timer.running:  # only open if the timer is not running, don't play with settings! PLAY THE GAME!
+            self.context_menu.exec(event.globalPos())
 
     def open_settings_popup(self):
         """
         Opens the keybinding assignment dialog popup and lets you reassign any key
         """
-        dialog = SettingsWindow(self)
+        dialog = SettingsWindow(parent=self)
         dialog.setGeometry(900, 900, 400, 400)
 
         # lock the splitter
         self.timer_controller.listening = False
 
-        clickedOk = dialog.exec()  # open the popup and wait for it to close
-
-        if clickedOk:
-            # give the controller the new mapping
-            self.timer_controller.update_mapping(dialog.keyWidget.event_map)
-
-            tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
+        dialog.exec()  # open the popup and wait for it to close
 
         # unlock the splitter
         self.timer_controller.listening = True
