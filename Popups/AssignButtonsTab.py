@@ -18,8 +18,8 @@ class AssignButtonsTab(ABCSettingTab):
         super().__init__(parent)
 
         # basic window setup
-        # self.setWindowTitle('Assign Hotkeys!')
         self.layout = QVBoxLayout()
+        self.main = mainWindow  # save the link to the main that we need to save our changes
 
         self.scrollWidget = QWidget()
         self.scrollWidgetLayout = QVBoxLayout()
@@ -127,7 +127,7 @@ class AssignButtonsTab(ABCSettingTab):
         self.event_map = dict(zip(keys, values))  # remake the map and set it
 
     def apply(self):
-        pass
+        self.main.timer_controller.update_mapping(self.event_map)
 
 
 class KeyReassignmentLine(QFrame):
