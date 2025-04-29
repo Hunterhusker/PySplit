@@ -89,7 +89,7 @@ class StyleBuilder(QObject):
 
         self.format_style()  # format the sheet with the updated data
 
-        self.UpdateStyle.emit(self.variable_map)
+        self.UpdateStyle.emit(self.formatted_style_sheet)
 
     def update_style_from_paths(self, style_path: str = None, vars_path: str = None):
         """
