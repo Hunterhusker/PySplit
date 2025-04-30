@@ -6,6 +6,7 @@ QWidget {
 QFrame {
     background-color: $primary-background;
     color: $text-color;
+    border: none;
 }
 
 QPushButton {
@@ -90,6 +91,25 @@ QScrollBar::add-line:vertical:hover {
 
 QScrollBar::add-line:vertical:pressed {
 	background-color: $pressed-background-color;
+}
+
+QTabBar::tab {
+    background: $primary-background;
+    color: $text-color;
+    border-top: 1px solid $secondary-background;
+    border-left: 1px solid $secondary-background;
+    border-right: 1px solid $secondary-background;
+    border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+    padding: 5px 10px;
+}
+
+QTabBar::tab:selected {
+    background: $secondary-background;
+}
+
+QTabBar::tab:!selected {
+    margin-top: 2px; /* makes the unselected tabs look smaller */
 }
 
 #TimeFrame {
