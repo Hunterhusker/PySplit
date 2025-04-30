@@ -76,6 +76,7 @@ class StyleSettingLine(QFrame):
 
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.textInput)
+        self.layout.setContentsMargins(10, 0, 10, 0)
 
         self.layout.setAlignment(self.textInput, Qt.AlignRight | Qt.AlignVCenter)
         self.layout.setAlignment(self.label, Qt.AlignLeft | Qt.AlignVCenter)
