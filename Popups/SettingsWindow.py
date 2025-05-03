@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QVBoxLayout, QDialog, QDialogButtonBox, QPushButto
 from PySide6.QtCore import Qt
 
 from Popups.AssignButtonsTab import AssignButtonsTab
+from Popups.SplitsTab import SplitsTab
 from Popups.StyleTab import StyleTab
 
 
@@ -11,12 +12,15 @@ class SettingsWindow(QDialog):
 
         self.layout = QVBoxLayout()
 
+        # create the tabs here before we add them, and give them a link to main
         self.keyWidget = AssignButtonsTab(mainWindow=parent)
         self.styleWidget = StyleTab(mainWindow=parent)
+        self.splitsWidget = SplitsTab(mainWindow=parent)
 
         self.tabs = QTabWidget()
         self.tabs.addTab(self.styleWidget, 'Style')
         self.tabs.addTab(self.keyWidget, 'Key Bindings')
+        self.tabs.addTab(self.splitsWidget, 'Splits')
 
         # set up our standard dialog buttons
         self.dialogButtons = QDialogButtonBox()
