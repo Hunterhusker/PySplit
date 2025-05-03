@@ -1,3 +1,6 @@
+from PySide6.QtCore import QTime
+
+
 def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     """
     Takes in a number of elapsed milliseconds and outputs the wallclock time as a string
@@ -29,3 +32,23 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     h = f'{h:02}:' if h != 0 else ''
 
     return result + "".join([h, m, base])
+
+
+def qtime_to_ms(time: QTime) -> int:
+    """
+    Calculates and returns the number of total milliseconds from 0 to the time defined by the QTime
+
+    Args:
+        time: (QTime) The QTime object
+
+    Returns:
+        (int) The number of milliseconds
+    """
+    total_time = 0
+
+    total_time += time.msec()
+    total_time += time.second() * 1000
+    total_time += time.minute() * 60000
+    total_time += time.hour() * 1440000
+
+    return total_time
