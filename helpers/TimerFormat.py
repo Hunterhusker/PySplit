@@ -14,13 +14,7 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     """
     result = ''
 
-    if millis < 0:
-        millis = millis * -1
-        result += '-'
-
-    s, ms = divmod(millis, 1000)
-    m, s = divmod(s, 60)
-    h, m = divmod(m, 60)
+    h, m, s, ms = millis_to_wallclock_components(millis)
 
     if full_length:  # if we want the fully expressed time as a string then return it
         return f'{h:02}:{m:02}:{s:02}.{ms:03}'
@@ -32,6 +26,35 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     h = f'{h:02}:' if h != 0 else ''
 
     return result + "".join([h, m, base])
+
+
+def millis_to_wallclock_components(millis: int):
+    if millis < 0:
+        millis = millis * -1
+
+    s, ms = divmod(millis, 1000)
+    m, s = divmod(s, 60)
+    h, m = divmod(m, 60)
+
+    return h, m, s, ms
+
+
+def ms_to_qtime(millis: int) -> QTime:
+    """
+    Turns a number of milliseconds to a QTime object
+
+    Args:
+        millis: (int) the number of milliseconds in this period
+
+    Returns:
+        (QTime) The QTime object that represents the MS duration
+    """
+    h, m, s, ms = millis_to_wallclock_components(millis)
+
+    tmp = QTime()
+    tmp.setHMS(h, m, s, ms)
+
+    return tmp
 
 
 def qtime_to_ms(time: QTime) -> int:
