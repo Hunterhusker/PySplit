@@ -42,10 +42,12 @@ class SplitLine(QFrame):
         self.goldTimeInput = QTimeEdit()
         self.goldTimeInput.setDisplayFormat('hh:mm:ss.zzz')
         self.goldTimeInput.setTime(QTime(0, 0, 0))
+        self.goldTimeInput.setFixedSize(125, 25)
 
         self.bestTimeInput = QTimeEdit()
         self.bestTimeInput.setDisplayFormat('hh:mm:ss.zzz')
         self.bestTimeInput.setTime(QTime(0, 0, 0))
+        self.bestTimeInput.setFixedSize(125, 25)
 
         # add them all in one block
         self.layout.addWidget(self.splitNameInput)
