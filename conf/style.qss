@@ -217,3 +217,9 @@ QTabBar::tab:!selected {
     color: $text-color;
     background-color: $secondary-background;
 }
+
+#SettingLine {
+    color: $text-color;
+    background-color: $secondary-background;
+    border-radius: 2px;
+}

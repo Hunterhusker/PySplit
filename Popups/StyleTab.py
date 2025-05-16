@@ -82,7 +82,7 @@ class StyleSettingLine(QFrame):
         self.layout.setAlignment(self.label, Qt.AlignLeft | Qt.AlignVCenter)
 
         self.setLayout(self.layout)
-        self.setObjectName('KeyReassignmentLine')
+        self.setObjectName('SettingLine')
 
         # hook up the signals to our input
         self.textInput.editingFinished.connect(self.textChanged)
