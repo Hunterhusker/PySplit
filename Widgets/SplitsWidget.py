@@ -177,10 +177,10 @@ class SplitsWidget(QWidget):
 
     def load_splits(self, json: str):
         # create the splits
-        split1 = SingleSplitWidget('test1', 1230, 2230, 1230, 2230, True)
-        split2 = SingleSplitWidget('test2', 3330, 3630, 3330 - 2230, 3630 - 2230, True)
-        split3 = SingleSplitWidget('test3', 5550, 6650, 5550 - 3330, 6650 - 3630, True)
-        split4 = SingleSplitWidget('test4', 8880, 8880, 8880 - 5550, 8880 - 6650, True)
+        split1 = SingleSplitWidget('test1',  2230, 1230, 2230, True)
+        split2 = SingleSplitWidget('test2',  3630, 3330 - 2230, 3630 - 2230, True)
+        split3 = SingleSplitWidget('test3',  6650, 5550 - 3330, 6650 - 3630, True)
+        split4 = SingleSplitWidget('test4',  8880, 8880 - 5550, 8880 - 6650, True)
 
         # add them to the list
         self.splits.append(split1)

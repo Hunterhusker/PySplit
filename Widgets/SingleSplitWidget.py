@@ -6,13 +6,12 @@ from helpers.TimerFormat import format_wall_clock_from_ms
 
 
 class SingleSplitWidget(QFrame):
-    def __init__(self, split_name: str, gold_time_ms: int, pb_time_ms: int, gold_segment_ms: int, pb_segment_ms: int, displayPb: bool):
+    def __init__(self, split_name: str, pb_time_ms: int, gold_segment_ms: int, pb_segment_ms: int, displayPb: bool):
         """
         An individual split that can display the times from the PB and the comparison  time
 
         Args:
             split_name: (str) the name of the split
-            gold_time_ms: (int) the number of milliseconds from the start that was achieved on the PB for this segment only
             pb_time_ms: (int) the number of milliseconds from the start that was achieved on the overall PB for this game
         """
         super().__init__()
@@ -21,7 +20,6 @@ class SingleSplitWidget(QFrame):
         self.split_name = split_name
 
         # track the saved times
-        self.gold_time_ms = gold_time_ms
         self.pb_time_ms = pb_time_ms
 
         # track our best saved segments
@@ -39,7 +37,7 @@ class SingleSplitWidget(QFrame):
         if displayPb:
             self.display_time_ms = self.pb_time_ms
         else:
-            self.display_time_ms = self.gold_time_ms
+            self.display_time_ms = self.pb_time_ms  # self.gold_time_ms
 
         self.layout = QHBoxLayout()
 
@@ -57,12 +55,6 @@ class SingleSplitWidget(QFrame):
         self.layout.setAlignment(self.split_name_label, Qt.AlignLeft | Qt.AlignVCenter)
         self.layout.setAlignment(self.delta_label, Qt.AlignRight)
         self.layout.setAlignment(self.time_label, Qt.AlignRight | Qt.AlignVCenter)
-
-        # set this as a little lighter grey so they look nice
-        # self.setStyleSheet("""
-        #     background-color: #323232;
-        #     color: #bbbbbb;
-        # """)
 
         self.setObjectName('SingleSplit')
 
@@ -88,7 +80,10 @@ class SingleSplitWidget(QFrame):
             time_delta_str = format_wall_clock_from_ms(time_delta)
 
             if time_delta >= 0:
-                time_delta_str = "+" + time_delta_str
+                time_delta_str = '+' + time_delta_str
+
+            else:
+                time_delta_str = '-' + time_delta_str
 
             self.delta_label.setText(time_delta_str)
 
@@ -116,7 +111,6 @@ class SingleSplitWidget(QFrame):
         Saves any golds and starts the split over
         """
         if self.current_segment_ms < self.gold_segment_ms and self.current_time_ms != 0:
-            self.gold_time_ms = self.current_time_ms
             self.gold_segment_ms = self.current_segment_ms
             self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
 
@@ -136,7 +130,6 @@ class SingleSplitWidget(QFrame):
         return f"""{indent * depth}{{
 {indent * (depth + 1)}"split_name": "{self.split_name}",
 {indent * (depth + 1)}"pb_time_ms": {self.pb_time_ms},
-{indent * (depth + 1)}"gold_time_ms": {self.gold_time_ms},
 {indent * (depth + 1)}"pb_segment_ms": {self.pb_segment_ms},
 {indent * (depth + 1)}"gold_segment_ms": {self.gold_segment_ms}
 {indent * depth}}}"""
@@ -148,15 +141,25 @@ class SingleSplitWidget(QFrame):
             time_delta_str = format_wall_clock_from_ms(time_delta)
 
             if time_delta >= 0:
-                time_delta_str = "+" + time_delta_str
+                time_delta_str = '+' + time_delta_str
+            else:
+                time_delta_str = '-' + time_delta_str
 
             self.delta_label.setText(time_delta_str)  # update the +/- time delta label
 
-            if self.current_time_ms < self.gold_time_ms:
+            if self.current_segment_ms < self.gold_segment_ms:
+                # set the text to show that we saved time
                 self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
-                self.time_label.setStyleSheet('color: gold;')
-                self.delta_label.setStyleSheet('color: gold;')
 
+                # if we're ahead of the saved time, then a "gold" gold
+                if self.current_segment_ms < self.pb_segment_ms:
+                    self.time_label.setStyleSheet('color: gold;')
+                    self.delta_label.setStyleSheet('color: gold;')
+                else:  # we're behind, but we saved time, then we ought to color it a different color to note the gold but while not ahead
+                    self.time_label.setStyleSheet('color: goldenrod;')
+                    self.delta_label.setStyleSheet('color: goldenrod;')
+
+            # TODO : non-gold time save while behind should get colored differently
             elif self.current_time_ms >= self.pb_time_ms:
                 self.time_label.setStyleSheet('color: red;')
                 self.delta_label.setStyleSheet('color: red;')
