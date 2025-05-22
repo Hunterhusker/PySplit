@@ -20,6 +20,9 @@ class SplitsTab(ABCSettingTab):
 
         self.splits = mainWindow.splits
 
+        self.json = self.splits.export_splits()
+        print(self.json)
+
         self.splitWidgets = []
         self.splitWidgets.append(SplitLine("test split", 0, 0, self))
         self.splitWidgets.append(SplitLine("test split", 0, 0, self))
@@ -93,19 +96,26 @@ class SplitLine(QFrame):
         self.splitNameInput.setText(splitName)
         self.splitNameInput.setFixedSize(125, 25)
 
-        self.goldTimeInput = QTimeEdit()
-        self.goldTimeInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.goldTimeInput.setTime(QTime(0, 0, 0))
-        self.goldTimeInput.setFixedSize(125, 25)
-
         self.bestTimeInput = QTimeEdit()
         self.bestTimeInput.setDisplayFormat('hh:mm:ss.zzz')
         self.bestTimeInput.setTime(QTime(0, 0, 0))
-        self.bestTimeInput.setFixedSize(125, 25)
+        self.bestTimeInput.setFixedSize(100, 25)
+
+        self.bestSegmentInput = QTimeEdit()
+        self.bestSegmentInput.setDisplayFormat('hh:mm:ss.zzz')
+        self.bestSegmentInput.setTime(QTime(0, 0, 0))
+        self.bestSegmentInput.setFixedSize(100, 25)
+
+        self.goldSegmentInput = QTimeEdit()
+        self.goldSegmentInput.setDisplayFormat('hh:mm:ss.zzz')
+        self.goldSegmentInput.setTime(QTime(0, 0, 0))
+        self.goldSegmentInput.setFixedSize(100, 25)
 
         # add them all in one block
         self.layout.addWidget(self.splitNameInput)
-        self.layout.addWidget(self.goldTimeInput)
         self.layout.addWidget(self.bestTimeInput)
+        self.layout.addWidget(self.bestSegmentInput)
+        self.layout.addWidget(self.goldSegmentInput)
 
         self.setLayout(self.layout)
+        self.setObjectName('SettingLine')
