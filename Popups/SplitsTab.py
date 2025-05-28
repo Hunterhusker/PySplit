@@ -1,3 +1,4 @@
+import json
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea, QTimeEdit, QPushButton
 from PySide6.QtCore import Slot, Qt, QTime
 from typing import TYPE_CHECKING
@@ -21,18 +22,14 @@ class SplitsTab(ABCSettingTab):
         self.splits = mainWindow.splits
 
         self.json = self.splits.export_splits()
-        print(self.json)
 
         self.splitWidgets = []
-        self.splitWidgets.append(SplitLine("test split", 0, 0, self))
-        self.splitWidgets.append(SplitLine("test split", 0, 0, self))
-
-        for sp in self.splitWidgets:
-            self.layout.addWidget(sp)
 
         self.addButton = QPushButton("+")
         self.addButton.setFixedSize(25, 25)
         self.layout.addWidget(self.addButton, alignment=Qt.AlignHCenter)
+
+        self.importSplits(self.json)
 
         self.layout.addStretch()  # add in a stretch for good measure
         self.setLayout(self.layout)
@@ -41,17 +38,33 @@ class SplitsTab(ABCSettingTab):
         # make our connections now that everything is displayed
         self.addButton.clicked.connect(self.addEmptySplit)
 
-    def importSplits(self, json):
+    def importSplits(self, jsonStr):
         """
         Generates a set of splits from the information in the main window
 
         Args:
-            json: (str) the JSON string that represents the splits for this game
+            jsonStr: (str) the JSON string that represents the splits for this game
 
         Returns:
             (list[SplitLine]): the list of the splits to put on the screen
         """
-        pass
+        print(jsonStr)
+
+        jsonDict = json.loads(jsonStr)
+
+        for k, v in jsonDict.items():
+            print(k, v)
+
+        splits = []
+
+        splits.append(SplitLine("test split", 0, 0, self))
+        splits.append(SplitLine("test split", 0, 0, self))
+
+        for sp in self.splitWidgets:
+            count = len(self.splitWidgets)
+
+            self.splitWidgets.append(sp)
+            self.layout.insertWidget(count, sp)  # insert the new split before the add button
 
     def exportSplits(self):
         """
