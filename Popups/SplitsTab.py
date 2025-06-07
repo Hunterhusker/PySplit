@@ -48,23 +48,18 @@ class SplitsTab(ABCSettingTab):
         Returns:
             (list[SplitLine]): the list of the splits to put on the screen
         """
-        print(jsonStr)
+        splitDict = json.loads(jsonStr)['splits']
 
-        jsonDict = json.loads(jsonStr)
+        for i in range(len(splitDict)):
+            curr = splitDict[i]
+            new_split = SplitLine(curr['split_name'], curr['pb_time_ms'], curr['gold_segment_ms'])
 
-        for k, v in jsonDict.items():
-            print(k, v)
+            currCount = len(self.splitWidgets)
 
-        splits = []
+            # add it to the list
+            self.splitWidgets.append(new_split)
 
-        splits.append(SplitLine("test split", 0, 0, self))
-        splits.append(SplitLine("test split", 0, 0, self))
-
-        for sp in self.splitWidgets:
-            count = len(self.splitWidgets)
-
-            self.splitWidgets.append(sp)
-            self.layout.insertWidget(count, sp)  # insert the new split before the add button
+            self.layout.insertWidget(currCount, self.splitWidgets[i])
 
     def exportSplits(self):
         """
