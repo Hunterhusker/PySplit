@@ -1,10 +1,11 @@
+import copy
 import json
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea, QTimeEdit, QPushButton
 from PySide6.QtCore import Slot, Qt, QTime
 from typing import TYPE_CHECKING
 
 from Popups.ABCSettingTab import ABCSettingTab
-from helpers.TimerFormat import qtime_to_ms
+from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
 
 if TYPE_CHECKING:
     from Main import Main
@@ -19,9 +20,9 @@ class SplitsTab(ABCSettingTab):
         self.layout = QVBoxLayout()
         self.main = mainWindow
 
-        self.splits = mainWindow.splits
-
-        self.json = self.splits.export_splits()
+        # keep a copy of the game settings as our local copy that we can work with without effecting the original
+        self.game_settings = copy.deepcopy(mainWindow.configurator.game_settings)
+        # TODO: Should this come from the splits object to make sure we have the up to date best times??
 
         self.splitWidgets = []
 
@@ -29,7 +30,7 @@ class SplitsTab(ABCSettingTab):
         self.addButton.setFixedSize(25, 25)
         self.layout.addWidget(self.addButton, alignment=Qt.AlignHCenter)
 
-        self.importSplits(self.json)
+        self.importSplits(self.game_settings)
 
         self.layout.addStretch()  # add in a stretch for good measure
         self.setLayout(self.layout)
@@ -38,21 +39,21 @@ class SplitsTab(ABCSettingTab):
         # make our connections now that everything is displayed
         self.addButton.clicked.connect(self.addEmptySplit)
 
-    def importSplits(self, jsonStr):
+    def importSplits(self, game_settings):
         """
         Generates a set of splits from the information in the main window
 
         Args:
-            jsonStr: (str) the JSON string that represents the splits for this game
+            game_settings: (dict) The dictionary of data representing the current game's configuration
 
         Returns:
             (list[SplitLine]): the list of the splits to put on the screen
         """
-        splitDict = json.loads(jsonStr)['splits']
+        splitDict = game_settings['splits']
 
         for i in range(len(splitDict)):
             curr = splitDict[i]
-            new_split = SplitLine(curr['split_name'], curr['pb_time_ms'], curr['gold_segment_ms'])
+            new_split = SplitLine(curr['split_name'], curr['pb_time_ms'], curr['pb_segment_ms'], curr['gold_segment_ms'])
 
             currCount = len(self.splitWidgets)
 
@@ -92,7 +93,7 @@ class SplitsTab(ABCSettingTab):
 
 
 class SplitLine(QFrame):
-    def __init__(self, splitName, bestTimeMs, goldTimeMs, parent=None):
+    def __init__(self, splitName, bestTimeMs, bestTimeSegmentMs, goldTimeMs, parent=None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
@@ -106,17 +107,17 @@ class SplitLine(QFrame):
 
         self.bestTimeInput = QTimeEdit()
         self.bestTimeInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.bestTimeInput.setTime(QTime(0, 0, 0))
+        self.bestTimeInput.setTime(ms_to_qtime(bestTimeMs))
         self.bestTimeInput.setFixedSize(100, 25)
 
         self.bestSegmentInput = QTimeEdit()
         self.bestSegmentInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.bestSegmentInput.setTime(QTime(0, 0, 0))
+        self.bestSegmentInput.setTime(ms_to_qtime(bestTimeSegmentMs))
         self.bestSegmentInput.setFixedSize(100, 25)
 
         self.goldSegmentInput = QTimeEdit()
         self.goldSegmentInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.goldSegmentInput.setTime(QTime(0, 0, 0))
+        self.goldSegmentInput.setTime(ms_to_qtime(goldTimeMs))
         self.goldSegmentInput.setFixedSize(100, 25)
 
         # add them all in one block
