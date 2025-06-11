@@ -8,33 +8,33 @@ class Configurator(QObject):
     Configure = Signal(dict)  # emit the settings
     ConfigureGame = Signal(dict)  # emit the game configuration
 
-    def __init__(self, file_path: str):
+    def __init__(self, settings_file_path: str, game_settings_file_path: str = None):
         super().__init__()
-        self.file_path = file_path
+        self.settings_file_path = settings_file_path
+        self.game_settings_file_path = game_settings_file_path
 
-        self.settings = {}  # define it here so that pycharm knows to intellisense it
+        # read and load the settings for the base program
+        with open(self.settings_file_path, 'r') as f:
+            settings_data = f.read()
+            self.settings = json.loads(settings_data)
 
-        self.read_settings()
+        if game_settings_file_path is not None:  # only if they define one
+            # read in the settings for this particular game
+            with open(self.game_settings_file_path, 'r') as f:
+                game_data = f.read()
+                self.game_settings = json.loads(game_data)
+
+        else:
+            self.game_settings = {}
 
         # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
         self.style = StyleBuilder(self.settings['style_path'], self.settings['var_path'])
-
-    def read_settings(self):
-        """
-        Read in the settings as JSON file to the internal settings dictionary
-        """
-        with open(self.file_path, 'r') as f:
-            file_contents = f.read()
-
-        settings = json.loads(file_contents)
-
-        self.settings = settings  # also save it here so we can reference it and update it later?
 
     def write_settings(self):
         """
         Writes the contents of the current settings to the settings file
         """
-        with open(self.file_path, 'w') as f:
+        with open(self.settings_file_path, 'w') as f:
             f.write(self.settings)
 
     def update_setting(self, key: str, settings: dict):
