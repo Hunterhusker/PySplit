@@ -55,7 +55,7 @@ class Main(QWidget):
         self.exit_action.triggered.connect(QApplication.instance().quit)
 
         # load the settings from the file
-        self.configurator = Configurator('conf/settings.json')
+        self.configurator = Configurator('conf/settings.json', 'conf/testGame.json')
 
         # use the configurations from the file
         self.configurator.style.UpdateStyle.connect(self.set_style)
