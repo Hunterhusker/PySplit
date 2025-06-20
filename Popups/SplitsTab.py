@@ -67,9 +67,9 @@ class SplitsTab(ABCSettingTab):
         Using the data on the screen, create the standard split format for passing to anything that cares
 
         Returns:
-            (str) the JSON string for these splits
+            (list[dict]) the JSON for these splits
         """
-        pass
+        return [sp.export() for sp in self.splitWidgets]
 
     def addEmptySplit(self):
         """
@@ -89,17 +89,19 @@ class SplitsTab(ABCSettingTab):
         Returns:
             TODO: figure out how the update are applied
         """
-        print(qtime_to_ms(self.test.bestTimeInput.time()))
+        data = self.exportSplits()
+
+        self.main.splits.load_splits(data)
 
 
 class SplitLine(QFrame):
-    def __init__(self, splitName, bestTimeMs, bestTimeSegmentMs, goldTimeMs, parent=None):
+    def __init__(self, splitName, bestTimeMs, bestTimeSegmentMs, goldTimeSegmentMs, parent=None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
 
         self.bestTimeMs = bestTimeMs
-        self.goldTimeMs = goldTimeMs
+        self.goldTimeSegmentMs = goldTimeSegmentMs
 
         self.splitNameInput = QLineEdit()
         self.splitNameInput.setText(splitName)
@@ -117,7 +119,7 @@ class SplitLine(QFrame):
 
         self.goldSegmentInput = QTimeEdit()
         self.goldSegmentInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.goldSegmentInput.setTime(ms_to_qtime(goldTimeMs))
+        self.goldSegmentInput.setTime(ms_to_qtime(goldTimeSegmentMs))
         self.goldSegmentInput.setFixedSize(100, 25)
 
         # add them all in one block
@@ -128,3 +130,12 @@ class SplitLine(QFrame):
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
+
+    def export(self):
+        """
+        Turn this split object into a single bit of JSON as a dictionary
+
+        Returns:
+            (dict): The split data as a dictionary
+        """
+        return {'split_name': self.splitNameInput.text(), 'pb_time_ms': qtime_to_ms(self.bestTimeInput.time()), 'gold_segment_ms': qtime_to_ms(self.goldSegmentInput.time()), 'pb_segment_ms': qtime_to_ms(self.bestSegmentInput.time())}
