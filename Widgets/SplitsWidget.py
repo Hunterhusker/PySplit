@@ -11,7 +11,7 @@ class SplitsWidget(QWidget):
     SplitFinish = Signal()
     SplitReset = Signal()
 
-    def __init__(self, json: str):
+    def __init__(self, splitData: list[dict]):
         super().__init__()
 
         self.visible_splits = 3
@@ -42,11 +42,11 @@ class SplitsWidget(QWidget):
         self.started = False
         self.done = False
 
-        self.load_splits(json)
+        self.load_splits(splitData)
 
         # add the splits to the
-        for split in self.splits:
-            self.scrollWidgetLayout.addWidget(split)
+        # for split in self.splits:
+        #     self.scrollWidgetLayout.addWidget(split)
 
         self.scrollWidget.setLayout(self.scrollWidgetLayout)
 
@@ -165,6 +165,16 @@ class SplitsWidget(QWidget):
                 sp.finalize_split()
 
     def export_splits(self, indent: str = '    ', depth: int = 0):
+        """
+        Exports the split data as a JSON string representing the current splits
+
+        Args:
+            indent: (str, optional) the indentation to increment for each level of nesting
+            depth: (str, optional) the number of indents to apply to the string
+
+        Returns:
+            (str) the string representing the  $ TODO: FIGURE THIS GUY OUT DO WE WANNA DO STRINGS OR NAH?
+        """
         tmp = f'{{\n{indent * (depth + 1)}"splits": [\n'
 
         for i in range(len(self.splits)):
@@ -175,18 +185,17 @@ class SplitsWidget(QWidget):
 
         return tmp + f'\n{indent * (depth + 1)}]\n}}'
 
-    def load_splits(self, json: str):
-        # create the splits
-        split1 = SingleSplitWidget('test1',  2230, 1230, 2230, True)
-        split2 = SingleSplitWidget('test2',  3630, 3330 - 2230, 3630 - 2230, True)
-        split3 = SingleSplitWidget('test3',  6650, 5550 - 3330, 6650 - 3630, True)
-        split4 = SingleSplitWidget('test4',  8880, 8880 - 5550, 8880 - 6650, True)
+    def load_splits(self, splitList: list):
+        # clear out the splits from the widget
+        for split in self.splits:
+            self.scrollWidgetLayout.removeWidget(split)
+            self.splits.remove(split)
 
-        # add them to the list
-        self.splits.append(split1)
-        self.splits.append(split2)
-        self.splits.append(split3)
-        self.splits.append(split4)
+        # create the new splits, and add them to the screen
+        for split in splitList:
+            tmp = SingleSplitWidget(split['split_name'], split['pb_time_ms'], split['gold_segment_ms'], split['pb_segment_ms'])
+            self.splits.append(tmp)
+            self.scrollWidgetLayout.addWidget(tmp)
 
     def reset_splits(self):
         self.index = 0
