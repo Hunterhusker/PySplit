@@ -199,7 +199,7 @@ class SplitsWidget(QWidget):
             depth: (str, optional) the number of indents to apply to the string
 
         Returns:
-            (str) the string representing the  $ TODO: FIGURE THIS GUY OUT DO WE WANNA DO STRINGS OR NAH?
+            (str) the string representing the splits and their configuration
         """
         tmp = f'{{\n{indent * (depth + 1)}"splits": [\n'
 
