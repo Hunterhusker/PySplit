@@ -37,12 +37,24 @@ class Configurator(QObject):
         with open(self.settings_file_path, 'w') as f:
             f.write(self.settings)
 
-    def update_setting(self, key: str, settings: dict):
+    def update_setting(self, key: str, value: any):
         """
-
+        Updates the settings for a key with the provided value
 
         Args:
             key:
-            settings:
+            value:
         """
         pass
+
+    def get_setting(self, key: str):
+        ...
+
+    def write_game(self):
+        ...
+
+    def update_game(self, key: str, value: any):
+        ...
+
+    def get_game_setting(self, key: str):
+        ...
