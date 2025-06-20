@@ -60,7 +60,7 @@ class Main(QWidget):
         # use the configurations from the file
         self.configurator.style.UpdateStyle.connect(self.set_style)
 
-        self.splits = SplitsWidget([])  # TODO: hook this up to the game data file
+        self.splits = SplitsWidget(self.configurator.game_settings)  # TODO: hook this up to the game data file
         self.splitStats = TimeStatsWidget()
 
         layout.addWidget(self.Title)

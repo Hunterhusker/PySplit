@@ -11,7 +11,7 @@ class SplitsWidget(QWidget):
     SplitFinish = Signal()
     SplitReset = Signal()
 
-    def __init__(self, splitData: list[dict]):
+    def __init__(self, gameData: list[dict]):
         super().__init__()
 
         self.visible_splits = 3
@@ -42,11 +42,7 @@ class SplitsWidget(QWidget):
         self.started = False
         self.done = False
 
-        self.load_splits(splitData)
-
-        # add the splits to the
-        # for split in self.splits:
-        #     self.scrollWidgetLayout.addWidget(split)
+        self.load_splits(gameData['splits'], gameData['displayPb'])
 
         self.scrollWidget.setLayout(self.scrollWidgetLayout)
 
@@ -61,6 +57,15 @@ class SplitsWidget(QWidget):
 
     @Slot(int)
     def increment_split(self, inc: int):
+        """
+        Go to the next (or more) split(s) and return it
+
+        Args:
+            inc: (int) the number of splits to increment by
+
+        Returns:
+            (SingleSplitWidget): The split that is currently active
+        """
         curr_time = self.splits[self.index].current_time_ms
 
         self.index += inc
@@ -78,6 +83,15 @@ class SplitsWidget(QWidget):
 
     @Slot(int)
     def decrement_split(self, inc: int):
+        """
+        Go back a (or more) split(s) and return it
+
+        Args:
+            inc: (int) the number of splits to decrement, if it goes negative, hard stop at 0
+
+        Returns:
+            (SingleSplitWidget): The split that is currently active
+        """
         self.index -= inc
         sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
         sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
@@ -89,6 +103,12 @@ class SplitsWidget(QWidget):
 
     @Slot(int)
     def update_split(self, curr_time: int):
+        """
+        Update the current split with the current time
+
+        Args:
+            curr_time: (int) the current time of the timer in milliseconds
+        """
         self.curr_time = curr_time
 
         if self.started:
@@ -96,6 +116,12 @@ class SplitsWidget(QWidget):
 
     @Slot(str)
     def handle_control(self, event: str):
+        """
+        An event handler to send all the needed data to the splits themsevles
+
+        Args:
+            event: (str) the event to handle from the user
+        """
         current_split = self.get_current_split()
 
         # pass the control on to the split itself
@@ -185,19 +211,29 @@ class SplitsWidget(QWidget):
 
         return tmp + f'\n{indent * (depth + 1)}]\n}}'
 
-    def load_splits(self, splitList: list):
+    def load_splits(self, splits: list[dict[str: any]], displayPb: bool):
+        """
+        Load the splits into the GUI from JSONish data
+
+        Args:
+            splits: (list[dict[str: any]]) JSON type data list of split data (name, pb time, pb segment, gold segment
+            displayPb: (bool) whether to display the PB or the Gold time on the GUI (True is PB of course)
+        """
         # clear out the splits from the widget
         for split in self.splits:
             self.scrollWidgetLayout.removeWidget(split)
             self.splits.remove(split)
 
         # create the new splits, and add them to the screen
-        for split in splitList:
-            tmp = SingleSplitWidget(split['split_name'], split['pb_time_ms'], split['gold_segment_ms'], split['pb_segment_ms'])
+        for split in splits:
+            tmp = SingleSplitWidget(split['split_name'], split['pb_time_ms'], split['gold_segment_ms'], split['pb_segment_ms'], displayPb)
             self.splits.append(tmp)
             self.scrollWidgetLayout.addWidget(tmp)
 
     def reset_splits(self):
+        """
+        Resets the splits back to an unstarted state
+        """
         self.index = 0
         self.started = False
         self.done = False

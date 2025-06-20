@@ -2,6 +2,7 @@
     "name": "Test Game",
     "sub-name": "Any%",
     "attempt-count": 0,
+    "displayPb": true,
     "splits": [
         {
             "split_name": "test1",
