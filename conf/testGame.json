@@ -31,6 +31,13 @@
             "gold_time_ms": 8880,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 3330
+        },
+        {
+            "split_name": "test5",
+            "pb_time_ms": 10080,
+            "gold_time_ms": 9880,
+            "pb_segment_ms": 2230,
+            "gold_segment_ms": 3330
         }
     ]
 }

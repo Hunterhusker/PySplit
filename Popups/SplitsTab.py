@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import json
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea, QTimeEdit, QPushButton
@@ -22,24 +24,21 @@ class SplitsTab(ABCSettingTab):
 
         # keep a copy of the game settings as our local copy that we can work with without effecting the original
         self.game_settings = copy.deepcopy(mainWindow.configurator.game_settings)
-        # TODO: Should this come from the splits object to make sure we have the up to date best times??
 
-        self.splitWidgets = []
+        self.add_button = QPushButton("+")
+        self.add_button.setFixedSize(25, 25)
+        self.layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
 
-        self.addButton = QPushButton("+")
-        self.addButton.setFixedSize(25, 25)
-        self.layout.addWidget(self.addButton, alignment=Qt.AlignHCenter)
-
-        self.importSplits(self.game_settings)
+        self.import_splits(self.game_settings)  # TODO: This needs to be in a scroll container or it can just get huge
 
         self.layout.addStretch()  # add in a stretch for good measure
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')  # set the object name here so it uses the right QSS
 
         # make our connections now that everything is displayed
-        self.addButton.clicked.connect(self.addEmptySplit)
+        self.add_button.clicked.connect(self.addEmptySplit)
 
-    def importSplits(self, game_settings):
+    def import_splits(self, game_settings):
         """
         Generates a set of splits from the information in the main window
 
@@ -53,14 +52,11 @@ class SplitsTab(ABCSettingTab):
 
         for i in range(len(splitDict)):
             curr = splitDict[i]
-            new_split = SplitLine(curr['split_name'], curr['pb_time_ms'], curr['pb_segment_ms'], curr['gold_segment_ms'])
+            new_split = SplitLine(curr['split_name'], curr['pb_time_ms'], curr['pb_segment_ms'], curr['gold_segment_ms'], parent=self)
 
-            currCount = len(self.splitWidgets)
+            currCount = self.layout.count() - 1  # -1 for the add button
 
-            # add it to the list
-            self.splitWidgets.append(new_split)
-
-            self.layout.insertWidget(currCount, self.splitWidgets[i])
+            self.layout.insertWidget(currCount, new_split)
 
     def exportSplits(self):
         """
@@ -69,18 +65,27 @@ class SplitsTab(ABCSettingTab):
         Returns:
             (list[dict]) the JSON for these splits
         """
-        return [sp.export() for sp in self.splitWidgets]
+        return [sp.export() for sp in self.split_widgets]
 
     def addEmptySplit(self):
         """
         Adds a blank split for the user to fill out
         """
-        newSplit = SplitLine("", 0, 0, self)
+        newSplit = SplitLine("", 0, 0, 0, parent=self)
 
-        count = len(self.splitWidgets)  # since this widget contains only split lines and then an add button count is the next index to insert at
+        count = self.layout.count() - 1  # -1 for the add button
 
-        self.splitWidgets.append(newSplit)
-        self.layout.insertWidget(count, newSplit)  # insert the new split before the add button
+        self.layout.insertWidget(count - 1, newSplit)  # insert the new split before the add button
+
+    def remove_split(self, split: SplitLine):
+        """
+        Removes the given split from the splits
+
+        Args:
+            split: (SplitLine) The actual split that we want to remove from the list
+        """
+        self.layout.removeWidget(split)  # removes the widget from the layout so the layout can work around it
+        split.deleteLater()  # delete later actually deletes the widget
 
     def apply(self):
         """
@@ -95,7 +100,7 @@ class SplitsTab(ABCSettingTab):
 
 
 class SplitLine(QFrame):
-    def __init__(self, splitName, bestTimeMs, bestTimeSegmentMs, goldTimeSegmentMs, parent=None):
+    def __init__(self, splitName, bestTimeMs, bestTimeSegmentMs, goldTimeSegmentMs, parent: SplitsTab = None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
@@ -122,14 +127,20 @@ class SplitLine(QFrame):
         self.goldSegmentInput.setTime(ms_to_qtime(goldTimeSegmentMs))
         self.goldSegmentInput.setFixedSize(100, 25)
 
+        self.removeButton = QPushButton("-")
+        self.removeButton.setFixedSize(25, 25)
+
         # add them all in one block
         self.layout.addWidget(self.splitNameInput)
         self.layout.addWidget(self.bestTimeInput)
         self.layout.addWidget(self.bestSegmentInput)
         self.layout.addWidget(self.goldSegmentInput)
+        self.layout.addWidget(self.removeButton)
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
+
+        self.removeButton.clicked.connect(lambda: parent.remove_split(self))  # must lambda to pass parameters to the method
 
     def export(self):
         """
@@ -138,4 +149,9 @@ class SplitLine(QFrame):
         Returns:
             (dict): The split data as a dictionary
         """
-        return {'split_name': self.splitNameInput.text(), 'pb_time_ms': qtime_to_ms(self.bestTimeInput.time()), 'gold_segment_ms': qtime_to_ms(self.goldSegmentInput.time()), 'pb_segment_ms': qtime_to_ms(self.bestSegmentInput.time())}
+        return {
+            'split_name': self.splitNameInput.text(),
+            'pb_time_ms': qtime_to_ms(self.bestTimeInput.time()),
+            'gold_segment_ms': qtime_to_ms(self.goldSegmentInput.time()),
+            'pb_segment_ms': qtime_to_ms(self.bestSegmentInput.time())
+        }
