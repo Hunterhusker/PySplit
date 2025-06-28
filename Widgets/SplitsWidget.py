@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
-from Widgets.SingleSplitWidget import SingleSplitWidget
+from Widgets.SingleSplitWidget import SingleSplitWidget, DisplayPBStrategy, DisplayGoldStrategy
 
 
 class SplitsWidget(QWidget):
@@ -21,17 +21,17 @@ class SplitsWidget(QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
 
         # create the widget we would like to be able to scroll on
-        self.scrollWidget = QWidget()
-        self.scrollWidgetLayout = QVBoxLayout()
-        self.scrollWidgetLayout.setSpacing(2)
-        self.scrollWidgetLayout.setContentsMargins(0, 2, 0, 2)
+        self.scroll_widget = QWidget()
+        self.scroll_widget_layout = QVBoxLayout()
+        self.scroll_widget_layout.setSpacing(2)
+        self.scroll_widget_layout.setContentsMargins(0, 2, 0, 2)
 
         # create the internal scroll area
-        self.scrollArea = QScrollArea()
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setFrameStyle(QFrame.NoFrame)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # we'll want to keep track of these
         self.splits = []
@@ -44,12 +44,12 @@ class SplitsWidget(QWidget):
 
         self.load_splits(gameData['splits'], gameData['displayPb'])
 
-        self.scrollWidget.setLayout(self.scrollWidgetLayout)
+        self.scroll_widget.setLayout(self.scroll_widget_layout)
 
-        self.scrollArea.setWidget(self.scrollWidget)
+        self.scroll_area.setWidget(self.scroll_widget)
         self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
 
-        self.layout.addWidget(self.scrollArea)
+        self.layout.addWidget(self.scroll_area)
         self.setLayout(self.layout)
 
     def get_current_split(self):
@@ -73,7 +73,7 @@ class SplitsWidget(QWidget):
         self.splits[self.index].current_start_time = curr_time
 
         if self.index >= self.visible_splits:
-            sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+            sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
             sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
 
         if self.index >= len(self.splits):  # don't let it leave the array
@@ -93,7 +93,7 @@ class SplitsWidget(QWidget):
             (SingleSplitWidget): The split that is currently active
         """
         self.index -= inc
-        sb = self.scrollArea.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+        sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
         sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
 
         if self.index < 0:  # don't let it leave the array
@@ -132,7 +132,7 @@ class SplitsWidget(QWidget):
 
             if not self.started:
                 self.index = 0
-                sb = self.scrollArea.verticalScrollBar()
+                sb = self.scroll_area.verticalScrollBar()
                 sb.setValue(0)
 
                 if self.done:
@@ -176,7 +176,7 @@ class SplitsWidget(QWidget):
             self.started = False
             self.done = False
 
-            sb = self.scrollArea.verticalScrollBar()
+            sb = self.scroll_area.verticalScrollBar()
             sb.setValue(0)
 
             for sp in self.splits:
@@ -190,7 +190,7 @@ class SplitsWidget(QWidget):
             for sp in self.splits:
                 sp.finalize_split()
 
-    def export_splits(self, indent: str = '    ', depth: int = 0):
+    def export_splits(self, indent: str = '    ', depth: int = 0) -> str:
         """
         Exports the split data as a JSON string representing the current splits
 
@@ -221,14 +221,14 @@ class SplitsWidget(QWidget):
         """
         # clear out the splits from the widget
         for split in self.splits:
-            self.scrollWidgetLayout.removeWidget(split)
+            self.scroll_widget_layout.removeWidget(split)
             self.splits.remove(split)
 
         # create the new splits, and add them to the screen
         for split in splits:
-            tmp = SingleSplitWidget(split['split_name'], split['pb_time_ms'], split['gold_segment_ms'], split['pb_segment_ms'], displayPb)
+            tmp = SingleSplitWidget(split['split_name'], split['pb_time_ms'], split['gold_segment_ms'], split['pb_segment_ms'], split['pb_time_ms'])
             self.splits.append(tmp)
-            self.scrollWidgetLayout.addWidget(tmp)
+            self.scroll_widget_layout.addWidget(tmp)
 
     def reset_splits(self):
         """

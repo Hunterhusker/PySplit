@@ -21,16 +21,16 @@ class AssignButtonsTab(ABCSettingTab):
         self.layout = QVBoxLayout()
         self.main = mainWindow  # save the link to the main that we need to save our changes
 
-        self.scrollWidget = QWidget()
-        self.scrollWidgetLayout = QVBoxLayout()
-        self.scrollWidgetLayout.setSpacing(3)
-        self.scrollWidgetLayout.setContentsMargins(0, 0, 0, 0)
+        self.scroll_widget = QWidget()
+        self.scroll_widget_layout = QVBoxLayout()
+        self.scroll_widget_layout.setSpacing(3)
+        self.scroll_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.scrollArea = QScrollArea()
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setFrameStyle(QFrame.NoFrame)
-        self.scrollArea.setViewportMargins(0, 0, 5, 0)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setFrameStyle(QFrame.NoFrame)
+        self.scroll_area.setViewportMargins(0, 0, 5, 0)
 
         self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
 
@@ -63,23 +63,23 @@ class AssignButtonsTab(ABCSettingTab):
             'LOCK': self.assignLock
         }
 
-        self.scrollWidgetLayout.addWidget(self.assignStartSplit)
-        self.scrollWidgetLayout.addWidget(self.assignUnsplit)
-        self.scrollWidgetLayout.addWidget(self.assignPause)
-        self.scrollWidgetLayout.addWidget(self.assignResume)
-        self.scrollWidgetLayout.addWidget(self.assignStop)
-        self.scrollWidgetLayout.addWidget(self.assignReset)
-        self.scrollWidgetLayout.addWidget(self.assignSkipSplit)
-        self.scrollWidgetLayout.addWidget(self.assignLock)
+        self.scroll_widget_layout.addWidget(self.assignStartSplit)
+        self.scroll_widget_layout.addWidget(self.assignUnsplit)
+        self.scroll_widget_layout.addWidget(self.assignPause)
+        self.scroll_widget_layout.addWidget(self.assignResume)
+        self.scroll_widget_layout.addWidget(self.assignStop)
+        self.scroll_widget_layout.addWidget(self.assignReset)
+        self.scroll_widget_layout.addWidget(self.assignSkipSplit)
+        self.scroll_widget_layout.addWidget(self.assignLock)
 
         # add a stretch to keep stuff sized right
-        self.scrollWidgetLayout.addStretch()
+        self.scroll_widget_layout.addStretch()
 
-        self.scrollWidget.setLayout(self.scrollWidgetLayout)
-        self.scrollArea.setWidget(self.scrollWidget)
+        self.scroll_widget.setLayout(self.scroll_widget_layout)
+        self.scroll_area.setWidget(self.scroll_widget)
 
-        self.scrollWidget.setLayout(self.scrollWidgetLayout)
-        self.layout.addWidget(self.scrollArea)
+        self.scroll_widget.setLayout(self.scroll_widget_layout)
+        self.layout.addWidget(self.scroll_area)
 
         # link it all up so that this displays
         self.setLayout(self.layout)
@@ -162,22 +162,22 @@ class KeyReassignmentLine(QFrame):
         self.event_label.setObjectName('KeyAssignmentLabel')
 
         # create the button
-        self.triggerButton = QPushButton(self.key_str)
-        self.triggerButton.setFixedSize(80, 25)
+        self.trigger_button = QPushButton(self.key_str)
+        self.trigger_button.setFixedSize(80, 25)
 
         # add the elements to the widget
         self.line_layout.addWidget(self.event_label)
-        self.line_layout.addWidget(self.triggerButton)
+        self.line_layout.addWidget(self.trigger_button)
         self.line_layout.setContentsMargins(10, 0, 10, 0)
 
         self.setLayout(self.line_layout)
 
         # align our items in the line
-        self.line_layout.setAlignment(self.triggerButton, Qt.AlignRight | Qt.AlignVCenter)
+        self.line_layout.setAlignment(self.trigger_button, Qt.AlignRight | Qt.AlignVCenter)
         self.line_layout.setAlignment(self.event_label, Qt.AlignLeft | Qt.AlignVCenter)
 
         # hookup the slots and signals
-        self.triggerButton.clicked.connect(self.toggle_listening)
+        self.trigger_button.clicked.connect(self.toggle_listening)
 
         # name this thing so we can globally style it different from the rest
         self.setObjectName('KeyReassignmentLine')
@@ -186,7 +186,7 @@ class KeyReassignmentLine(QFrame):
         self.event_object = obj
         self.key_str = key_to_str(self.event_object)
 
-        self.triggerButton.setText(self.key_str)
+        self.trigger_button.setText(self.key_str)
 
     @Slot()
     def toggle_listening(self):
@@ -195,14 +195,14 @@ class KeyReassignmentLine(QFrame):
             self.listener.on_press.disconnect(self.listen_for_key)
 
             # update the label on the button too
-            self.triggerButton.setText(self.key_str)
-            self.triggerButton.clearFocus()  # lose the focus on this button too
+            self.trigger_button.setText(self.key_str)
+            self.trigger_button.clearFocus()  # lose the focus on this button too
 
         else:
             self.listening = True
             self.listener.on_press.connect(self.listen_for_key)
 
-            self.triggerButton.setText('...')  # TODO: setup a QTimer to count down from 5 and then untoggle
+            self.trigger_button.setText('...')  # TODO: setup a QTimer to count down from 5 and then untoggle
 
     @Slot(object)
     def listen_for_key(self, event_object):

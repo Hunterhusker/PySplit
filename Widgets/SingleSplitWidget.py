@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from abc import abstractmethod, ABCMeta, ABC
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt
 from PySide6.QtCore import Slot, Signal
@@ -6,13 +9,16 @@ from helpers.TimerFormat import format_wall_clock_from_ms
 
 
 class SingleSplitWidget(QFrame):
-    def __init__(self, split_name: str, pb_time_ms: int, gold_segment_ms: int, pb_segment_ms: int, displayPb: bool):
+    def __init__(self, split_name: str, pb_time_ms: int, gold_segment_ms: int, pb_segment_ms: int, comparison_time: str):
         """
-        An individual split that can display the times from the PB and the comparison  time
+        An individual split that can display the times from the PB and the comparison time
 
         Args:
             split_name: (str) the name of the split
             pb_time_ms: (int) the number of milliseconds from the start that was achieved on the overall PB for this game
+            gold_segment_ms: (int) the number of milliseconds from the end of the last split to the end of the shortest time we ever did this split
+            pb_segment_ms: (int) the number of milliseconds from the end of the last split to the end of this split on the shortest time we ever beat the game
+            comparison_time: (int) the time that we are going to display on the split itself
         """
         super().__init__()
 
@@ -31,13 +37,8 @@ class SingleSplitWidget(QFrame):
         self.current_segment_ms = 0
         self.current_start_time = 0
 
-        # whether to display the PB or not
-        self.displayPb = displayPb
-
-        if displayPb:
-            self.display_time_ms = self.pb_time_ms
-        else:
-            self.display_time_ms = self.pb_time_ms  # self.gold_time_ms
+        # grab the display time using the strategy
+        self.display_time_ms = comparison_time
 
         self.layout = QHBoxLayout()
 
@@ -74,7 +75,7 @@ class SingleSplitWidget(QFrame):
 
         self.current_time_ms = curr_time_ms
 
-        time_delta = self.current_time_ms - self.display_time_ms
+        time_delta = self.current_time_ms - self.pb_time_ms
 
         if time_delta >= -1000.0:
             time_delta_str = format_wall_clock_from_ms(time_delta)
@@ -94,6 +95,9 @@ class SingleSplitWidget(QFrame):
 
         else:
             self.delta_label.setText('')
+
+    def get_comparison_time(self):
+        return self.display_strategy.get_display_time_ms(self)
 
     def reset_split(self):
         """
@@ -173,3 +177,22 @@ class SingleSplitWidget(QFrame):
 
         elif event == 'STOP':
             self.finalize_split()
+
+
+# TODO : Split Builder factory that takes these in to decide which values goes on a split
+class AbstractSplitDisplayStrategy(ABC):
+    @abstractmethod
+    def get_display_time_ms(self, split: SingleSplitWidget):
+        ...
+
+
+class DisplayPBStrategy(AbstractSplitDisplayStrategy):
+    @abstractmethod
+    def get_display_time_ms(self, split: SingleSplitWidget):
+        return SingleSplitWidget.pb_time_ms
+
+
+class DisplayGoldStrategy(AbstractSplitDisplayStrategy):
+    @abstractmethod
+    def get_display_time_ms(self, split: SingleSplitWidget):
+        return SingleSplitWidget.gold_segment_ms
