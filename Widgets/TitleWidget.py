@@ -8,62 +8,28 @@ class TitleWidget(QFrame):
         self.layout.setContentsMargins(5, 5, 5, 3)
         self.layout.setSpacing(2)
 
-        self.TitleLabel = QLabel(title, self)
-        self.TitleLabel.setObjectName('TitleLabel')
+        self.title_label = QLabel(title, self)
+        self.title_label.setObjectName('TitleLabel')
 
-        self.SubtitleLabel = QLabel(subtitle, self)
-        self.SubtitleLabel.setObjectName('SubLabel')
+        self.subtitle_label = QLabel(subtitle, self)
+        self.subtitle_label.setObjectName('SubLabel')
 
-        self.layout.addWidget(self.TitleLabel)
-        #self.layout.addWidget(self.SubtitleLabel)
+        self.layout.addWidget(self.title_label)
 
-        self.attemptCounterHBox = QHBoxLayout()
+        self.attempt_counter_hbox = QHBoxLayout()
 
-        self.triesTodayLabel = QLabel('0', self)
-        self.triesTodayLabel.setObjectName('triesTodayLabel')
+        self.tries_today_label = QLabel('0', self)
+        self.tries_today_label.setObjectName('triesTodayLabel')
 
-        self.triesTotalLabel = QLabel('10', self)
-        self.triesTotalLabel.setObjectName('triesTotalLabel')
+        self.tries_total_label = QLabel('10', self)
+        self.tries_total_label.setObjectName('triesTotalLabel')
 
-        self.attemptCounterHBox.addWidget(self.triesTodayLabel)
-        self.attemptCounterHBox.addWidget(self.SubtitleLabel)
-        self.attemptCounterHBox.addWidget(self.triesTotalLabel)
+        self.attempt_counter_hbox.addWidget(self.tries_today_label)
+        self.attempt_counter_hbox.addWidget(self.subtitle_label)
+        self.attempt_counter_hbox.addWidget(self.tries_total_label)
 
-        self.layout.addLayout(self.attemptCounterHBox)
+        self.layout.addLayout(self.attempt_counter_hbox)
 
         self.setObjectName('TitleFrame')
-        # self.setStyleSheet("""
-        #     #TitleFrame {
-        #         border-bottom: 1px solid #bbbbbb;
-        #         border-top: none;
-        #         border-left: none;
-        #         border-right: none;
-        #     }
-        #
-        #     QLabel {
-        #         font-family: "Chakra Petch;
-        #         color: #bbbbbb;
-        #     }
-        #
-        #     #TitleLabel {
-        #         qproperty-alignment: AlignCenter;
-        #         font-size: 14px;
-        #     }
-        #
-        #     #SubLabel {
-        #         qproperty-alignment: AlignCenter;
-        #         font-size: 12px;
-        #     }
-        #
-        #     #triesTodayLabel {
-        #         qproperty-alignment: AlignLeft;
-        #         font-size: 12px;
-        #     }
-        #
-        #     #triesTotalLabel {
-        #         qproperty-alignment: AlignRight;
-        #         font-size: 12px;
-        #     }
-        # """)
 
         self.setLayout(self.layout)
