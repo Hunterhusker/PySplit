@@ -10,33 +10,17 @@ class TimerWidget(QFrame):
 
         self.layout = QVBoxLayout()
 
-        self.MainTimerLabel = QLabel("00.000", self)
-        self.MainTimerLabel.setObjectName('TimeLabel')
-        self.MainTimerLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.main_timer_label = QLabel("00.000", self)
+        self.main_timer_label.setObjectName('TimeLabel')
+        self.main_timer_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.layout.addStretch(0)
-        self.layout.addWidget(self.MainTimerLabel)
+        self.layout.addWidget(self.main_timer_label)
         self.layout.addStretch(0)
 
-        self.layout.setAlignment(self.MainTimerLabel, Qt.AlignRight)
+        self.layout.setAlignment(self.main_timer_label, Qt.AlignRight)
 
         self.setObjectName('TimeFrame')
-        # self.setStyleSheet("""
-        #     #TimeFrame {
-        #         border-bottom: 1px solid #bbbbbb;
-        #         border-top: 1px solid #bbbbbb;
-        #         border-left: none;
-        #         border-right: none;
-        #     }
-        #
-        #     #TimeLabel {
-        #         border-bottom: none;
-        #         border-top: none;
-        #         border-left: none;
-        #         border-right: none;
-        #         font-size: 24px;
-        #     }
-        # """)
 
         self.setLayout(self.layout)
 
@@ -44,4 +28,4 @@ class TimerWidget(QFrame):
     def update_time(self, time: int):
         timer_string = format_wall_clock_from_ms(time)
 
-        self.MainTimerLabel.setText(timer_string)
+        self.main_timer_label.setText(timer_string)
