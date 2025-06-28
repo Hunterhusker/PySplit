@@ -19,7 +19,7 @@ class Splits:
 
         """
         with open(file_path) as f:
-
+            pass
 
 
 if __name__ == '__main__':

@@ -34,12 +34,12 @@ class Main(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        self.Title = TitleWidget('Game', 'SubTitle')
-        self.Title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
+        self.title = TitleWidget('Game', 'SubTitle')
+        self.title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
         self._start_pos = None
 
-        self.MainTimerWidget = TimerWidget()
+        self.main_timer_widget = TimerWidget()
 
         self.context_menu = QMenu(self)
 
@@ -63,9 +63,9 @@ class Main(QWidget):
         self.splits = SplitsWidget(self.configurator.game_settings)
         self.splitStats = TimeStatsWidget()
 
-        layout.addWidget(self.Title)
+        layout.addWidget(self.title)
         layout.addWidget(self.splits)
-        layout.addWidget(self.MainTimerWidget)
+        layout.addWidget(self.main_timer_widget)
         layout.addWidget(self.splitStats)
 
         self.setLayout(layout)
@@ -83,7 +83,7 @@ class Main(QWidget):
         self.game_timer.moveToThread(self.game_timer_thread)
 
         # connect the game timer signals to the desired slots
-        self.game_timer.update.connect(self.MainTimerWidget.update_time)
+        self.game_timer.update.connect(self.main_timer_widget.update_time)
         self.game_timer.update.connect(self.splits.update_split)
         self.game_timer_thread.started.connect(self.game_timer.run)
         self.game_timer_thread.destroyed.connect(self.game_timer.stop_timer)
