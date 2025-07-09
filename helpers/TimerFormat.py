@@ -29,6 +29,14 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
 
 
 def millis_to_wallclock_components(millis: int):
+    """
+    Turns the milliseconds to wallclock time ie hours, minutes, seconds, and remaining milliseconds
+    Args:
+        millis: (int) the milliseconds to convert
+
+    Returns:
+        tuple[int, int, int, int]: a tuple ints in order hours, minutes, seconds, and milliseconds
+    """
     if millis < 0:
         millis = millis * -1
 
