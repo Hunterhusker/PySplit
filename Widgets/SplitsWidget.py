@@ -42,7 +42,7 @@ class SplitsWidget(QWidget):
         self.started = False
         self.done = False
 
-        self.load_splits(gameData['splits'], gameData['displayPb'])
+        self.load_splits(gameData['splits'], gameData['display_pb'])
 
         self.scroll_widget.setLayout(self.scroll_widget_layout)
 
