@@ -1,41 +1,37 @@
 {
-    "name": "Test Game",
-    "sub-name": "Any%",
-    "attempt-count": 0,
+    "title": "Test Game",
+    "sub_title": "Any%",
+    "lifetime_attempts": 0,
+    "session_attempts": 0,
     "displayPb": true,
     "splits": [
         {
             "split_name": "test1",
             "pb_time_ms": 2230,
-            "gold_time_ms": 1230,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 1230
         },
         {
             "split_name": "test2",
             "pb_time_ms": 3630,
-            "gold_time_ms": 3330,
             "pb_segment_ms": 1400,
             "gold_segment_ms": 1100
         },
         {
             "split_name": "test3",
             "pb_time_ms": 6650,
-            "gold_time_ms": 5550,
             "pb_segment_ms": 3020,
             "gold_segment_ms": 2220
         },
         {
             "split_name": "test4",
             "pb_time_ms": 8880,
-            "gold_time_ms": 8880,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 3330
         },
         {
             "split_name": "test5",
             "pb_time_ms": 10080,
-            "gold_time_ms": 9880,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 3330
         }
