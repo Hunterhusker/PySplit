@@ -1,8 +1,11 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
+from __future__ import annotations
+
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QSizePolicy
+from Models.Game import Game
 
 
 class TitleWidget(QFrame):
-    def __init__(self, title, subtitle):
+    def __init__(self, title: str, subtitle: str, session_attempts: int, lifetime_attempts: int):
         super().__init__()
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(5, 5, 5, 3)
@@ -18,18 +21,36 @@ class TitleWidget(QFrame):
 
         self.attempt_counter_hbox = QHBoxLayout()
 
-        self.tries_today_label = QLabel('0', self)
-        self.tries_today_label.setObjectName('triesTodayLabel')
+        self.session_attempts_label = QLabel(str(session_attempts), self)
+        self.session_attempts_label.setObjectName('sessionAttemptsLabel')
 
-        self.tries_total_label = QLabel('10', self)
-        self.tries_total_label.setObjectName('triesTotalLabel')
+        self.lifetime_attempts_label = QLabel(str(lifetime_attempts), self)
+        self.lifetime_attempts_label.setObjectName('lifetimeAttemptsLabel')
 
-        self.attempt_counter_hbox.addWidget(self.tries_today_label)
+        self.attempt_counter_hbox.addWidget(self.session_attempts_label)
         self.attempt_counter_hbox.addWidget(self.subtitle_label)
-        self.attempt_counter_hbox.addWidget(self.tries_total_label)
+        self.attempt_counter_hbox.addWidget(self.lifetime_attempts_label)
 
         self.layout.addLayout(self.attempt_counter_hbox)
 
         self.setObjectName('TitleFrame')
 
         self.setLayout(self.layout)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # sets how we would like this widget to be on the main page
+
+    @classmethod
+    def from_game(cls, game: Game) -> TitleWidget:
+        """
+        Builds a title widget from the game 
+        Args:
+            game:
+
+        Returns:
+
+        """
+        title = game.title
+        sub_title = game.sub_title
+        session_attempts = game.session_attempts
+        lifetime_attempts = game.lifetime_attempts
+
+        return cls(title, sub_title, session_attempts, lifetime_attempts)
