@@ -198,12 +198,12 @@ QTabBar::tab:!selected {
     font-size: $subtitle-size;
 }
 
-#TitleFrame #triesTodayLabel {
+#TitleFrame #sessionAttemptsLabel {
     qproperty-alignment: AlignLeft;
     font-size: $subtitle-size;
 }
 
-#TitleFrame #triesTotalLabel {
+#TitleFrame #lifetimeAttemptsLabel {
     qproperty-alignment: AlignRight;
     font-size: $subtitle-size;
 }
