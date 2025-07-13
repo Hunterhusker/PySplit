@@ -1,6 +1,4 @@
 import copy
-import json
-
 from PySide6.QtCore import Signal, QObject
 
 

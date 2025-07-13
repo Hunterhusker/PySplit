@@ -1,14 +1,11 @@
-from dataclasses import dataclass
-
 from PySide6.QtCore import QObject, Signal
 import json
 
-from Configurator.Style.styleBuilder import StyleBuilder
+from Styling.Style.styleBuilder import StyleBuilder
 
 
 class Configurator(QObject):
     Configure = Signal(dict)  # emit the settings
-    ConfigureGame = Signal(dict)  # emit the game configuration
 
     def __init__(self, settings_file_path: str, game_settings_file_path: str = None):
         super().__init__()
@@ -50,13 +47,4 @@ class Configurator(QObject):
         pass
 
     def get_setting(self, key: str):
-        ...
-
-    def write_game(self):
-        ...
-
-    def update_game(self, key: str, value: any):
-        ...
-
-    def get_game_setting(self, key: str):
         ...
