@@ -1,12 +1,9 @@
-from abc import abstractmethod, ABC, ABCMeta
+from abc import abstractmethod, ABC
 from PySide6.QtWidgets import QWidget
+from helpers.QtABCMetas import QWidgetABCMeta
 
 
-class WidgetABCMeta(type(QWidget), ABCMeta):
-    pass
-
-
-class ABCSettingTab(QWidget, metaclass=WidgetABCMeta):
+class ABCSettingTab(QWidget, ABC, metaclass=QWidgetABCMeta):
     """
     Just an abstract base class to use to make sure all our tabs have some set methods we can call from the settings dialog
     """
