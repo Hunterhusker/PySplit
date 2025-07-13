@@ -6,6 +6,7 @@ import json
 from time import sleep
 
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
+from Models.Game import Game
 from Popups.SettingsWindow import SettingsWindow
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
@@ -13,7 +14,7 @@ from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
-from Configurator.Configurator import Configurator
+from Styling.Configurator import Configurator
 
 
 class Main(QWidget):
@@ -26,18 +27,20 @@ class Main(QWidget):
     Quit = Signal()
     SaveSettings = Signal()
 
+    _widget_starting_location = None  # the starting location of the widget, used for click and drag actions
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle('PySplit v0.0')
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        self.title = TitleWidget('Game', 'SubTitle')
-        self.title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
-        self._start_pos = None
+        self.game = Game.from_json_file('conf/testGame.json')
+
+        self.title = TitleWidget.from_game(self.game)
 
         self.main_timer_widget = TimerWidget()
 
@@ -171,14 +174,14 @@ class Main(QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self._start_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+            self._widget_starting_location = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
 
     def mouseMoveEvent(self, event):
-        if self._start_pos is not None and event.buttons() & Qt.LeftButton:
-            self.move(event.globalPosition().toPoint() - self._start_pos)
+        if self._widget_starting_location is not None and event.buttons() & Qt.LeftButton:
+            self.move(event.globalPosition().toPoint() - self._widget_starting_location)
 
     def mouseReleaseEvent(self, event):
-        self._start_pos = None
+        self._widget_starting_location = None
 
 
 if __name__ == "__main__":
