@@ -1,50 +1,40 @@
+"""
+This class defines the way that a single split can be displayed on the screen
+"""
 from __future__ import annotations
 
-from abc import abstractmethod, ABCMeta, ABC
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt
 from PySide6.QtCore import Slot, Signal
+from typing import Callable
 
 from helpers.TimerFormat import format_wall_clock_from_ms
+from Models.Game import Split
 
 
 class SingleSplitWidget(QFrame):
-    def __init__(self, split_name: str, pb_time_ms: int, gold_segment_ms: int, pb_segment_ms: int, comparison_time: str):
+    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int]):
         """
         An individual split that can display the times from the PB and the comparison time
-
         Args:
-            split_name: (str) the name of the split
-            pb_time_ms: (int) the number of milliseconds from the start that was achieved on the overall PB for this game
-            gold_segment_ms: (int) the number of milliseconds from the end of the last split to the end of the shortest time we ever did this split
-            pb_segment_ms: (int) the number of milliseconds from the end of the last split to the end of this split on the shortest time we ever beat the game
-            comparison_time: (int) the time that we are going to display on the split itself
+            split: (Split) The split object that contains the information for the split itself
+            comparison_strategy: (Callable[[Split], int]) a strategy function that extracts the value we display and compare against from the Split object
         """
         super().__init__()
 
-        # save the variables we will need
-        self.split_name = split_name
-
-        # track the saved times
-        self.pb_time_ms = pb_time_ms
-
-        # track our best saved segments
-        self.gold_segment_ms = gold_segment_ms
-        self.pb_segment_ms = pb_segment_ms
+        self.split = split
+        self.comparison_strategy = comparison_strategy
 
         # setup values for the current state of the split
         self.current_time_ms = 0
         self.current_segment_ms = 0
         self.current_start_time = 0
 
-        # grab the display time using the strategy
-        self.display_time_ms = comparison_time
-
         self.layout = QHBoxLayout()
 
         # create the labels we need
-        self.split_name_label = QLabel(split_name, self)
-        self.time_label = QLabel(format_wall_clock_from_ms(self.display_time_ms), self)
+        self.split_name_label = QLabel(self.split.split_name, self)
+        self.time_label = QLabel(format_wall_clock_from_ms(self.get_comparison_time()), self)
         self.delta_label = QLabel('', self)
 
         # add them to the layout
@@ -75,7 +65,7 @@ class SingleSplitWidget(QFrame):
 
         self.current_time_ms = curr_time_ms
 
-        time_delta = self.current_time_ms - self.pb_time_ms
+        time_delta = self.current_time_ms - self.split.pb_time_ms
 
         if time_delta >= -1000.0:
             time_delta_str = format_wall_clock_from_ms(time_delta)
@@ -97,14 +87,14 @@ class SingleSplitWidget(QFrame):
             self.delta_label.setText('')
 
     def get_comparison_time(self):
-        return self.display_strategy.get_display_time_ms(self)
+        return self.comparison_strategy(self.split)
 
     def reset_split(self):
         """
         Resets the split data to how it would have been when first loaded
         """
         self.delta_label.setText('')  # clear the time delta
-        self.time_label.setText(format_wall_clock_from_ms(self.display_time_ms))
+        self.time_label.setText(format_wall_clock_from_ms(self.get_comparison_time()))
         self.time_label.setStyleSheet('color: #bbbbbb')
 
         self.current_time_ms = 0
@@ -114,8 +104,8 @@ class SingleSplitWidget(QFrame):
         """
         Saves any golds and starts the split over
         """
-        if self.current_segment_ms < self.gold_segment_ms and self.current_time_ms != 0:
-            self.gold_segment_ms = self.current_segment_ms
+        if self.current_segment_ms < self.split.gold_segment_ms and self.current_time_ms != 0:
+            self.split.gold_segment_ms = self.current_segment_ms
             self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
 
             # reset the current state to 0 since this split is done
@@ -132,16 +122,16 @@ class SingleSplitWidget(QFrame):
         """
         # indentation gets weird here due to the multiline string, but it stays a one-liner so whatever
         return f"""{indent * depth}{{
-{indent * (depth + 1)}"split_name": "{self.split_name}",
-{indent * (depth + 1)}"pb_time_ms": {self.pb_time_ms},
-{indent * (depth + 1)}"pb_segment_ms": {self.pb_segment_ms},
-{indent * (depth + 1)}"gold_segment_ms": {self.gold_segment_ms}
+{indent * (depth + 1)}"split_name": "{self.split.split_name}",
+{indent * (depth + 1)}"pb_time_ms": {self.split.pb_time_ms},
+{indent * (depth + 1)}"pb_segment_ms": {self.split.pb_segment_ms},
+{indent * (depth + 1)}"gold_segment_ms": {self.split.gold_segment_ms}
 {indent * depth}}}"""
 
     @Slot(str)
     def handle_control(self, event: str):
         if event == 'STARTSPLIT' and self.current_time_ms != 0:
-            time_delta = self.current_time_ms - self.display_time_ms
+            time_delta = self.current_time_ms - self.get_comparison_time()
             time_delta_str = format_wall_clock_from_ms(time_delta)
 
             if time_delta >= 0:
@@ -151,12 +141,12 @@ class SingleSplitWidget(QFrame):
 
             self.delta_label.setText(time_delta_str)  # update the +/- time delta label
 
-            if self.current_segment_ms < self.gold_segment_ms:
+            if self.current_segment_ms < self.split.gold_segment_ms:
                 # set the text to show that we saved time
                 self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
 
                 # if we're ahead of the saved time, then a "gold" gold
-                if self.current_segment_ms < self.pb_segment_ms:
+                if self.current_segment_ms < self.split.pb_segment_ms:
                     self.time_label.setStyleSheet('color: gold;')
                     self.delta_label.setStyleSheet('color: gold;')
                 else:  # we're behind, but we saved time, then we ought to color it a different color to note the gold but while not ahead
@@ -164,7 +154,7 @@ class SingleSplitWidget(QFrame):
                     self.delta_label.setStyleSheet('color: goldenrod;')
 
             # TODO : non-gold time save while behind should get colored differently
-            elif self.current_time_ms >= self.pb_time_ms:
+            elif self.current_time_ms >= self.split.pb_time_ms:
                 self.time_label.setStyleSheet('color: red;')
                 self.delta_label.setStyleSheet('color: red;')
 
@@ -177,22 +167,3 @@ class SingleSplitWidget(QFrame):
 
         elif event == 'STOP':
             self.finalize_split()
-
-
-# TODO : Split Builder factory that takes these in to decide which values goes on a split
-class AbstractSplitDisplayStrategy(ABC):
-    @abstractmethod
-    def get_display_time_ms(self, split: SingleSplitWidget):
-        ...
-
-
-class DisplayPBStrategy(AbstractSplitDisplayStrategy):
-    @abstractmethod
-    def get_display_time_ms(self, split: SingleSplitWidget):
-        return SingleSplitWidget.pb_time_ms
-
-
-class DisplayGoldStrategy(AbstractSplitDisplayStrategy):
-    @abstractmethod
-    def get_display_time_ms(self, split: SingleSplitWidget):
-        return SingleSplitWidget.gold_segment_ms
