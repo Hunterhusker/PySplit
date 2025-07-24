@@ -1,10 +1,18 @@
 """A file to model an instance of a game, and the associated data that we need"""
 from __future__ import annotations
+
 import json
 
+from PySide6.QtCore import Signal
+from PySide6.scripts.project_lib import Singleton
 
-class Game:
+
+class Game(metaclass=Singleton):
     """A representation of a game and the splits we'd like to track during a run"""
+    GameUpdated = Signal()
+
+    _instance = None
+
     def __init__(self, title: str, sub_title: str, splits: list[Split], lifetime_attempts: int, session_attempts: int, display_pb: bool = True):
         self.title = title
         self.sub_title = sub_title
@@ -28,10 +36,18 @@ class Game:
         lifetime_attempts = json_dict['lifetime_attempts']
         session_attempts = json_dict['session_attempts']
 
+        prev_pb_segment_total_ms = 0
+        prev_gold_segment_total_ms = 0
+
         # build the splits from the JSON in the game dictionary
         splits = []
         for split in json_dict['splits']:
-            splits.append(Split.from_json(split))
+            new_split = Split.from_json(split, prev_pb_segment_total_ms, prev_gold_segment_total_ms)
+
+            prev_pb_segment_total_ms = new_split.pb_segment_total_ms
+            prev_gold_segment_total_ms = new_split.gold_segment_total_ms
+
+            splits.append(new_split)
 
         # call the constructor on the data we extracted from the JSON
         return cls(title, sub_title, splits, lifetime_attempts, session_attempts)
@@ -104,36 +120,46 @@ class Game:
 
 class Split:
     """A class that represents a single split in a speedrun"""
-    def __init__(self, split_name: str, pb_time_ms: int, pb_segment_ms: int, gold_segment_ms: int):
+    def __init__(self, split_name: str, pb_time_ms: int, pb_segment_ms: int, gold_segment_ms: int, pb_segment_total_ms: int = 0, gold_segment_total_ms: int = 0):
         self.split_name = split_name
         self.pb_time_ms = pb_time_ms
         self.pb_segment_ms = pb_segment_ms
         self.gold_segment_ms = gold_segment_ms
+        self.pb_segment_total_ms = pb_segment_total_ms
+        self.gold_segment_total_ms = gold_segment_total_ms
 
     @classmethod
-    def from_json(cls, json_dict: dict):
+    def from_json(cls, json_dict: dict, prev_pb_segment_total_ms: int = 0, prev_gold_segment_total_ms: int = 0):
         """
         Makes a single split from the dictionary (aka JSON)
         Args:
             json_dict: (dict) the JSON dictionary representing the split
+            prev_pb_segment_total_ms: (int) the total of the previously seen segments pb segment times in ms
+            prev_gold_segment_total_ms: (int) the total of the previously seen segments gold segment times in ms
 
         Returns:
             (Split) the split detailed in the JSON object
         """
-        return cls(json_dict['split_name'], json_dict['pb_time_ms'], json_dict['pb_segment_ms'], json_dict['gold_segment_ms'])
+        # track the local segment totals
+        prev_pb_segment_total_ms += json_dict['pb_segment_ms']
+        prev_gold_segment_total_ms += json_dict['gold_segment_ms']
+
+        return cls(json_dict['split_name'], json_dict['pb_time_ms'], json_dict['pb_segment_ms'], json_dict['gold_segment_ms'], prev_pb_segment_total_ms, prev_gold_segment_total_ms)
 
     @classmethod
-    def from_json_str(cls, json_str: str):
+    def from_json_str(cls, json_str: str, prev_pb_segment_total_ms: int = 0, prev_gold_segment_total_ms: int = 0):
         """
         Makes a split object from a json string representation
         Args:
             json_str: (str) the string representing the split as JSON as a string
+            prev_pb_segment_total_ms: (int) the total of the previously seen segments pb segment times in ms
+            prev_gold_segment_total_ms: (int) the total of the previously seen segments gold segment times in ms
 
         Returns:
             (Split) the Split object that the JSON string represents
         """
         json_dict = json.loads(json_str)
-        return cls.from_json(json_dict)
+        return cls.from_json(json_dict, prev_pb_segment_total_ms, prev_gold_segment_total_ms)
 
     def __str__(self):
         """

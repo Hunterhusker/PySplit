@@ -1,6 +1,10 @@
+"""
+
+"""
+from Models.Game import Game, Split
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
-from Widgets.SingleSplitWidget import SingleSplitWidget, DisplayPBStrategy, DisplayGoldStrategy
+from Widgets.SingleSplitWidget import SingleSplitWidget
 
 
 class SplitsWidget(QWidget):
@@ -11,7 +15,8 @@ class SplitsWidget(QWidget):
     SplitFinish = Signal()
     SplitReset = Signal()
 
-    def __init__(self, gameData: list[dict]):
+    # TODO : Make this use the game obj and it's split type to make this widget and its SingleSplitWidgets
+    def __init__(self, game: Game):
         super().__init__()
 
         self.visible_splits = 3
@@ -42,7 +47,7 @@ class SplitsWidget(QWidget):
         self.started = False
         self.done = False
 
-        self.load_splits(gameData['splits'], gameData['display_pb'])
+        self.load_splits(game)
 
         self.scroll_widget.setLayout(self.scroll_widget_layout)
 
@@ -211,22 +216,30 @@ class SplitsWidget(QWidget):
 
         return tmp + f'\n{indent * (depth + 1)}]\n}}'
 
-    def load_splits(self, splits: list[dict[str: any]], displayPb: bool):
+    def load_splits(self, game: Game):
         """
         Load the splits into the GUI from JSONish data
 
         Args:
-            splits: (list[dict[str: any]]) JSON type data list of split data (name, pb time, pb segment, gold segment
-            displayPb: (bool) whether to display the PB or the Gold time on the GUI (True is PB of course)
+            game: (Models.Game) the game object that we are building the GUI from
         """
+        pb_segment_total = 0
+        gold_segment_total = 0
+
         # clear out the splits from the widget
         for split in self.splits:
             self.scroll_widget_layout.removeWidget(split)
             self.splits.remove(split)
 
         # create the new splits, and add them to the screen
-        for split in splits:
-            tmp = SingleSplitWidget(split['split_name'], split['pb_time_ms'], split['gold_segment_ms'], split['pb_segment_ms'], split['pb_time_ms'])
+        for split in game.splits:
+            pb_segment_total += split.pb_segment_ms
+            gold_segment_total += split.gold_segment_ms
+
+            tmp = SingleSplitWidget(split, split_pb_strategy)
+            tmp.pb_segment_total = pb_segment_total
+            tmp.gold_segment_total = gold_segment_total
+
             self.splits.append(tmp)
             self.scroll_widget_layout.addWidget(tmp)
 
@@ -258,3 +271,16 @@ class SplitsWidget(QWidget):
                 sp.pb_time_ms = sp.current_time_ms
 
             sp.reset_split()
+
+
+# different split display time strategies
+def split_pb_strategy(split: Split):
+    return split.pb_time_ms
+
+
+def split_pb_segment_strategy(split: Split):
+    return split.pb_segment_total_ms
+
+
+def split_gold_segement_strategy(split: Split):
+    return split.gold_segment_total_ms
