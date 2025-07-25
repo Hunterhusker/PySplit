@@ -35,7 +35,8 @@ class AssignButtonsTab(ABCSettingTab):
         self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
 
         # get the listener from the main page so we can listen to it
-        self.listener = mainWindow.keyboard_listener
+        self.listener = mainWindow.timer_controller.listeners[0]  # mainWindow.keyboard_listener
+        # TODO : Should listen to all things in the timer controller, perhaps it should be a controller type instead??
 
         # pull apart the event mapping, so I can build my assignment GUI
         keys = list(self.event_map.keys())
