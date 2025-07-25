@@ -2,16 +2,13 @@
 from __future__ import annotations
 
 import json
-
-from PySide6.QtCore import Signal
-from PySide6.scripts.project_lib import Singleton
+from PySide6.QtCore import Signal, QObject
 
 
-class Game(metaclass=Singleton):
+# TODO: How to tell from the file which thing to read
+class Game(QObject):
     """A representation of a game and the splits we'd like to track during a run"""
-    GameUpdated = Signal()
-
-    _instance = None
+    GameUpdated = Signal(QObject)
 
     def __init__(self, title: str, sub_title: str, splits: list[Split], lifetime_attempts: int, session_attempts: int, display_pb: bool = True):
         self.title = title
