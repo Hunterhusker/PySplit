@@ -11,7 +11,7 @@ class TimerController(QObject):
     """
     ControlEvent = Signal(str)
 
-    def __init__(self, Listeners: list[ABCListener], event_map):
+    def __init__(self, listeners: list[ABCListener], event_map):
         super().__init__()  # do the basic init
 
         # save our listeners to a list just in case
@@ -20,7 +20,7 @@ class TimerController(QObject):
         self.listening = True
 
         # subscribe to all the on_press events from the different listeners
-        self.add_listeners(Listeners)
+        self.add_listeners(listeners)
 
         # find the format of the input map
         if type(event_map) == dict:
@@ -93,7 +93,7 @@ class TimerController(QObject):
         Exports the current input config as a JSON string that we can store and load in later
 
         Returns:
-            (dict[str, str]) : The JSON string representing the current inputs
+            (dict[str, str]): The JSON string representing the current inputs
         """
         export_list = []
 
@@ -130,6 +130,7 @@ class TimerController(QObject):
         Args:
             listener: (ABCListener) The listener to add to the list and begin listening to
         """
+        listener.run()
         self.listeners.append(listener)  # save it for later
 
         listener.on_press.connect(self.input_event)  # start listening to events from this

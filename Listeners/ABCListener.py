@@ -9,7 +9,7 @@ class ABCQObjectMeta(type(QObject), ABCMeta):
     ...
 
 
-class ABCListener(QObject, metaclass=ABCQObjectMeta):
+class ABCListener(QObject, ABC, metaclass=ABCQObjectMeta):
     """
     An abstract object that we can define a template for all listeners for
     """
