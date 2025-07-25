@@ -7,7 +7,10 @@ from time import sleep
 
 from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
 from Models.Game import Game
+from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.SettingsWindow import SettingsWindow
+from Popups.SplitsTab import SplitsTab
+from Popups.StyleTab import StyleTab
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
@@ -66,8 +69,6 @@ class Main(QWidget):
         self.splits = SplitsWidget(self.game)
         self.splitStats = TimeStatsWidget()
 
-        print(self.game)
-
         layout.addWidget(self.title)
         layout.addWidget(self.splits)
         layout.addWidget(self.main_timer_widget)
@@ -75,12 +76,6 @@ class Main(QWidget):
 
         self.setLayout(layout)
         self.setGeometry(800, 800, 225, 200)
-
-        # create a keyboard listener
-        self.keyboard_listener = KeyboardListener()
-
-        # start the keyboard listener, it already runs the listener on its own thread so there is no need to add another thread
-        self.keyboard_listener.run()
 
         # create and connect to the timer thread
         self.game_timer = Timer()
@@ -96,7 +91,7 @@ class Main(QWidget):
         self.game_timer_thread.start()
 
         # create the timer controller from the config
-        self.timer_controller = TimerController(Listeners=[self.keyboard_listener], event_map=self.configurator.settings['inputs'])
+        self.timer_controller = TimerController(listeners=[KeyboardListener()], event_map=self.configurator.settings['inputs'])
 
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
@@ -106,9 +101,17 @@ class Main(QWidget):
         self.splits.SplitFinish.connect(self.game_timer.stop_timer)
         self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
+        self.settings_window = SettingsWindow(parent=self)
+        self.settings_window.setGeometry(900, 900, 400, 400)
+        self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
+        self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
+        self.settings_window.add_tab(SplitsTab(mainWindow=self), 'Splits')
+
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
-        self.Quit.connect(self.keyboard_listener.quit)
+        
+        for listener in self.timer_controller.listeners:
+            self.Quit.connect(listener.quit)
 
     def contextMenuEvent(self, event):
         if not self.game_timer.running:  # only open if the timer is not running, don't play with settings! PLAY THE GAME!
@@ -118,13 +121,10 @@ class Main(QWidget):
         """
         Opens the keybinding assignment dialog popup and lets you reassign any key
         """
-        dialog = SettingsWindow(parent=self)
-        dialog.setGeometry(900, 900, 400, 400)
-
         # lock the splitter
         self.timer_controller.listening = False
 
-        dialog.exec()  # open the popup and wait for it to close
+        self.settings_window.exec()  # open the popup and wait for it to close
 
         # unlock the splitter
         self.timer_controller.listening = True
