@@ -15,7 +15,8 @@ class SplitsWidget(QWidget):
     SplitFinish = Signal()
     SplitReset = Signal()
 
-    # TODO : Make this use the game obj and it's split type to make this widget and its SingleSplitWidgets
+    # TODO : FIX BUG: Finishing a split doesn't always put the just achieved time on the split itself where the old time was
+    # TODO : Add better support for the strategy adoption as well
     def __init__(self, game: Game):
         super().__init__()
 

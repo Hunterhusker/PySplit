@@ -1,9 +1,7 @@
 from PySide6.QtWidgets import QVBoxLayout, QDialog, QDialogButtonBox, QPushButton, QWidget, QTabWidget
 from PySide6.QtCore import Qt
 
-from Popups.AssignButtonsTab import AssignButtonsTab
-from Popups.SplitsTab import SplitsTab
-from Popups.StyleTab import StyleTab
+from Popups.ABCSettingTab import ABCSettingTab
 
 
 class SettingsWindow(QDialog):
@@ -11,21 +9,10 @@ class SettingsWindow(QDialog):
         super().__init__(parent)
 
         self.layout = QVBoxLayout()
-
-        # create the tabs here before we add them, and give them a link to main
-        self.keyWidget = AssignButtonsTab(mainWindow=parent)
-        self.styleWidget = StyleTab(mainWindow=parent)
-        self.splitsWidget = SplitsTab(mainWindow=parent)
-
+        
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.styleWidget, 'Style')
-        self.tabs.addTab(self.keyWidget, 'Key Bindings')
-        self.tabs.addTab(self.splitsWidget, 'Splits')
-
-        # set up our standard dialog buttons
+        
         self.dialogButtons = QDialogButtonBox()
-
-        # create buttons for the button dialog
         self.dialogButtons.addButton(QDialogButtonBox.Ok)
         self.dialogButtons.addButton(QDialogButtonBox.Apply)
         self.dialogButtons.addButton(QDialogButtonBox.Cancel)
@@ -71,3 +58,12 @@ class SettingsWindow(QDialog):
 
         elif role == QDialogButtonBox.ApplyRole:
             self.apply_settings()
+
+    def add_tab(self, tab_widget: ABCSettingTab, name: str):
+        """
+        Adds the provided tab to the end of the tab list. Must provide an ABCSettingsTab so that it has the required structure.
+        Args:
+            tab_widget: (ABCSettingsTab) the settings popup window to add
+            name: (str) the name of the tab
+        """
+        self.tabs.addTab(tab_widget, name)
