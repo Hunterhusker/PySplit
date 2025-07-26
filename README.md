@@ -42,14 +42,13 @@ Inspiration, code snippets, and other things I would like to thank
 
 
 ```mermaid
- classDiagram
+classDiagram
     class main {
         layout: QVBoxLayout
         Title: TitleWidget
         context_menu: QMenu
         configurator: Configurator
         splits: SplitsWidget
-        keyboard_listener: KeyboardListener
         game_timer: Timer
         timer_controller: TimerController
         open_settings_popup()
@@ -61,16 +60,43 @@ Inspiration, code snippets, and other things I would like to thank
         mouseMoveEvent(event)
         mouseReleaseEvent(event)
     }
-
     main "1" --* "1" TitleWidget
     main "1" --* "1" Configurator
     main "1" --* "1" TimerWidget
     main "1" --* "0..1" SplitsWidget
     main "1" --*"0..1" TimeStatsWidget
     main "1" --*"0..1" SplitGraphWidget
-    main "1" --o "1" KeyboardListener
     main "1" --o "1" Timer
     main "1" --o "1" TimerController
+    main "1" --o "1" Game
+
+    class Game {
+        from_json(json_dict: dict)
+        from_json_file(file_path: str)
+        to_dict(): dict
+        to_json(): str
+        \_\_str\_\_(): str
+        title: str
+        sub_title: str
+        splits: list[Split]
+        lifetime_attempts: int
+        session_attempts: int
+    }
+
+    class Split {
+        from_json(json_dict: dict, prev_pb_segment_total_ms: int, prev_gold_segment_total_ms: int)
+        from_json_str(json_str: str, prev_pb_segment_total_ms, prev_gold_segment_total_ms: int)
+        \_\_str\_\_(): str
+        to_dict(): dict
+        to_json(): str
+        split_name: str
+        pb_time_ms: int
+        pb_segment_ms: int
+        gold_segment_ms: int
+        pb_segment_total_ms: int
+        gold_segment_total_ms: int
+    }
+    Game "1" --o  "1.." Split
 
     class TitleWidget {
         layout: QVBoxLayout
@@ -90,7 +116,6 @@ Inspiration, code snippets, and other things I would like to thank
         game_settings: dict[str, any]
         style: StyleBuilder
     }
-
     Configurator --o StyleBuilder
 
     class StyleBuilder {
@@ -136,7 +161,6 @@ Inspiration, code snippets, and other things I would like to thank
         reset_splits()
         update_splits()
     }
-
     SplitsWidget "1" --* "0..n" SingleSplitWidget
 
     class SingleSplitWidget {
@@ -145,7 +169,7 @@ Inspiration, code snippets, and other things I would like to thank
         gold_segment_ms: int
         pb_segment_ms: int
         current_time_ms: int
-        current_segment_ms: int
+        current_segement_ms: int
         current_start_time: int
         display_time_ms: int
         layout: QHBoxLayout
@@ -183,11 +207,11 @@ Inspiration, code snippets, and other things I would like to thank
 
     class ABCListenedObject {
         <<abstract>>
-        __init__(obj)
-        __eq__(other)
-        __str__()
-        __repr__()
-        __hash__()
+        \_\_init\_\_(obj)
+        \_\_eq\_\_(other)
+        \_\_str\_\_()
+        \_\_repr\_\_()
+        \_\_hash\_\_()
         serialize()
         deserialize()
     }
@@ -208,19 +232,18 @@ Inspiration, code snippets, and other things I would like to thank
         source: str
         value: str
         obj: pynput.Keyboard.Key
-        __init__(obj: pynput.Keyboard.Key)
-        __eq__(other)
-        __hash__()
-        __str__()
-        __repr__()
+        \_\_init\_\_(obj: pynput.Keyboard.Key)
+        \_\_eq\_\_(other)
+        \_\_hash\_\_()
+        \_\_str\_\_()
+        \_\_repr\_\_()
         serialize() -> dict[str, str]
         deserialize(obj: dict[str, str])
         key_to_str(key: pynput.Keyboard.Key)
         str_to_key(key_str: str)
     }
-
-    KeyPressObject --|> ABCListenedObject
-    KeyboardListener --|> ABCListener
+    ABCListenedObject <|-- KeyPressObject 
+    ABCListener <|-- KeyboardListener
     KeyboardListener ..|> KeyPressObject
 
     class Timer {
@@ -231,7 +254,7 @@ Inspiration, code snippets, and other things I would like to thank
         timer: QElapsedTimer
         update_timer: QTimer
         event_map: dict[str, func]
-        __init__()
+        \_\_init\_\_()
         run()
         handle_control()
         doNothing()
@@ -247,12 +270,12 @@ Inspiration, code snippets, and other things I would like to thank
 
     class TimerController {
         ControlEvent: Signal[str]
-        __init__(Listeners: list[ABCListener], event_map: dict[str, any])
+        \_\_init\_\_(Listeners: list[ABCListener], event_map: dict[str, any])
         input_event(event_obj)
         update_mapping(event_map: dict[KeyPressObject, str])
         get_mapping()
-        add_mapping(key: KeyPressObject, value: str)
-        remove_mapping(key: KeyPressObject)
+        add_mapping(key: ABCListener, value: str)
+        remove_mapping(key: ABCListener)
         export_mapping() -> str
         import_mapping(serialized_event_map)
         add_listener(listener: ABCListener)
@@ -262,121 +285,111 @@ Inspiration, code snippets, and other things I would like to thank
         resume_listeners()
         toggle_listening()
     }
+    TimerController --> ABCListener
 
-    TimerController --> KeyPressObject  
+    class SettingsWindow {
+        layout: QVBoxLayout
+        keyWidget: AssignButtonsTab
+    }
+    SettingsWindow --* ABCSettingsTab
 
-%% Settings window stuff
-class SettingsWindow {
-    layout: QVBoxLayout
-    keyWidget: AssignButtonsTab
+    class ABCSettingsTab {
+        <<abstract>>
+        apply()
+    }
 
-}
+    class AssignButtonsTab {
+        layout: QVBoxLayout
+        main: main
+        scroll_widget: QWidget
+        scroll_widget_layout: QVBoxLayout
+        scroll_area: QScrollArea
+        event_map: dict[str, str]
+        listener: KeyboardListener
+        keys: list[str]
+        values: list[str]
+        assignStartSplit: KeyReassignmentLine
+        assignUnsplit: KeyReassignmentLine
+        assignPause: KeyReassignmentLine
+        assignResume: : KeyReassignmentLine
+        assignReset: KeyReassignmentLine
+        assignStop : KeyReassignmentLine
+        assignSkipSplit: : KeyReassignmentLine
+        assignLock: KeyReassignmentLine
+        widgets: dict[str, KeyReassignmentLine]
+        \_\_init\_\_()
+        apply()
+        assign_mapping(key: str, timer_event: str)
+    }
 
-class ABCSettingsTab {
-    <<abstract>>
-    apply()
-}
+    class KeyReassignmentLine {
+        listening: bool
+        event_object: str
+        timer_event: str
+        key_str: str
+        line_layout: QHBoxLayout
+        event_label: QLabel
+        trigger_button: QPushButton
+        \_\_init\_\_(listener, event_object, timer_event: str, label: str)
+        assign_key(obj)
+        toggle_listening()
+        listen_for_key(event_object)
+    }
+    AssignButtonsTab --* KeyReassignmentLine
 
-class AssignButtonsTab {
-    layout: QVBoxLayout
-    main: main
-    scroll_widget: QWidget
-    scroll_widget_layout: QVBoxLayout
-    scroll_area: QScrollArea
-    event_map: dict[str, str]
-    listener: KeyboardListener
-    keys: list[str]
-    values: list[str]
-    assignStartSplit: KeyReassignmentLine
-    assignUnsplit: KeyReassignmentLine
-    assignPause: KeyReassignmentLine
-    assignResume: : KeyReassignmentLine
-    assignReset: KeyReassignmentLine
-    assignStop : KeyReassignmentLine
-    assignSkipSplit: : KeyReassignmentLine
-    assignLock: KeyReassignmentLine
-    widgets: dict[str, KeyReassignmentLine]
-    __init__()
-    apply()
-    assign_mapping(key: str, timer_event: str)
-}
+    class LayoutTab {
+        TODO
+    }
 
-class KeyReassignmentLine {
-    listening: bool
-    event_object: str
-    timer_event: str
-    key_str: str
-    line_layout: QHBoxLayout
-    event_label: QLabel
-    trigger_button: QPushButton
-    __init__(listener, event_object, timer_event: str, label: str)
-    assign_key(obj)
-    toggle_listening()
-    listen_for_key(event_object)
-}
+    class SplitsTab {
+        layout: QVBoxLayout
+        main: main 
+        game_settings: dict[str, str]
+        add_button: QPushButton
+        \_\_init\_\_(mainWindow: main)
+        import_splits(game_settings: dict[str, str])
+        exportSplits()
+        addEmptySplit()
+        remove_split(split: SplitLine)
+        apply()
+    }
+    SplitsTab ..> Game
 
-AssignButtonsTab --* KeyReassignmentLine
+    class SplitLine {
+        layout: QHBoxLayout
+        bestTimeMS: int 
+        goldTimeSegementMs: int 
+        splitNameInput: QLineEdit 
+        bestTimeInput: QTimeEdit 
+        bestSegmentInput: QTimeEdit
+        goldSegmentInput: QTimeEdit 
+        removeButton: QPushButton 
+        export()
+    }
 
-class LayoutTab {
-    TODO
-}
+    class StyleTab {
+        main: main 
+        update_key(key: str, value: str)
+        \_\_init\_\_(mainWindow: main)
+        apply()
+    }
 
-class SplitsTab {
-    layout: QVBoxLayout
-    main: main 
-    game_settings: dict[str, str]
-    add_button: QPushButton
-    __init__(mainWindow: main)
-    import_splits(game_settings: dict[str, str])
-    exportSplits()
-    addEmptySplit()
-    remove_split(split: SplitLine)
-    apply()
-}
+    class StyleSettingLine {
+        UpdateKey: Signal[str, str]
+        layout: QHBoxLayout
+        parent: StyleTab
+        key: str
+        label: QLabel
+        textInput: QLineEdit
+        \_\_init\_\_(key: str, value: str, parent: StyleTab)
+        textChanged()
+    }
+    main --> SettingsWindow
+    ABCSettingsTab <|-- AssignButtonsTab
+    ABCSettingsTab <|-- LayoutTab
+    ABCSettingsTab <|-- SplitsTab
+    ABCSettingsTab <|-- StyleTab
+    StyleTab --* StyleSettingLine
+    SplitsTab --* SplitLine
 
-class SplitLine {
-    layout: QHBoxLayout
-    bestTimeMS: int 
-    goldTimeSegmentMs: int 
-    splitNameInput: QLineEdit 
-    bestTimeInput: QTimeEdit 
-    bestSegmentInput: QTimeEdit
-    goldSegmentInput: QTimeEdit 
-    removeButton: QPushButton 
-    export()
-}
-
-class StyleTab {
-    main: main 
-    update_key(key: str, value: str)
-    __init__(mainWindow: main)
-    apply()
-}
-
-class StyleSettingLine {
-    UpdateKey: Signal[str, str]
-    layout: QHBoxLayout
-    parent: StyleTab
-    key: str
-    label: QLabel
-    textInput: QLineEdit
-    __init__(key: str, value: str, parent: StyleTab)
-    textChanged()
-}
-
-StyleTab --* StyleSettingLine
-
-main ..> SettingsWindow
-    
-%% map the tabs to their abstract base class
-AssignButtonsTab --|> ABCSettingsTab
-LayoutTab --|> ABCSettingsTab
-SplitsTab --|> ABCSettingsTab
-StyleTab --|> ABCSettingsTab
-
-%% add them all to the settings window
-SettingsWindow --* AssignButtonsTab
-SettingsWindow --* LayoutTab
-SettingsWindow --* SplitsTab
-SettingsWindow --* StyleTab
 ```
