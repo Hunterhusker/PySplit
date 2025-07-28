@@ -5,7 +5,8 @@ import sys
 import json
 from time import sleep
 
-from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
+from Listeners.AggregateListener import AggregateListener
+from Listeners.KeyboardListener import KeyboardListener
 from Models.Game import Game
 from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.SettingsWindow import SettingsWindow
@@ -90,8 +91,10 @@ class Main(QWidget):
 
         self.game_timer_thread.start()
 
+        aggregate_listener = AggregateListener(listeners=[KeyboardListener()])
+
         # create the timer controller from the config
-        self.timer_controller = TimerController(listeners=[KeyboardListener()], event_map=self.configurator.settings['inputs'])
+        self.timer_controller = TimerController(listener=aggregate_listener, event_map=self.configurator.settings['inputs'])
 
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
@@ -109,9 +112,7 @@ class Main(QWidget):
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
-        
-        for listener in self.timer_controller.listeners:
-            self.Quit.connect(listener.quit)
+        self.Quit.connect(self.timer_controller.listener.quit)
 
     def contextMenuEvent(self, event):
         if not self.game_timer.running:  # only open if the timer is not running, don't play with settings! PLAY THE GAME!

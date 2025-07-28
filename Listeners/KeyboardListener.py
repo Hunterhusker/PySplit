@@ -1,56 +1,18 @@
 from abc import ABC
 
 from pynput.keyboard import Listener, Key, KeyCode
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Slot
 from Listeners.ABCListener import ABCListener, ABCListenedObject
 
 
-class KeyboardListener(ABCListener, ABC):
-    """
-    Runs a keyboard listener in another thread that uses callbacks to emit our own "key_pressed" event to control the timer
-    """
-    on_press = Signal(Key)
-    listener = None
-    listening = None
-
-    def __init__(self):
-        super().__init__()
-        self.listening = True
-
-    def run(self):
-        self.listen()
-
-    def listen(self):
-        self.listener = Listener(on_press=self.on_input_event)
-        self.listener.daemon = True
-        self.listener.start()
-
-    def on_input_event(self, key):
-        if self.listening:  # only emit the event if the listener is currently "on"
-            self.on_press.emit(KeyPressObject(key))
-
-    @Slot()
-    def pause_listening(self):
-        if self.listening:
-            self.listening = False
-
-    @Slot()
-    def resume_listening(self):
-        if not self.listening:
-            self.listening = True
-
-    @Slot()
-    def quit(self):
-        """
-        Stops the keyboard listener cleanly
-        """
-        self.listener.stop()
+# I want them to share sources, but I also don't want to tie them together like that
+KEY_PRESS_SOURCE = 'pynput'
 
 
 class KeyPressObject(ABCListenedObject):
     def __init__(self, obj: Key = None):
         if obj is not None:
-            self.source = 'pynput'
+            self.source = KEY_PRESS_SOURCE
             self.value = key_to_str(obj)
             self.obj = obj
 
@@ -60,7 +22,7 @@ class KeyPressObject(ABCListenedObject):
             else:
                 self.type = 'complex'
 
-        else:  # if no obj is there, make it blank I guess
+        else:  # if no obj is there, make it blank, I guess
             self.source = ''
             self.value = ''
             self.obj = ''
@@ -83,9 +45,9 @@ class KeyPressObject(ABCListenedObject):
         return f'KeyPressObj({self.value})'
 
     def __repr__(self):
-        return f'KeyPressObj{{\'source\': {self.source}, \'type\': {self.type_str}, \'value\': {self.value}}}'
+        return f'KeyPressObj{{\'source\': {self.source}, \'type\': {self.type}, \'value\': {self.value}}}'
 
-    def serialize(self) -> dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """
         Converts the input object into a dictionary of strings that we can save to a file
 
@@ -98,7 +60,8 @@ class KeyPressObject(ABCListenedObject):
             'value': self.value
         }
 
-    def deserialize(self, obj: dict[str, str]):
+    @classmethod
+    def from_dict(cls, obj: dict[str, str]):
         """
         Makes an input obj from the provided serialized data that is what we would expect to have generated that JSON
           - useful for reading in an input from a JSON file and giving back the object that it represents
@@ -107,16 +70,65 @@ class KeyPressObject(ABCListenedObject):
             obj: (dict[str, str]) The serialized data that represents this input object
 
         Returns:
-            (KeyPressObject) : A reference to the thing we just created
+            (KeyPressObject): A reference to the thing we just created
         """
-        self.source = obj['source']
-        self.type = obj['type']
-        self.value = obj['value']
+        source = obj['source']
+        type = obj['type']
+        value = obj['value']
+        obj = str_to_key(value)
 
-        # also get the obj just cause
-        self.obj = str_to_key(self.value)
+        tmp = cls(obj)
+        tmp.type = type
+        tmp.source = source
 
-        return self
+        return tmp
+
+
+class KeyboardListener(ABCListener, ABC):
+    """
+    Runs a keyboard listener in another thread that uses callbacks to emit our own "key_pressed" event to control the timer
+    """
+    listener = None
+    event_type = KeyPressObject
+    _source = KEY_PRESS_SOURCE
+
+    def __init__(self):
+        super().__init__()
+        self.listening = False
+
+    def listen(self):
+        self.listener = Listener(on_press=self.on_input_event)
+        self.listener.daemon = True
+        self.listening = True
+        self.listener.start()
+
+    def on_input_event(self, event):
+        if self.listening:  # only emit the event if the listener is currently "on"
+            self.on_event.emit(self.event_type(event))
+
+    @Slot()
+    def pause_listening(self):
+        if self.listening:
+            self.listening = False
+
+    @Slot()
+    def resume_listening(self):
+        if not self.listening:
+            self.listening = True
+
+    @Slot()
+    def quit(self):
+        """
+        Stops the keyboard listener cleanly
+        """
+        self.listener.stop()
+
+    def event_object_from_dict(self, event_dict: dict[str, str]):
+        return self.event_type().from_dict(event_dict)
+
+    @property
+    def source(self):
+        return self._source
 
 
 def key_to_str(key: Key) -> str:
@@ -157,7 +169,7 @@ def str_to_key(key_str: str) -> Key:
     if 'Key.' in key_str:  # remove Key. from the string incase that made it over from a non-standard toStringing
         key_str = key_str.replace('Key.', '')
 
-    if len(key_str) != 1:  # if it is more than one character then it can't be gotten as a char
+    if len(key_str) != 1:  # if it is more than one character, then it can't be gotten as a char
         try:
             key = getattr(Key, key_str)
 

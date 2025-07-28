@@ -35,7 +35,7 @@ class AssignButtonsTab(ABCSettingTab):
         self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
 
         # get the listener from the main page so we can listen to it
-        self.listener = mainWindow.timer_controller.listeners[0]  # mainWindow.keyboard_listener
+        self.listener = mainWindow.timer_controller.listener  # mainWindow.keyboard_listener
         # TODO : Should listen to all things in the timer controller, perhaps it should be a controller type instead??
 
         # pull apart the event mapping, so I can build my assignment GUI
@@ -193,7 +193,7 @@ class KeyReassignmentLine(QFrame):
     def toggle_listening(self):
         if self.listening:
             self.listening = False
-            self.listener.on_press.disconnect(self.listen_for_key)
+            self.listener.on_event.disconnect(self.listen_for_key)
 
             # update the label on the button too
             self.trigger_button.setText(self.key_str)
@@ -201,7 +201,7 @@ class KeyReassignmentLine(QFrame):
 
         else:
             self.listening = True
-            self.listener.on_press.connect(self.listen_for_key)
+            self.listener.on_event.connect(self.listen_for_key)
 
             self.trigger_button.setText('...')  # TODO: setup a QTimer to count down from 5 and then untoggle
 
