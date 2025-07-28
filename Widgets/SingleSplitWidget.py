@@ -140,11 +140,9 @@ class SingleSplitWidget(QFrame):
                 time_delta_str = '-' + time_delta_str
 
             self.delta_label.setText(time_delta_str)  # update the +/- time delta label
+            self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))  # set the text to show the time taken
 
             if self.current_segment_ms < self.split.gold_segment_ms:
-                # set the text to show that we saved time
-                self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
-
                 # if we're ahead of the saved time, then a "gold" gold
                 if self.current_segment_ms < self.split.pb_segment_ms:
                     self.time_label.setStyleSheet('color: gold;')
@@ -153,7 +151,10 @@ class SingleSplitWidget(QFrame):
                     self.time_label.setStyleSheet('color: goldenrod;')
                     self.delta_label.setStyleSheet('color: goldenrod;')
 
-            # TODO : non-gold time save while behind should get colored differently
+            elif self.current_segment_ms < self.split.pb_segment_ms:
+                self.time_label.setStyleSheet('color: blue;')
+                self.delta_label.setStyleSheet('color: blue;')
+
             elif self.current_time_ms >= self.split.pb_time_ms:
                 self.time_label.setStyleSheet('color: red;')
                 self.delta_label.setStyleSheet('color: red;')
