@@ -1,11 +1,9 @@
-"""A file to model an instance of a game, and the associated data that we need"""
 from __future__ import annotations
 
 import json
 from PySide6.QtCore import Signal, QObject
 
 
-# TODO: How to tell from the file which thing to read
 class Game(QObject):
     """A representation of a game and the splits we'd like to track during a run"""
     GameUpdated = Signal(QObject)
@@ -23,7 +21,7 @@ class Game(QObject):
         """
         Builds a game object from JSON
         Args:
-            json_dict: (dict) the json representation of the game
+            json_dict: (dict) the JSON representation of the game
 
         Returns:
             (Game) the game object that was detailed in the JSON
@@ -105,6 +103,12 @@ class Game(QObject):
             (str) the JSON string representing this Game object
         """
         return json.dumps(self.to_dict(), indent=4)
+
+    def to_json_file(self, file_path: str):
+        data = self.to_json()
+
+        with open(file_path, 'w') as f:
+            f.write(data)
 
     def __str__(self):
         """
