@@ -54,6 +54,7 @@ class SplitsWidget(QWidget):
 
         self.scroll_area.setWidget(self.scroll_widget)
         self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
+        self.scroll_area.verticalScrollBar().setSingleStep(self.splits[0].height())
 
         self.layout.addWidget(self.scroll_area)
         self.setLayout(self.layout)
