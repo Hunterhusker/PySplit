@@ -161,7 +161,7 @@ class Main(QWidget):
         return self.styleSheet()
 
     def closeEvent(self, event):
-        # emit a close so the threads clean up themselves
+        # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
         sleep(0.125)  # wait for the quits to go through, not my proudest work, but it works
 
