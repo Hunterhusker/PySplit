@@ -36,7 +36,7 @@ class Main(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('PySplit v0.0')
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
