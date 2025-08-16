@@ -15,8 +15,7 @@ class SplitsWidget(QWidget):
     SplitFinish = Signal()
     SplitReset = Signal()
 
-    # TODO : FIX BUG: Finishing a split doesn't always put the just achieved time on the split itself where the old time was
-    # TODO : Add better support for the strategy adoption as well
+    # TODO : Add better support for the strategy adoption
     def __init__(self, game: Game):
         super().__init__()
 
@@ -48,6 +47,8 @@ class SplitsWidget(QWidget):
         self.started = False
         self.done = False
 
+        # save the game so we can apply updates to it later
+        self.game = game
         self.load_splits(game)
 
         self.scroll_widget.setLayout(self.scroll_widget_layout)
@@ -124,7 +125,7 @@ class SplitsWidget(QWidget):
     @Slot(str)
     def handle_control(self, event: str):
         """
-        An event handler to send all the needed data to the splits themsevles
+        An event handler to send all the needed data to the splits themselves
 
         Args:
             event: (str) the event to handle from the user
@@ -153,14 +154,24 @@ class SplitsWidget(QWidget):
 
             elif not self.done:
                 if self.index == len(self.splits) - 1:
-                    self.SplitFinish.emit()
+                    did_pb = self.splits[-1].split.pb_time_ms < self.splits[-1].current_time_ms
 
                     for sp in self.splits:
-                        sp.finalize_split()
+                        if did_pb:
+                            sp.split.pb_time_ms = sp.current_time_ms
+                            sp.split.pb_segment_ms = sp.current_segment_ms
+
+                        if sp.current_segment_ms < sp.split.gold_segment_ms:
+                            sp.split.gold_segment_ms = sp.current_segment_ms
+
+                        sp.current_time_ms = 0
+                        sp.current_segment_ms = 0
 
                     # maintain state
                     self.started = False
                     self.done = True
+
+                    self.SplitFinish.emit()
 
                 else:
                     self.increment_split(1)
@@ -195,7 +206,12 @@ class SplitsWidget(QWidget):
             self.done = False
 
             for sp in self.splits:
-                sp.finalize_split()
+                # sp.finalize_split()
+                if sp.current_segment_ms != 0 and sp.current_segment_ms < sp.split.gold_segment_ms:
+                    sp.split.gold_segment_ms = sp.current_segment_ms
+
+                sp.current_segment_ms = 0
+                sp.gold_segment_ms = 0
 
     def export_splits(self, indent: str = '    ', depth: int = 0) -> str:
         """
@@ -225,6 +241,46 @@ class SplitsWidget(QWidget):
         Args:
             game: (Models.Game) the game object that we are building the GUI from
         """
+        self.load_splits_from_list(game.splits)
+
+    def load_splits_from_list(self, splits: list[Split]):
+        """
+        Loads in splits form a list of Models.Game.Split
+        Args:
+            splits: (list[Models.Game.Split]) the list of splits to load into our split widget
+        """
+        pb_segment_total = 0
+        gold_segment_total = 0
+
+        # clear out the splits from the layout
+        for split in self.splits:
+            self.scroll_widget_layout.removeWidget(split)
+
+        self.splits = []  # and empty our internal list
+
+        # create the new splits, and add them to the screen
+        for i in range(len(splits)):
+            split = splits[i]
+
+            pb_segment_total += split.pb_segment_ms
+            gold_segment_total += split.gold_segment_ms
+
+            tmp = SingleSplitWidget(split, split_pb_strategy)
+            tmp.pb_segment_total = pb_segment_total
+            tmp.gold_segment_total = gold_segment_total
+
+            self.splits.append(tmp)
+            self.scroll_widget_layout.addWidget(tmp)
+
+    def load_splits_from_json(self, json: dict[str]):
+        """
+
+        Args:
+            json:
+
+        Returns:
+
+        """
         pb_segment_total = 0
         gold_segment_total = 0
 
@@ -234,7 +290,7 @@ class SplitsWidget(QWidget):
             self.splits.remove(split)
 
         # create the new splits, and add them to the screen
-        for split in game.splits:
+        for split in json:
             pb_segment_total += split.pb_segment_ms
             gold_segment_total += split.gold_segment_ms
 
