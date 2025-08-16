@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import copy
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, \
+    QScrollArea, QWidget
 from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
 
@@ -28,23 +29,42 @@ class SplitsTab(ABCSettingTab):
 
         self.add_button = QPushButton("+")
         self.add_button.setFixedSize(25, 25)
-        self.layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
 
-        self.import_splits(self.game)  # TODO: This needs to be in a scroll container or it can just get huge
+        self.scroll_widget = QWidget()
+        self.scroll_widget_layout = QVBoxLayout()
 
-        self.layout.addStretch()  # add in a stretch for good measure
+        self.scroll_area = QScrollArea()  # TODO : Make popup wider to accommodate the split settings
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setFrameStyle(QFrame.NoFrame)
+
+        self.scroll_widget_layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
+
+        self.import_splits(self.game, self.scroll_widget_layout)
+
+        # add a stretch to keep stuff sized right
+        self.scroll_widget_layout.addStretch()
+
+        self.scroll_widget.setLayout(self.scroll_widget_layout)
+        self.scroll_area.setWidget(self.scroll_widget)
+
+        self.scroll_widget.setLayout(self.scroll_widget_layout)
+        self.layout.addWidget(self.scroll_area)
+
+        # link it all up so that this displays
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')  # set the object name here so it uses the right QSS
 
         # make our connections now that everything is displayed
         self.add_button.clicked.connect(self.addEmptySplit)
 
-    def import_splits(self, game: Game):
+    def import_splits(self, game: Game, container: QBoxLayout):
         """
         Generates a set of splits from the information in the main window
 
         Args:
             game: (Game) The current game settings
+            container: (QBoxLayout) Where to stick the splits once we make them
 
         Returns:
             (list[SplitLine]): the list of the splits to put on the screen
@@ -52,9 +72,9 @@ class SplitsTab(ABCSettingTab):
         for split in game.splits:
             new_split = SplitLine(split, parent=self)
 
-            currCount = self.layout.count() - 1  # -1 for the add button
+            currCount = container.count() - 1  # -1 for the add button
 
-            self.layout.insertWidget(currCount, new_split)
+            container.insertWidget(currCount, new_split)
 
     def exportSplits(self):
         """
@@ -63,7 +83,6 @@ class SplitsTab(ABCSettingTab):
         Returns:
             (list[dict]) the JSON for these splits
         """
-        #return [sp.export() for sp in self.split_widgets]
         return [self.layout.itemAt(i).widget().export() for i in range(self.layout.count() - 2)]
 
     def addEmptySplit(self):
@@ -92,7 +111,7 @@ class SplitsTab(ABCSettingTab):
         Send the updates to the game object
         """
         new_splits = []
-
+        # TODO When are new splits added to the game object??
         for i in range(self.layout.count() - 2):
             curr = self.layout.itemAt(i).widget()
 
