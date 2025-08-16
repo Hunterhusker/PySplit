@@ -1,8 +1,6 @@
-from PySide6.QtGui import QFontDatabase
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame, QScrollArea
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu
 from PySide6.QtCore import Slot, Signal, QThread, Qt
 import sys
-import json
 from time import sleep
 
 from Listeners.AggregateListener import AggregateListener
@@ -18,7 +16,7 @@ from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
-from Styling.Configurator import Configurator
+from Styling.StyleConfigurator import Configurator
 
 
 class Main(QWidget):
@@ -62,7 +60,7 @@ class Main(QWidget):
         self.exit_action.triggered.connect(QApplication.instance().quit)
 
         # load the settings from the file
-        self.configurator = Configurator('conf/settings.json', 'conf/testGame.json')
+        self.configurator = Configurator('conf/settings.json')
 
         # use the configurations from the file
         self.configurator.style.UpdateStyle.connect(self.set_style)
@@ -108,7 +106,7 @@ class Main(QWidget):
         self.settings_window.setGeometry(900, 900, 400, 400)
         self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
-        self.settings_window.add_tab(SplitsTab(mainWindow=self), 'Splits')
+        self.settings_window.add_tab(SplitsTab(self.game, mainWindow=self), 'Splits')
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)

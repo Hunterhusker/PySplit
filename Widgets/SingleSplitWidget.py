@@ -102,15 +102,20 @@ class SingleSplitWidget(QFrame):
 
     def finalize_split(self):
         """
-        Saves any golds and starts the split over
+        Saves any golds and pbs and starts the split over
         """
         if self.current_segment_ms < self.split.gold_segment_ms and self.current_time_ms != 0:
             self.split.gold_segment_ms = self.current_segment_ms
-            self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))
 
-            # reset the current state to 0 since this split is done
-            self.current_time_ms = 0
-            self.current_segment_ms = 0
+        if self.current_time_ms < self.split.pb_time_ms and self.current_time_ms != 0:
+            self.split.pb_time_ms = self.current_time_ms
+
+        # make the split show what it should
+        self.time_label.setText(format_wall_clock_from_ms(self.get_comparison_time()))
+
+        # reset the current state to 0 since this split is done
+        self.current_time_ms = 0
+        self.current_segment_ms = 0
 
     @Slot()
     def export_data(self, indent: str = '    ', depth: int = 1):

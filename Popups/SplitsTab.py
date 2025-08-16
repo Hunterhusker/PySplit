@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import copy
-import json
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea, QTimeEdit, QPushButton
-from PySide6.QtCore import Slot, Qt, QTime
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton
+from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
 
+import Models.Game
 from Popups.ABCSettingTab import ABCSettingTab
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
+from Models.Game import Game, Split
 
 if TYPE_CHECKING:
     from Main import Main
@@ -17,19 +18,19 @@ class SplitsTab(ABCSettingTab):
     """
     A tab to CRUD your splits
     """
-    def __init__(self, mainWindow: 'Main' = None):
+    def __init__(self, game: Game, mainWindow: 'Main' = None):
         super().__init__(parent=mainWindow)
         self.layout = QVBoxLayout()
         self.main = mainWindow
 
         # keep a copy of the game settings as our local copy that we can work with without effecting the original
-        self.game_settings = copy.deepcopy(mainWindow.configurator.game_settings)
+        self.game = game
 
         self.add_button = QPushButton("+")
         self.add_button.setFixedSize(25, 25)
         self.layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
 
-        self.import_splits(self.game_settings)  # TODO: This needs to be in a scroll container or it can just get huge
+        self.import_splits(self.game)  # TODO: This needs to be in a scroll container or it can just get huge
 
         self.layout.addStretch()  # add in a stretch for good measure
         self.setLayout(self.layout)
@@ -38,21 +39,18 @@ class SplitsTab(ABCSettingTab):
         # make our connections now that everything is displayed
         self.add_button.clicked.connect(self.addEmptySplit)
 
-    def import_splits(self, game_settings):
+    def import_splits(self, game: Game):
         """
         Generates a set of splits from the information in the main window
 
         Args:
-            game_settings: (dict) The dictionary of data representing the current game's configuration
+            game: (Game) The current game settings
 
         Returns:
             (list[SplitLine]): the list of the splits to put on the screen
         """
-        splitDict = game_settings['splits']
-
-        for i in range(len(splitDict)):
-            curr = splitDict[i]
-            new_split = SplitLine(curr['split_name'], curr['pb_time_ms'], curr['pb_segment_ms'], curr['gold_segment_ms'], parent=self)
+        for split in game.splits:
+            new_split = SplitLine(split, parent=self)
 
             currCount = self.layout.count() - 1  # -1 for the add button
 
@@ -65,13 +63,15 @@ class SplitsTab(ABCSettingTab):
         Returns:
             (list[dict]) the JSON for these splits
         """
-        return [sp.export() for sp in self.split_widgets]
+        #return [sp.export() for sp in self.split_widgets]
+        return [self.layout.itemAt(i).widget().export() for i in range(self.layout.count() - 2)]
 
     def addEmptySplit(self):
         """
         Adds a blank split for the user to fill out
         """
-        newSplit = SplitLine("", 0, 0, 0, parent=self)
+        empty_split = Split('', 0, 0, 0, 0, 0)
+        newSplit = SplitLine(empty_split, parent=self)
 
         count = self.layout.count() - 1  # -1 for the add button
 
@@ -89,58 +89,63 @@ class SplitsTab(ABCSettingTab):
 
     def apply(self):
         """
-        Creates the splits as they need to be sent out, and then applies it on the main window
-
-        Returns:
-            TODO: figure out how the update are applied
+        Send the updates to the game object
         """
-        data = self.exportSplits()
+        new_splits = []
 
-        self.main.splits.load_splits(data)
+        for i in range(self.layout.count() - 2):
+            curr = self.layout.itemAt(i).widget()
+
+            curr.update_split()
+            new_splits.append(curr.split)
+
+        self.main.splits.load_splits_from_list(new_splits)
 
 
 class SplitLine(QFrame):
-    def __init__(self, splitName, bestTimeMs, bestTimeSegmentMs, goldTimeSegmentMs, parent: SplitsTab = None):
+    def __init__(self, split: Split, parent: SplitsTab = None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
+        self.split = split
 
-        self.bestTimeMs = bestTimeMs
-        self.goldTimeSegmentMs = goldTimeSegmentMs
+        self.pb_time_ms = split.pb_time_ms
+        self.pb_segment_ms = split.pb_segment_ms
+        self.gold_segment_ms = split.gold_segment_ms
 
-        self.splitNameInput = QLineEdit()
-        self.splitNameInput.setText(splitName)
-        self.splitNameInput.setFixedSize(125, 25)
+        self.split_name_input = QLineEdit()
+        self.split_name_input.setText(split.split_name)
+        self.split_name_input.setFixedSize(125, 25)
 
-        self.bestTimeInput = QTimeEdit()
-        self.bestTimeInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.bestTimeInput.setTime(ms_to_qtime(bestTimeMs))
-        self.bestTimeInput.setFixedSize(100, 25)
+        self.best_time_input = QTimeEdit()
+        self.best_time_input.setDisplayFormat('hh:mm:ss.zzz')
+        self.best_time_input.setTime(ms_to_qtime(self.pb_time_ms))
+        self.best_time_input.setFixedSize(100, 25)
 
-        self.bestSegmentInput = QTimeEdit()
-        self.bestSegmentInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.bestSegmentInput.setTime(ms_to_qtime(bestTimeSegmentMs))
-        self.bestSegmentInput.setFixedSize(100, 25)
+        self.best_segment_input = QTimeEdit()
+        self.best_segment_input.setDisplayFormat('hh:mm:ss.zzz')
+        self.best_segment_input.setTime(ms_to_qtime(self.pb_segment_ms))
+        self.best_segment_input.setFixedSize(100, 25)
 
-        self.goldSegmentInput = QTimeEdit()
-        self.goldSegmentInput.setDisplayFormat('hh:mm:ss.zzz')
-        self.goldSegmentInput.setTime(ms_to_qtime(goldTimeSegmentMs))
-        self.goldSegmentInput.setFixedSize(100, 25)
+        self.gold_segment_input = QTimeEdit()
+        self.gold_segment_input.setDisplayFormat('hh:mm:ss.zzz')
+        self.gold_segment_input.setTime(ms_to_qtime(self.gold_segment_ms))
+        self.gold_segment_input.setFixedSize(100, 25)
 
-        self.removeButton = QPushButton("-")
-        self.removeButton.setFixedSize(25, 25)
+        self.remove_button = QPushButton("-")
+        self.remove_button.setFixedSize(25, 25)
 
         # add them all in one block
-        self.layout.addWidget(self.splitNameInput)
-        self.layout.addWidget(self.bestTimeInput)
-        self.layout.addWidget(self.bestSegmentInput)
-        self.layout.addWidget(self.goldSegmentInput)
-        self.layout.addWidget(self.removeButton)
+        self.layout.addWidget(self.split_name_input)
+        self.layout.addWidget(self.best_time_input)
+        self.layout.addWidget(self.best_segment_input)
+        self.layout.addWidget(self.gold_segment_input)
+        self.layout.addWidget(self.remove_button)
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
 
-        self.removeButton.clicked.connect(lambda: parent.remove_split(self))  # must lambda to pass parameters to the method
+        self.remove_button.clicked.connect(lambda: parent.remove_split(self))  # must lambda to pass parameters to the method
 
     def export(self):
         """
@@ -150,8 +155,23 @@ class SplitLine(QFrame):
             (dict): The split data as a dictionary
         """
         return {
-            'split_name': self.splitNameInput.text(),
-            'pb_time_ms': qtime_to_ms(self.bestTimeInput.time()),
-            'gold_segment_ms': qtime_to_ms(self.goldSegmentInput.time()),
-            'pb_segment_ms': qtime_to_ms(self.bestSegmentInput.time())
+            'split_name': self.split_name_input.text(),
+            'pb_time_ms': qtime_to_ms(self.best_time_input.time()),
+            'gold_segment_ms': qtime_to_ms(self.gold_segment_input.time()),
+            'pb_segment_ms': qtime_to_ms(self.best_segment_input.time())
         }
+
+    def update_split(self):
+        self.split.split_name = self.split_name_input.text()
+        self.split.pb_time_ms = qtime_to_ms(self.best_time_input.time())
+        self.split.gold_segment_ms = qtime_to_ms(self.gold_segment_input.time())
+        self.split.pb_segment_ms = qtime_to_ms(self.best_segment_input.time())
+
+    def to_Split(self) -> Models.Game.Split:
+        """
+        Exports the current SplitLine as the corresponding Models.Game.Split that would make it
+
+        Returns:
+            (Models.Game.Split)
+        """
+        pass
