@@ -92,9 +92,9 @@ class SplitsTab(ABCSettingTab):
         empty_split = Split('', 0, 0, 0, 0, 0)
         newSplit = SplitLine(empty_split, parent=self)
 
-        count = self.layout.count() - 1  # -1 for the add button
+        count = self.scroll_widget_layout.count() - 1  # -1 for the add button
 
-        self.layout.insertWidget(count - 1, newSplit)  # insert the new split before the add button
+        self.scroll_widget_layout.insertWidget(count - 1, newSplit)  # insert the new split before the add button
 
     def remove_split(self, split: SplitLine):
         """
@@ -110,15 +110,15 @@ class SplitsTab(ABCSettingTab):
         """
         Send the updates to the game object
         """
-        new_splits = []
-        # TODO When are new splits added to the game object??
-        for i in range(self.layout.count() - 2):
-            curr = self.layout.itemAt(i).widget()
+        self.game.splits = []  # make this into an empty list
+
+        for i in range(self.scroll_widget_layout.count() - 2):
+            curr = self.scroll_widget_layout.itemAt(i).widget()
 
             curr.update_split()
-            new_splits.append(curr.split)
+            self.game.splits.append(curr.split)
 
-        self.main.splits.load_splits_from_list(new_splits)
+        self.main.splits.load_splits_from_list(self.game.splits)
 
 
 class SplitLine(QFrame):
