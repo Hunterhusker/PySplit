@@ -33,7 +33,7 @@ class SplitsTab(ABCSettingTab):
         self.scroll_widget = QWidget()
         self.scroll_widget_layout = QVBoxLayout()
 
-        self.scroll_area = QScrollArea()  # TODO : Make popup wider to accommodate the split settings
+        self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
@@ -134,25 +134,30 @@ class SplitLine(QFrame):
 
         self.split_name_input = QLineEdit()
         self.split_name_input.setText(split.split_name)
-        self.split_name_input.setFixedSize(125, 25)
+        self.split_name_input.setBaseSize(125, 25)
+        self.split_name_input.setMinimumSize(125, 25)
 
         self.best_time_input = QTimeEdit()
         self.best_time_input.setDisplayFormat('hh:mm:ss.zzz')
         self.best_time_input.setTime(ms_to_qtime(self.pb_time_ms))
-        self.best_time_input.setFixedSize(100, 25)
+        self.best_time_input.setBaseSize(100, 25)
+        self.best_time_input.setMinimumSize(100, 25)
 
         self.best_segment_input = QTimeEdit()
         self.best_segment_input.setDisplayFormat('hh:mm:ss.zzz')
         self.best_segment_input.setTime(ms_to_qtime(self.pb_segment_ms))
-        self.best_segment_input.setFixedSize(100, 25)
+        self.best_segment_input.setBaseSize(100, 25)
+        self.best_segment_input.setMinimumSize(100, 25)
 
         self.gold_segment_input = QTimeEdit()
         self.gold_segment_input.setDisplayFormat('hh:mm:ss.zzz')
         self.gold_segment_input.setTime(ms_to_qtime(self.gold_segment_ms))
-        self.gold_segment_input.setFixedSize(100, 25)
+        self.gold_segment_input.setBaseSize(100, 25)
+        self.gold_segment_input.setMinimumSize(100, 25)
 
         self.remove_button = QPushButton("-")
-        self.remove_button.setFixedSize(25, 25)
+        self.remove_button.setBaseSize(25, 25)
+        self.remove_button.setMinimumSize(25, 25)
 
         # add them all in one block
         self.layout.addWidget(self.split_name_input)
@@ -185,12 +190,3 @@ class SplitLine(QFrame):
         self.split.pb_time_ms = qtime_to_ms(self.best_time_input.time())
         self.split.gold_segment_ms = qtime_to_ms(self.gold_segment_input.time())
         self.split.pb_segment_ms = qtime_to_ms(self.best_segment_input.time())
-
-    def to_Split(self) -> Models.Game.Split:
-        """
-        Exports the current SplitLine as the corresponding Models.Game.Split that would make it
-
-        Returns:
-            (Models.Game.Split)
-        """
-        pass

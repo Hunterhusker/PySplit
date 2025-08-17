@@ -103,7 +103,8 @@ class Main(QWidget):
         self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
         self.settings_window = SettingsWindow(parent=self)
-        self.settings_window.setGeometry(900, 900, 400, 400)
+        self.settings_window.setGeometry(900, 900, 550, 400)
+        self.settings_window.setMinimumSize(550, 400)
         self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
         self.settings_window.add_tab(SplitsTab(self.game, mainWindow=self), 'Splits')
