@@ -170,6 +170,9 @@ class Main(QWidget):
         # save the configurations to their files
         #self.configurator.write_settings()
 
+        for split in self.game.splits:
+            print(split.split_name)
+
         # accept the close event and actually close
         event.accept()
 
