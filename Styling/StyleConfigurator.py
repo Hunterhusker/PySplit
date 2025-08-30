@@ -4,7 +4,7 @@ import json
 from Styling.Style.styleBuilder import StyleBuilder
 
 
-class Configurator(QObject):
+class StyleConfigurator(QObject):
     Configure = Signal(dict)  # emit the settings
 
     def __init__(self, settings_file_path: str):
@@ -23,8 +23,8 @@ class Configurator(QObject):
         """
         Writes the contents of the current settings to the settings file
         """
-        with open(self.settings_file_path, 'w') as f:
-            f.write(self.settings)
+        self.style.export_style()
+        self.style.export_vars()
 
     def update_setting(self, key: str, value: any):
         """

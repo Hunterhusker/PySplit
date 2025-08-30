@@ -1,4 +1,5 @@
 import copy
+from os import linesep
 from PySide6.QtCore import Signal, QObject
 
 
@@ -40,6 +41,7 @@ class StyleBuilder(QObject):
 
         for k, v in self.variable_map.items():
             tmp += f'{k}:{v}'
+            tmp += linesep
 
         with open(self.vars_path, 'w') as f:
             f.write(tmp)
