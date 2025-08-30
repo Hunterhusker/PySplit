@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QMessageBox
 from PySide6.QtCore import Slot, Signal, QThread, Qt
 import sys
 from time import sleep
@@ -16,7 +16,7 @@ from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
-from Styling.StyleConfigurator import Configurator
+from Styling.StyleConfigurator import StyleConfigurator
 
 
 class Main(QWidget):
@@ -60,7 +60,7 @@ class Main(QWidget):
         self.exit_action.triggered.connect(QApplication.instance().quit)
 
         # load the settings from the file
-        self.configurator = Configurator('conf/settings.json')
+        self.configurator = StyleConfigurator('conf/settings.json')
 
         # use the configurations from the file
         self.configurator.style.UpdateStyle.connect(self.set_style)
@@ -160,6 +160,18 @@ class Main(QWidget):
         return self.styleSheet()
 
     def closeEvent(self, event):
+        # make a popup to ask the user if they would like to save changes before exiting
+        save_box = QMessageBox()
+        save_box.setWindowTitle('Save Changes?')
+        save_box.setText('Would you like to save any changes?')
+        save_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        save_box.setIcon(QMessageBox.Icon.Question)
+        result = save_box.exec()
+
+        if result == QMessageBox.StandardButton.Yes:
+            self.configurator.write_settings()
+
+
         # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
         sleep(0.125)  # wait for the quits to go through, not my proudest work, but it works
@@ -167,12 +179,6 @@ class Main(QWidget):
         # stop the timer thread
         self.game_timer_thread.quit()
         self.game_timer_thread.wait()
-
-        # save the configurations to their files
-        #self.configurator.write_settings()
-
-        for split in self.game.splits:
-            print(split.split_name)
 
         # accept the close event and actually close
         event.accept()
