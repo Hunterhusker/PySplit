@@ -129,6 +129,9 @@ class AssignButtonsTab(ABCSettingTab):
 
     def apply(self):
         self.main.timer_controller.update_mapping(self.event_map)
+        input_list = self.main.timer_controller.export_mapping()
+
+        self.main.configurator.settings['inputs'] = input_list
 
 
 class KeyReassignmentLine(QFrame):
