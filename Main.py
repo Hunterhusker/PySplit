@@ -163,14 +163,21 @@ class Main(QWidget):
         # make a popup to ask the user if they would like to save changes before exiting
         save_box = QMessageBox()
         save_box.setWindowTitle('Save Changes?')
-        save_box.setText('Would you like to save any changes?')
-        save_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        save_box.setText('Would you like to save any configuration changes and new PBs?')
+        save_box.setStandardButtons(QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes)
         save_box.setIcon(QMessageBox.Icon.Question)
+
+        # resize the buttons
+        save_yes = save_box.button(QMessageBox.StandardButton.Yes)
+        save_yes.setMinimumSize(75, 25)
+
+        save_no = save_box.button(QMessageBox.StandardButton.No)
+        save_no.setMinimumSize(75, 25)
+
         result = save_box.exec()
 
         if result == QMessageBox.StandardButton.Yes:
             self.configurator.write_settings()
-
 
         # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
