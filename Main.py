@@ -16,7 +16,7 @@ from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
-from Styling.StyleConfigurator import StyleConfigurator
+from Styling.Configurator import Configurator
 
 
 class Main(QWidget):
@@ -60,7 +60,7 @@ class Main(QWidget):
         self.exit_action.triggered.connect(QApplication.instance().quit)
 
         # load the settings from the file
-        self.configurator = StyleConfigurator('conf/settings.json')
+        self.configurator = Configurator('conf/settings.json')
 
         # use the configurations from the file
         self.configurator.style.UpdateStyle.connect(self.set_style)
@@ -178,6 +178,7 @@ class Main(QWidget):
 
         if result == QMessageBox.StandardButton.Yes:
             self.configurator.write_settings()
+            print(self.configurator.settings)
 
         # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
