@@ -213,7 +213,7 @@ QTabBar::tab:!selected {
     border-radius: 2px;
 }
 
-#KeyAssignmentLabel {
+#SettingsLabel {
     color: $text-color;
     background-color: $secondary-background;
 }

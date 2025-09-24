@@ -8,7 +8,7 @@ from Listeners.KeyboardListener import KeyboardListener
 from Models.Game import Game
 from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.SettingsWindow import SettingsWindow
-from Popups.SplitsTab import SplitsTab
+from Popups.GameSettingsTab import GameSettingsTab
 from Popups.StyleTab import StyleTab
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
@@ -16,7 +16,7 @@ from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
-from Styling.Configurator import Configurator
+from Styling.Settings import Settings
 
 
 class Main(QWidget):
@@ -40,7 +40,9 @@ class Main(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        self.game = Game.from_json_file('conf/testGame.json')
+        # load the settings from the file
+        self.configurator = Settings('conf/settings.json')
+        self.game = Game.from_json_file(self.configurator.settings['game_path'])
 
         self.title = TitleWidget.from_game(self.game)
 
@@ -58,9 +60,6 @@ class Main(QWidget):
 
         self.exit_action = self.context_menu.addAction('Exit')
         self.exit_action.triggered.connect(QApplication.instance().quit)
-
-        # load the settings from the file
-        self.configurator = Configurator('conf/settings.json')
 
         # use the configurations from the file
         self.configurator.style.UpdateStyle.connect(self.set_style)
@@ -107,7 +106,7 @@ class Main(QWidget):
         self.settings_window.setMinimumSize(550, 400)
         self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
-        self.settings_window.add_tab(SplitsTab(self.game, mainWindow=self), 'Splits')
+        self.settings_window.add_tab(GameSettingsTab(self.game, mainWindow=self), 'Splits')
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
@@ -178,7 +177,7 @@ class Main(QWidget):
 
         if result == QMessageBox.StandardButton.Yes:
             self.configurator.write_settings()
-            print(self.configurator.settings)
+            self.game.to_json_file(self.configurator.settings['game_path'])
 
         # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
