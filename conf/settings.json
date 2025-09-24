@@ -1,6 +1,7 @@
 {
     "style_path": "conf/style.qss",
     "var_path": "conf/vars.qvars",
+    "game_path": "conf/testGame.json",
     "inputs": [
         {
             "source": "pynput",

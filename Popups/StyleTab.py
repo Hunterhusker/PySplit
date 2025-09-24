@@ -67,7 +67,7 @@ class StyleSettingLine(QFrame):
         self.key = key
 
         self.label = QLabel(key, self)
-        self.label.setObjectName('KeyAssignmentLabel')
+        self.label.setObjectName('SettingsLabel')
         self.setFixedHeight(35)
 
         self.textInput = QLineEdit()

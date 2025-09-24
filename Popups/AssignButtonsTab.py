@@ -163,7 +163,7 @@ class KeyReassignmentLine(QFrame):
             label = timer_event
 
         self.event_label = QLabel(label)
-        self.event_label.setObjectName('KeyAssignmentLabel')
+        self.event_label.setObjectName('SettingsLabel')
 
         # create the button
         self.trigger_button = QPushButton(self.key_str)
