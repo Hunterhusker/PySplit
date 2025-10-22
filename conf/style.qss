@@ -223,3 +223,12 @@ QTabBar::tab:!selected {
     background-color: $secondary-background;
     border-radius: 2px;
 }
+
+QSplitter::handle {
+    background-color: darkgray;
+    width: 2px; /* For horizontal splitter */
+    height: 2px; /* For vertical splitter */
+}
+QSplitter::handle:hover {
+    background-color: gray;
+}

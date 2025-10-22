@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-import copy
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, \
-    QScrollArea, QWidget, QLabel
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, QScrollArea, QWidget
 from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
 
-import Models.Game
 from Popups.ABCSettingTab import ABCSettingTab
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
 from Models.Game import Game, Split
+from Widgets.FormWidgets import LabeledTextEntry
 
 if TYPE_CHECKING:
     from Main import Main
@@ -41,6 +39,15 @@ class GameSettingsTab(ABCSettingTab):
         self.split_area = QVBoxLayout()
         self.split_area.setContentsMargins(0, 0, 0, 0)
 
+        # make the basic labeled inputs
+        self.titleInput = LabeledTextEntry("Title: ", self.game.title, parent=self)
+        self.titleInput.setMinimumHeight(35)
+
+        self.subTitleInput = LabeledTextEntry("Sub-Title: ", self.game.sub_title, parent=self)
+        self.subTitleInput.setMinimumHeight(35)
+
+        self.scroll_widget_layout.addWidget(self.titleInput)
+        self.scroll_widget_layout.addWidget(self.subTitleInput)
         self.scroll_widget_layout.addLayout(self.split_area)
         self.scroll_widget_layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
 
@@ -75,11 +82,6 @@ class GameSettingsTab(ABCSettingTab):
         """
         for split in game.splits:
             new_split = SplitLine(split, parent=self)
-
-            #currCount = container.count() - 1  # -1 for the add button
-
-            #container.insertWidget(currCount, new_split)
-
             container.addWidget(new_split)
 
     def exportSplits(self):
@@ -99,10 +101,6 @@ class GameSettingsTab(ABCSettingTab):
         newSplit = SplitLine(empty_split, parent=self)
         self.split_area.addWidget(newSplit)
 
-        # count = self.scroll_widget_layout.count() - 1  # -1 for the add button
-        #
-        # self.scroll_widget_layout.insertWidget(count - 1, newSplit)  # insert the new split before the add button
-
     def remove_split(self, split: SplitLine):
         """
         Removes the given split from the splits
@@ -117,6 +115,9 @@ class GameSettingsTab(ABCSettingTab):
         """
         Send the updates to the game object
         """
+        self.game.title = self.titleInput.input.text()
+        self.game.sub_title = self.subTitleInput.input.text()
+
         self.game.splits = []  # make this into an empty list
 
         # update the splits
@@ -198,24 +199,3 @@ class SplitLine(QFrame):
         self.split.pb_time_ms = qtime_to_ms(self.best_time_input.time())
         self.split.gold_segment_ms = qtime_to_ms(self.gold_segment_input.time())
         self.split.pb_segment_ms = qtime_to_ms(self.best_segment_input.time())
-
-
-class LabeledTextEntry(QFrame):
-    def __init__(self, label: str, original_value: str, parent: GameSettingsTab = None):
-        super().__init__(parent=parent)
-
-        self.layout = QHBoxLayout()
-
-        self.label = QLabel(label)
-        self.event_label.setObjectName('SettingsLabel')
-
-        self.input = QLineEdit()
-        self.input.setText(original_value)
-        self.input.setBaseSize(125, 25)
-        self.input.setMinimumSize(125, 25)
-
-        self.layout.addWidget(self.label)
-        self.layout.addWidget(self.input)
-        self.layout.setContentsMargins(10, 0, 10, 0)
-
-        self.setLayout(self.layout)
