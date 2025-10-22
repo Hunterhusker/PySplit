@@ -1,4 +1,5 @@
 import copy
+import os
 from os import linesep
 from PySide6.QtCore import Signal, QObject
 
@@ -13,6 +14,8 @@ class StyleBuilder(QObject):
         self.vars_path = vars_path
 
         self.variable_map = {}
+
+        self.raw_vars = ""
         self.raw_style_sheet = ""
 
         self.formatted_style_sheet = ""
@@ -22,16 +25,34 @@ class StyleBuilder(QObject):
 
     def load_vars(self):
         with open(self.vars_path, 'r') as f:
-            lines = f.readlines()
+            raw = f.read()
+
+        self.raw_vars = raw
+
+        lines = [l for l in raw.split(os.linesep) if l is not None and l != '']
 
         for line in lines:
-            l_temp = line.replace('\n', '')  # remove the newlines
-            k, v = l_temp.split(':')
+            k, v = line.split(':')
 
             self.variable_map[k] = v
 
     def set_vars(self, variable_map):
         self.variable_map = variable_map
+        new_raw = ""
+
+        for k in variable_map:
+            new_raw += str(k) + ':' + str(variable_map[k]) + os.linesep
+
+        self.raw_vars = new_raw
+
+    def set_vars_raw(self, raw_vars):
+        self.raw_vars = raw_vars
+
+        lines = [l for l in raw_vars.split(os.linesep) if l is not None and l != '']
+
+        for line in lines:
+            k, v = line.split(':')
+            self.variable_map[k] = v
 
     def export_vars(self):
         """
@@ -56,6 +77,9 @@ class StyleBuilder(QObject):
 
     def set_style(self, styleSheet):
         self.formatted_style_sheet = styleSheet
+
+    def set_raw_style(self, styleSheet):
+        self.raw_style_sheet = styleSheet
 
     def format_style(self):
         tmp = copy.deepcopy(self.raw_style_sheet)
@@ -82,7 +106,7 @@ class StyleBuilder(QObject):
             UpdateStyle: A signal that you can subscribe to know when the style sheet changes
         """
         if style_sheet is not None:
-            self.set_style(style_sheet)
+            self.set_raw_style(style_sheet)
 
         if var_map is not None:
             self.set_vars(var_map)

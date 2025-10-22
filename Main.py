@@ -6,6 +6,7 @@ from time import sleep
 from Listeners.AggregateListener import AggregateListener
 from Listeners.KeyboardListener import KeyboardListener
 from Models.Game import Game
+from Popups.AdvancedStyleTab import AdvancedStyleTab
 from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.SettingsWindow import SettingsWindow
 from Popups.GameSettingsTab import GameSettingsTab
@@ -107,6 +108,7 @@ class Main(QWidget):
         self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
         self.settings_window.add_tab(GameSettingsTab(self.game, mainWindow=self), 'Splits')
+        self.settings_window.add_tab(AdvancedStyleTab(mainWindow=self), 'Advanced')
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
@@ -167,11 +169,11 @@ class Main(QWidget):
         save_box.setIcon(QMessageBox.Icon.Question)
 
         # resize the buttons
-        save_yes = save_box.button(QMessageBox.StandardButton.Yes)
-        save_yes.setMinimumSize(75, 25)
-
         save_no = save_box.button(QMessageBox.StandardButton.No)
         save_no.setMinimumSize(75, 25)
+
+        save_yes = save_box.button(QMessageBox.StandardButton.Yes)
+        save_yes.setMinimumSize(75, 25)
 
         result = save_box.exec()
 
