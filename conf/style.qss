@@ -229,6 +229,23 @@ QSplitter::handle {
     width: 2px; /* For horizontal splitter */
     height: 2px; /* For vertical splitter */
 }
+
 QSplitter::handle:hover {
     background-color: gray;
+}
+
+QPlainTextArea {
+    background-color: $secondary-background;
+}
+
+#StyleTextArea {
+    background-color: $secondary-background;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#VarTextArea {
+    background-color: $secondary-background;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
