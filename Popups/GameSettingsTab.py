@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, QScrollArea, QWidget
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, QScrollArea, QWidget, QGroupBox
 from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
 
@@ -36,19 +36,26 @@ class GameSettingsTab(ABCSettingTab):
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
-        self.split_area = QVBoxLayout()
-        self.split_area.setContentsMargins(0, 0, 0, 0)
+        self.splits_group = QGroupBox('Splits')
+        self.split_area = QVBoxLayout(self.splits_group)
+        #self.split_area.setContentsMargins(0, 0, 0, 0)
 
         # make the basic labeled inputs
-        self.titleInput = LabeledTextEntry("Title: ", self.game.title, parent=self)
-        self.titleInput.setMinimumHeight(35)
+        self.title_group = QGroupBox('Title')
+        self.title_group_layout = QVBoxLayout(self.title_group)
 
-        self.subTitleInput = LabeledTextEntry("Sub-Title: ", self.game.sub_title, parent=self)
-        self.subTitleInput.setMinimumHeight(35)
+        self.title_input = LabeledTextEntry("Title: ", self.game.title, parent=self)
+        self.title_input.setMinimumHeight(35)
 
-        self.scroll_widget_layout.addWidget(self.titleInput)
-        self.scroll_widget_layout.addWidget(self.subTitleInput)
-        self.scroll_widget_layout.addLayout(self.split_area)
+        self.sub_title_input = LabeledTextEntry("Sub-Title: ", self.game.sub_title, parent=self)
+        self.sub_title_input.setMinimumHeight(35)
+
+        self.title_group_layout.addWidget(self.title_input)
+        self.title_group_layout.addWidget(self.sub_title_input)
+
+        self.scroll_widget_layout.addWidget(self.title_group)
+        #self.scroll_widget_layout.addLayout(self.split_area)
+        self.scroll_widget_layout.addWidget(self.splits_group)
         self.scroll_widget_layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
 
         self.import_splits(self.game, self.split_area)
@@ -115,8 +122,8 @@ class GameSettingsTab(ABCSettingTab):
         """
         Send the updates to the game object
         """
-        self.game.title = self.titleInput.input.text()
-        self.game.sub_title = self.subTitleInput.input.text()
+        self.game.title = self.title_input.input.text()
+        self.game.sub_title = self.sub_title_input.input.text()
 
         self.game.splits = []  # make this into an empty list
 
