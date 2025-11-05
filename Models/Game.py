@@ -9,6 +9,8 @@ class Game(QObject):
     GameUpdated = Signal(QObject)
 
     def __init__(self, title: str, sub_title: str, splits: list[Split], lifetime_attempts: int, session_attempts: int, display_pb: bool = True):
+        super().__init__()
+
         self.title = title
         self.sub_title = sub_title
         self.splits = splits
