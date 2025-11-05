@@ -272,6 +272,9 @@ class SplitsWidget(QWidget):
             self.splits.append(tmp)
             self.scroll_widget_layout.addWidget(tmp)
 
+    def load_splits_from_game(self, game: Game):
+        self.load_splits_from_list(game.splits)
+
     def load_splits_from_json(self, json: dict[str]):
         """
 
