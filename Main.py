@@ -8,6 +8,7 @@ from Listeners.KeyboardListener import KeyboardListener
 from Models.Game import Game
 from Popups.AdvancedStyleTab import AdvancedStyleTab
 from Popups.AssignButtonsTab import AssignButtonsTab
+from Popups.BasicSettingsTab import BasicSettingsTab
 from Popups.SettingsWindow import SettingsWindow
 from Popups.GameSettingsTab import GameSettingsTab
 from Popups.StyleTab import StyleTab
@@ -102,13 +103,17 @@ class Main(QWidget):
         self.splits.SplitFinish.connect(self.game_timer.stop_timer)
         self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
+        self.game.GameUpdated.connect(self.splits.load_splits_from_game)
+        self.game.GameUpdated.connect(self.title.update_from_game)
+
         self.settings_window = SettingsWindow(parent=self)
-        self.settings_window.setGeometry(900, 900, 550, 400)
-        self.settings_window.setMinimumSize(550, 400)
+        self.settings_window.setGeometry(900, 900, 600, 400)
+        self.settings_window.setMinimumSize(600, 400)
         self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
         self.settings_window.add_tab(GameSettingsTab(self.game, mainWindow=self), 'Splits')
         self.settings_window.add_tab(AdvancedStyleTab(mainWindow=self), 'Advanced')
+        self.settings_window.add_tab(BasicSettingsTab(mainWindow=self), 'Settings')
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
