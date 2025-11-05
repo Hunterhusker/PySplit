@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from Popups.ABCSettingTab import ABCSettingTab
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
 from Models.Game import Game, Split
-from Widgets.FormWidgets import LabeledTextEntry
+from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit
 
 if TYPE_CHECKING:
     from Main import Main
@@ -36,12 +36,11 @@ class GameSettingsTab(ABCSettingTab):
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
-        self.splits_group = QGroupBox('Splits')
+        self.splits_group = QGroupBox('Split Data')
         self.split_area = QVBoxLayout(self.splits_group)
-        #self.split_area.setContentsMargins(0, 0, 0, 0)
 
         # make the basic labeled inputs
-        self.title_group = QGroupBox('Title')
+        self.title_group = QGroupBox('Game Information')
         self.title_group_layout = QVBoxLayout(self.title_group)
 
         self.title_input = LabeledTextEntry("Title: ", self.game.title, parent=self)
@@ -50,11 +49,18 @@ class GameSettingsTab(ABCSettingTab):
         self.sub_title_input = LabeledTextEntry("Sub-Title: ", self.game.sub_title, parent=self)
         self.sub_title_input.setMinimumHeight(35)
 
+        self.session_attempts_input = LabeledSpinBox('Session Attempts: ', self.game.session_attempts, parent=self)
+        self.session_attempts_input.setMinimumHeight(35)
+
+        self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.game.lifetime_attempts, parent=self)
+        self.lifetime_attempts_input.setMinimumHeight(35)
+
         self.title_group_layout.addWidget(self.title_input)
         self.title_group_layout.addWidget(self.sub_title_input)
+        self.title_group_layout.addWidget(self.session_attempts_input)
+        self.title_group_layout.addWidget(self.lifetime_attempts_input)
 
         self.scroll_widget_layout.addWidget(self.title_group)
-        #self.scroll_widget_layout.addLayout(self.split_area)
         self.scroll_widget_layout.addWidget(self.splits_group)
         self.scroll_widget_layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
 
@@ -124,6 +130,8 @@ class GameSettingsTab(ABCSettingTab):
         """
         self.game.title = self.title_input.input.text()
         self.game.sub_title = self.sub_title_input.input.text()
+        self.game.session_attempts = self.session_attempts_input.input.value()
+        self.game.lifetime_attempts = self.lifetime_attempts_input.input.value()
 
         self.game.splits = []  # make this into an empty list
 
@@ -134,9 +142,7 @@ class GameSettingsTab(ABCSettingTab):
             curr.update_split()
             self.game.splits.append(curr.split)
 
-        self.main.splits.load_splits_from_list(self.game.splits)
-
-        self.main.title.update(self.game.title, self.game.sub_title, self.game.session_attempts, self.game.lifetime_attempts)
+        self.game.GameUpdated.emit(self.game)
 
 
 class SplitLine(QFrame):
@@ -155,19 +161,19 @@ class SplitLine(QFrame):
         self.split_name_input.setBaseSize(125, 25)
         self.split_name_input.setMinimumSize(125, 25)
 
-        self.best_time_input = QTimeEdit()
+        self.best_time_input = NoScrollQTimeEdit()
         self.best_time_input.setDisplayFormat('hh:mm:ss.zzz')
         self.best_time_input.setTime(ms_to_qtime(self.pb_time_ms))
         self.best_time_input.setBaseSize(100, 25)
         self.best_time_input.setMinimumSize(100, 25)
 
-        self.best_segment_input = QTimeEdit()
+        self.best_segment_input = NoScrollQTimeEdit()
         self.best_segment_input.setDisplayFormat('hh:mm:ss.zzz')
         self.best_segment_input.setTime(ms_to_qtime(self.pb_segment_ms))
         self.best_segment_input.setBaseSize(100, 25)
         self.best_segment_input.setMinimumSize(100, 25)
 
-        self.gold_segment_input = QTimeEdit()
+        self.gold_segment_input = NoScrollQTimeEdit()
         self.gold_segment_input.setDisplayFormat('hh:mm:ss.zzz')
         self.gold_segment_input.setTime(ms_to_qtime(self.gold_segment_ms))
         self.gold_segment_input.setBaseSize(100, 25)
