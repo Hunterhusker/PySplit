@@ -54,3 +54,16 @@ class TitleWidget(QFrame):
         lifetime_attempts = game.lifetime_attempts
 
         return cls(title, sub_title, session_attempts, lifetime_attempts)
+
+    def update(self, title: str = None, subtitle: str = None, session_attempts: int = None, lifetime_attempts: int = None):
+        if title is not None:
+            self.title_label.setText(title)
+
+        if subtitle is not None:
+            self.subtitle_label.setText(subtitle)
+
+        if session_attempts is not None:
+            self.session_attempts_label.setText(str(session_attempts))
+
+        if lifetime_attempts is not None:
+            self.session_attempts_label.setText(str(lifetime_attempts))
