@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit
 
 
 class LabeledTextEntry(QFrame):
@@ -37,7 +37,7 @@ class LabeledSpinBox(QFrame):
         self.label.setFixedHeight(25)
         self.label.setObjectName('SettingsLabel')
 
-        self.input = QSpinBox()
+        self.input = NoScrollQSpinBox()
         self.input.setMinimumWidth(225)
         self.input.setFixedHeight(25)
         self.input.setValue(original_value)
@@ -49,3 +49,13 @@ class LabeledSpinBox(QFrame):
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
+
+
+class NoScrollQSpinBox(QSpinBox):
+    def wheelEvent(self, event):
+        event.ignore()  # prevent scroll changes
+
+
+class NoScrollQTimeEdit(QTimeEdit):
+    def wheelEvent(self, event):
+        event.ignore()  # prevent scroll changes
