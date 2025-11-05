@@ -129,6 +129,8 @@ class GameSettingsTab(ABCSettingTab):
 
         self.main.splits.load_splits_from_list(self.game.splits)
 
+        self.main.title.update(self.game.title, self.game.sub_title, self.game.session_attempts, self.game.lifetime_attempts)
+
 
 class SplitLine(QFrame):
     def __init__(self, split: Split, parent: GameSettingsTab = None):
