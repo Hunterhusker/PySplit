@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QMessageBox
 from PySide6.QtCore import Slot, Signal, QThread, Qt
+from PySide6.QtGui import QIcon
 import sys
 from time import sleep
 
@@ -211,8 +212,12 @@ class Main(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    icon = QIcon('Static/pysplitIcon.png')
 
     window = Main()
+
+    # set the window's icon
+    window.setWindowIcon(icon)
 
     # use main's style configurations to get the initial stylesheet
     style = window.configurator.style.formatted_style_sheet
