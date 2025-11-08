@@ -43,10 +43,10 @@ class TitleWidget(QFrame):
         """
         Builds a title widget from the game 
         Args:
-            game:
+            game: (Models.Game) The game object that has the data for the current game
 
         Returns:
-
+            (TitleWidget): An instance of the title widget object
         """
         title = game.title
         sub_title = game.sub_title
@@ -56,6 +56,15 @@ class TitleWidget(QFrame):
         return cls(title, sub_title, session_attempts, lifetime_attempts)
 
     def update(self, title: str = None, subtitle: str = None, session_attempts: int = None, lifetime_attempts: int = None):
+        """
+        A simple method to update the shown content in the title of the timer
+
+        Args:
+            title: (str) Main title for the timer usually name of the game eg: Super Mario World
+            subtitle: (str) A string to display under the main title, usually category eg: 11 Exit Glitchless
+            session_attempts: (int) The number of attempts done since opening the app today
+            lifetime_attempts: (int) The total number of times this game has been run
+        """
         if title is not None:
             self.title_label.setText(title)
 
@@ -69,4 +78,10 @@ class TitleWidget(QFrame):
             self.lifetime_attempts_label.setText(str(lifetime_attempts))
 
     def update_from_game(self, game: Game):
+        """
+        Updates the title widget with the currently saved game information
+
+        Args:
+            game: (Models.Game) The game object that we keep our game / split data in
+        """
         self.update(game.title, game.sub_title, game.session_attempts, game.lifetime_attempts)
