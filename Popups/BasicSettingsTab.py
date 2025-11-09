@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import os
 
-from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPlainTextEdit, QFrame, QLabel, QGroupBox
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPlainTextEdit, QFrame, QLabel, \
+    QGroupBox, QColorDialog, QPushButton
 from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
+from Widgets.FormWidgets import ColorPicker
 
 from Popups.ABCSettingTab import ABCSettingTab
 
@@ -31,9 +34,16 @@ class BasicSettingsTab(ABCSettingTab):
         self.label = QLabel('TEST')
         self.label2 = QLabel('TEST2')
 
+        self.colorPicker = ColorPicker('Pick A Color', QColor("#ff0000"), parent=self)
+
+        self.colorPicker2 = ColorPicker('Pick A Color', QColor("#00ff00"), parent=self)
+        self.colorPicker2.setFixedSize(300, 35)
+
         # add them to scroll widget layout here, and it will show up
         self.testGroupLayout.addWidget(self.label)
         self.testGroupLayout.addWidget(self.label2)
+        self.testGroupLayout.addWidget(self.colorPicker)
+        self.testGroupLayout.addWidget(self.colorPicker2)
 
         self.scroll_widget_layout.addWidget(self.testGroup)
 
@@ -49,6 +59,12 @@ class BasicSettingsTab(ABCSettingTab):
         # link it all up so that this displays
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')  # set the object name here so it uses the right QSS
+
+    def pickColor(self):
+        color = QColorDialog.getColor(QColor('#ffffff'), self, "Select A Color")
+
+        if color.isValid():
+            self.label.setText(color.name())
 
     def apply(self):
         raise NotImplementedError()
