@@ -1,4 +1,6 @@
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog
+from PySide6.QtCore import Qt, Signal
 
 
 class LabeledTextEntry(QFrame):
@@ -59,3 +61,46 @@ class NoScrollQSpinBox(QSpinBox):
 class NoScrollQTimeEdit(QTimeEdit):
     def wheelEvent(self, event):
         event.ignore()  # prevent scroll changes
+
+
+class ClickableFrame(QFrame):
+    clicked = Signal()
+
+    def __init__(self):
+        super().__init__()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+        super().mousePressEvent(event)
+
+
+class ColorPicker(QFrame):
+    def __init__(self, label: str, color: QColor, parent):
+        super().__init__(parent=parent)
+
+        self.layout = QHBoxLayout()
+
+        self.label = QLabel(label)
+
+        self.color = color
+        self.color_name = color.name()
+
+        self.color_preview = ClickableFrame()
+        self.color_preview.setFixedSize(20, 20)
+        self.color_preview.clicked.connect(self.pick_color)
+        self.color_preview.setStyleSheet(f"background-color: {self.color_name};")
+
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.color_preview)
+
+        self.setLayout(self.layout)
+
+    def pick_color(self):
+        color = QColorDialog.getColor(self.color, self, "Pick A Color")
+
+        if color.isValid():
+            self.color = color
+            self.color_name = color.name()
+
+            self.color_preview.setStyleSheet(f"background-color: {self.color_name}")
