@@ -92,7 +92,7 @@ class Game(QObject):
         return {
             'title': self.title,
             'sub_title': self.sub_title,
-            'lifetime_attempts': self.lifetime_attempts + self.session_attempts,
+            'lifetime_attempts': self.lifetime_attempts,
             'display_pb': self.display_pb,
             'splits': splits
         }
