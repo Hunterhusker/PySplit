@@ -143,6 +143,10 @@ class SplitsWidget(QWidget):
                 sb = self.scroll_area.verticalScrollBar()
                 sb.setValue(0)
 
+                self.game.session_attempts += 1
+                self.game.lifetime_attempts += 1
+                self.game.GameUpdated.emit(self.game)
+
                 if self.done:
                     for sp in self.splits:
                         sp.delta_label.setText('')
