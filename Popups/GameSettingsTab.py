@@ -37,7 +37,8 @@ class GameSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         self.splits_group = QGroupBox('Split Data')
-        self.split_area = QVBoxLayout(self.splits_group)
+        self.splits_group_layout = QVBoxLayout(self.splits_group)
+        self.split_area = QVBoxLayout()
 
         # make the basic labeled inputs
         self.title_group = QGroupBox('Game Information')
@@ -55,15 +56,19 @@ class GameSettingsTab(ABCSettingTab):
         self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.game.lifetime_attempts, parent=self)
         self.lifetime_attempts_input.setMinimumHeight(35)
 
+        # populate the title group
         self.title_group_layout.addWidget(self.title_input)
         self.title_group_layout.addWidget(self.sub_title_input)
         self.title_group_layout.addWidget(self.session_attempts_input)
         self.title_group_layout.addWidget(self.lifetime_attempts_input)
 
+        # add everything to the main layout
         self.scroll_widget_layout.addWidget(self.title_group)
+        self.splits_group_layout.addLayout(self.split_area)
+        self.splits_group_layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
         self.scroll_widget_layout.addWidget(self.splits_group)
-        self.scroll_widget_layout.addWidget(self.add_button, alignment=Qt.AlignHCenter)
 
+        # import the splits to their layout
         self.import_splits(self.game, self.split_area)
 
         # add a stretch to keep stuff sized right
