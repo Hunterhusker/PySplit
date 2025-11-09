@@ -31,7 +31,7 @@ class Game(QObject):
         title = json_dict['title']
         sub_title = json_dict['sub_title']
         lifetime_attempts = json_dict['lifetime_attempts']
-        session_attempts = json_dict['session_attempts']
+        session_attempts = json_dict.get('session_attempts', 0)
 
         prev_pb_segment_total_ms = 0
         prev_gold_segment_total_ms = 0
@@ -92,8 +92,7 @@ class Game(QObject):
         return {
             'title': self.title,
             'sub_title': self.sub_title,
-            'lifetime_attempts': self.lifetime_attempts,
-            'session_attempts': self.session_attempts,
+            'lifetime_attempts': self.lifetime_attempts + self.session_attempts,
             'display_pb': self.display_pb,
             'splits': splits
         }
@@ -119,6 +118,10 @@ class Game(QObject):
             (str) the JSON string representing this Game object
         """
         return self.to_json()
+
+    def add_attempt(self):
+        self.session_attempts += 1
+        self.GameUpdated.emit(self)
 
 
 class Split:
