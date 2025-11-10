@@ -75,10 +75,12 @@ class SplitsWidget(QWidget):
             (SingleSplitWidget): The split that is currently active
         """
         curr_time = self.splits[self.index].current_time_ms
+        self.splits[self.index].setSelected(False)
 
         self.index += inc
 
         self.splits[self.index].current_start_time = curr_time
+        self.splits[self.index].setSelected(True)
 
         if self.index >= self.visible_splits:
             sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
@@ -100,9 +102,12 @@ class SplitsWidget(QWidget):
         Returns:
             (SingleSplitWidget): The split that is currently active
         """
+        self.splits[self.index].setSelected(False)
+
         self.index -= inc
         sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
         sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
+        self.splits[self.index].setSelected(True)
 
         if self.index < 0:  # don't let it leave the array
             self.index = 0
@@ -155,6 +160,7 @@ class SplitsWidget(QWidget):
 
                 self.started = True
                 self.done = False
+                self.splits[self.index].setSelected(True)  # highlight it once it starts
 
             elif not self.done:
                 if self.index == len(self.splits) - 1:
@@ -174,6 +180,7 @@ class SplitsWidget(QWidget):
                     # maintain state
                     self.started = False
                     self.done = True
+                    self.splits[self.index].setSelected(False)
 
                     self.SplitFinish.emit()
 
@@ -194,6 +201,8 @@ class SplitsWidget(QWidget):
                 self.splits[self.index].time_label.setStyleSheet('color: #bbbbbb;')
 
         elif event == 'RESET':
+            self.splits[self.index].setSelected(False)
+
             self.index = 0
             self.started = False
             self.done = False
@@ -205,6 +214,8 @@ class SplitsWidget(QWidget):
                 sp.reset_split()
 
         elif event == 'STOP':
+            self.splits[self.index].setSelected(False)
+
             self.index = 0
             self.started = False
             self.done = False

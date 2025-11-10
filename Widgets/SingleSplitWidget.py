@@ -4,7 +4,7 @@ This class defines the way that a single split can be displayed on the screen
 from __future__ import annotations
 
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QHBoxLayout
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Property
 from PySide6.QtCore import Slot, Signal
 from typing import Callable
 
@@ -13,6 +13,27 @@ from Models.Game import Split
 
 
 class SingleSplitWidget(QFrame):
+    def isSelected(self):
+        return self._selected
+
+    def setSelected(self, state: bool):
+        if self._selected != state:
+            self._selected = state
+            self.setProperty("selected", state)
+
+            # Repolish self + children
+            def repolish(w):
+                w.style().unpolish(w)
+                w.style().polish(w)
+                for child in w.findChildren(QWidget):
+                    child.style().unpolish(child)
+                    child.style().polish(child)
+
+            repolish(self)
+            self.update()
+
+    selected = Property(bool, isSelected, setSelected)  # hate the formatting here
+
     def __init__(self, split: Split, comparison_strategy: Callable[[Split], int]):
         """
         An individual split that can display the times from the PB and the comparison time
@@ -21,6 +42,8 @@ class SingleSplitWidget(QFrame):
             comparison_strategy: (Callable[[Split], int]) a strategy function that extracts the value we display and compare against from the Split object
         """
         super().__init__()
+
+        self._selected = False
 
         self.split = split
         self.comparison_strategy = comparison_strategy
