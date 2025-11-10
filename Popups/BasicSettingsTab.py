@@ -37,7 +37,7 @@ class BasicSettingsTab(ABCSettingTab):
         self.colorPicker = ColorPicker('Pick A Color', QColor("#ff0000"), parent=self)
 
         self.colorPicker2 = ColorPicker('Pick A Color', QColor("#00ff00"), parent=self)
-        self.colorPicker2.setFixedSize(300, 35)
+        self.colorPicker2.setFixedSize(300, 60)
 
         # add them to scroll widget layout here, and it will show up
         self.testGroupLayout.addWidget(self.label)

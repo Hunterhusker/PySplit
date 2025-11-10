@@ -80,11 +80,17 @@ class ColorPicker(QFrame):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
+        self.layout.setAlignment(Qt.AlignVCenter)
 
         self.label = QLabel(label)
 
         self.color = color
         self.color_name = color.name()
+
+        self.hex_entry = QLineEdit()
+        self.hex_entry.setFixedHeight(25)
+        self.hex_entry.setText(self.color_name)
+        self.hex_entry.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.color_preview = ClickableFrame()
         self.color_preview.setFixedSize(20, 20)
@@ -92,7 +98,10 @@ class ColorPicker(QFrame):
         self.color_preview.setStyleSheet(f"background-color: {self.color_name};")
 
         self.layout.addWidget(self.label)
+        self.layout.addWidget(self.hex_entry)
         self.layout.addWidget(self.color_preview)
+
+        self.setStyleSheet("background-color: #ffffff")
 
         self.setLayout(self.layout)
 
