@@ -2,6 +2,8 @@ from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog
 from PySide6.QtCore import Qt, Signal
 
+from helpers.ColorHelpers import *
+
 
 class LabeledTextEntry(QFrame):
     def __init__(self, label: str, original_value: str, parent):
@@ -54,11 +56,19 @@ class LabeledSpinBox(QFrame):
 
 
 class NoScrollQSpinBox(QSpinBox):
+    def __init__(self):
+        super().__init__()
+        self.setObjectName('SettingLine')
+
     def wheelEvent(self, event):
         event.ignore()  # prevent scroll changes
 
 
 class NoScrollQTimeEdit(QTimeEdit):
+    def __init__(self):
+        super().__init__()
+        self.setObjectName('SettingLine')
+
     def wheelEvent(self, event):
         event.ignore()  # prevent scroll changes
 
@@ -85,12 +95,13 @@ class ColorPicker(QFrame):
         self.label = QLabel(label)
 
         self.color = color
-        self.color_name = color.name()
+        self.color_name = color.name(QColor.HexArgb)
 
         self.hex_entry = QLineEdit()
         self.hex_entry.setFixedHeight(25)
         self.hex_entry.setText(self.color_name)
         self.hex_entry.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.hex_entry.textChanged.connect(self.set_color)
 
         self.color_preview = ClickableFrame()
         self.color_preview.setFixedSize(20, 20)
@@ -101,15 +112,29 @@ class ColorPicker(QFrame):
         self.layout.addWidget(self.hex_entry)
         self.layout.addWidget(self.color_preview)
 
-        self.setStyleSheet("background-color: #ffffff")
-
         self.setLayout(self.layout)
+        self.setObjectName('SettingLine')
 
     def pick_color(self):
         color = QColorDialog.getColor(self.color, self, "Pick A Color")
 
         if color.isValid():
             self.color = color
-            self.color_name = color.name()
+            self.color_name = color.name(QColor.HexArgb)
+
+            self.hex_entry.setText(to_full_rgba(self.color_name, argb=True))
 
             self.color_preview.setStyleSheet(f"background-color: {self.color_name}")
+
+    def set_color(self, hex_code: str):
+        if hex_code is not None and hex_code != '' and hex_code != '#':  # if there is something to select
+            hex_code = hex_code.strip('#')
+            argb_hex_code = to_full_argb(hex_code, rgba=True)
+
+            color = QColor.fromRgba(int(argb_hex_code, 16))
+
+            if color.isValid():
+                self.color = color
+                self.color_name = color.name(QColor.HexArgb)
+
+                self.color_preview.setStyleSheet(f"background-color: {self.color_name}")
