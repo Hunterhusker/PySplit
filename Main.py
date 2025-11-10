@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QMessageBox
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QMessageBox, QMainWindow
 from PySide6.QtCore import Slot, Signal, QThread, Qt
 from PySide6.QtGui import QIcon
 import sys
@@ -38,6 +38,9 @@ class Main(QWidget):
         super().__init__()
         self.setWindowTitle('PySplit v0.0')
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint)
+
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setAutoFillBackground(True)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -119,6 +122,8 @@ class Main(QWidget):
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
         self.Quit.connect(self.timer_controller.listener.quit)
+
+        self.setObjectName('MainWindow')
 
     def contextMenuEvent(self, event):
         if not self.game_timer.running:  # only open if the timer is not running, don't play with settings! PLAY THE GAME!
