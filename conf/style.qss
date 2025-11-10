@@ -1,10 +1,10 @@
 QWidget {
-    background-color: $primary-background;
+    background-color: transparent; /*$primary-background;*/
     color: $text-color;
 }
 
 QFrame {
-    background-color: $primary-background;
+    background-color: transparent; /*$primary-background;*/
     color: $text-color;
     border: none;
 }
@@ -18,6 +18,24 @@ QPushButton {
 
 QTabWidget {
     border: none;
+}
+
+QTabWidget::Pane {
+    border: none;
+    background-color: transparent;
+}
+
+#MainWindow {
+    background-color: $primary-background;
+    /*border-image: url("/home/hunter/Pictures/Backgrounds/dbpg16g-d0814f5c-4142-4dbb-b50d-f22e0fe1e103.jpg") 0 0 0 0 stretch stretch;*/
+}
+
+QDialog {
+    background-color: $primary-background;
+}
+
+QMenu {
+    background-color: $primary-background;
 }
 
 QMenu::item {
@@ -206,13 +224,23 @@ QTabBar::tab:!selected {
 }
 
 #SingleSplit {
-    background-color: $secondary-background;
+    background-color: $split-background;
+    color: $text-color;
+}
+
+#SingleSplit[selected="true"] {
+    background-color: $current-split-background;
     color: $text-color;
 }
 
 #SingleSplit QLabel {
     color: $text-color;
-    background-color: $secondary-background;
+    background-color: $split-background;
+}
+
+#SingleSplit[selected="true"] QLabel {
+    background-color: $current-split-background;
+    color: $text-color;
 }
 
 #TitleFrame {
