@@ -1,5 +1,7 @@
 primary-background:#2b2b2b
-secondary-background:#323232
+accent-background:#323232
+app-background:#2b2b2b
+app-accent-background:#323232
 split-background:#323232
 current-split-background:#4c5052
 item-background-color:#4c5052
