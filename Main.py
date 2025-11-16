@@ -172,6 +172,9 @@ class Main(QWidget):
         return self.styleSheet()
 
     def closeEvent(self, event):
+        # stop listening to events
+        self.timer_controller.toggle_listening()
+
         # make a popup to ask the user if they would like to save changes before exiting
         save_box = QMessageBox()
         save_box.setWindowTitle('Save Changes?')
