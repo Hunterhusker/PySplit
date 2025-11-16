@@ -45,7 +45,37 @@ class BasicSettingsTab(ABCSettingTab):
         self.testGroupLayout.addWidget(self.colorPicker)
         self.testGroupLayout.addWidget(self.colorPicker2)
 
+        # create a group for selecting colors
+        self.colorGroup = QGroupBox('Colors')
+        self.colorGroupLayout = QVBoxLayout(self.colorGroup)
+
+        self.backgroundColorPicker = ColorPicker('Background: ', QColor("#2b2b2b"), parent=self)
+
+        self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor("#323232"), parent=self)
+        self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ', QColor("#4c5052"), parent=self)
+
+        self.bestTimeAheadPicker = ColorPicker('Best Time: ', QColor('#ffffff'), parent=self)
+        self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor('#ffffff'), parent=self)
+
+        self.savedTimeAheadPicker = ColorPicker('Saved Time: ', QColor('#ffffff'), parent=self)
+        self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor('#ffffff'), parent=self)
+
+        self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor('#ffffff'), parent=self)
+        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor('#ffffff'), parent=self)
+
+        self.colorGroupLayout.addWidget(self.backgroundColorPicker)
+        self.colorGroupLayout.addWidget(self.splitBackgroundColorPicker)
+        self.colorGroupLayout.addWidget(self.currentSplitBackgroundColorPicker)
+        self.colorGroupLayout.addWidget(self.bestTimeAheadPicker)
+        self.colorGroupLayout.addWidget(self.bestTimeBehindPicker)
+        self.colorGroupLayout.addWidget(self.savedTimeAheadPicker)
+        self.colorGroupLayout.addWidget(self.savedTimeBehindPicker)
+        self.colorGroupLayout.addWidget(self.lostTimeAheadPicker)
+        self.colorGroupLayout.addWidget(self.lostTimeBehindPicker)
+
+        # add all the groups into the scroll
         self.scroll_widget_layout.addWidget(self.testGroup)
+        self.scroll_widget_layout.addWidget(self.colorGroup)
 
         # add a stretch for funsies
         self.scroll_widget_layout.addStretch()

@@ -1,6 +1,6 @@
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QTime
 
 from helpers.ColorHelpers import *
 
@@ -73,6 +73,30 @@ class NoScrollQTimeEdit(QTimeEdit):
         event.ignore()  # prevent scroll changes
 
 
+class LabeledNoScrollQTimeEdit(QFrame):
+    def __init__(self, label: str, time: QTime, parent, timerFormat: str = 'hh:mm:ss.zzz'):
+        super().__init__(parent=parent)
+
+        self.timer_start_delay_input = QHBoxLayout()
+
+        self.timer_start_delay_label = QLabel(label)
+        self.timer_start_delay_label.setMinimumWidth(125)
+        self.timer_start_delay_label.setFixedHeight(25)
+        self.timer_start_delay_label.setObjectName('SettingsLabel')
+
+        self.timer_start_delay = NoScrollQTimeEdit()
+        self.timer_start_delay.setDisplayFormat(timerFormat)
+        self.timer_start_delay.setTime(time)
+        self.timer_start_delay.setBaseSize(100, 25)
+        self.timer_start_delay.setMinimumSize(100, 25)
+
+        self.timer_start_delay_input.addWidget(self.timer_start_delay_label)
+        self.timer_start_delay_input.addWidget(self.timer_start_delay)
+
+        self.setLayout(self.timer_start_delay_input)
+        self.setObjectName('SettingLine')
+
+
 class ClickableFrame(QFrame):
     clicked = Signal()
 
@@ -91,6 +115,7 @@ class ColorPicker(QFrame):
 
         self.layout = QHBoxLayout()
         self.layout.setAlignment(Qt.AlignVCenter)
+        self.layout.setSpacing(5)
 
         self.label = QLabel(label)
 
@@ -99,16 +124,18 @@ class ColorPicker(QFrame):
 
         self.hex_entry = QLineEdit()
         self.hex_entry.setFixedHeight(25)
+        self.hex_entry.setMaximumWidth(150)
         self.hex_entry.setText(self.color_name)
         self.hex_entry.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.hex_entry.textChanged.connect(self.set_color)
 
         self.color_preview = ClickableFrame()
-        self.color_preview.setFixedSize(20, 20)
+        self.color_preview.setFixedSize(25, 25)
         self.color_preview.clicked.connect(self.pick_color)
-        self.color_preview.setStyleSheet(f"background-color: {self.color_name};")
+        self.color_preview.setStyleSheet(f"background-color: {self.color_name}; border-radius: 2; border: 1px solid #616769;")
 
         self.layout.addWidget(self.label)
+        self.layout.addStretch()
         self.layout.addWidget(self.hex_entry)
         self.layout.addWidget(self.color_preview)
 
