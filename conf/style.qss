@@ -31,19 +31,19 @@ QTabWidget::Pane {
 }
 
 QDialog {
-    background-color: $primary-background;
+    background-color: $app-background;
 }
 
 QMenu {
-    background-color: $primary-background;
+    background-color: $app-background;
 }
 
 QMenu::item {
-    background-color: $primary-background;
+    background-color: $app-background;
 }
 
 QMenu::item:selected {
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
 }
 
 QLineEdit {
@@ -134,7 +134,7 @@ QTimeEdit::down-arrow {
 QScrollBar:vertical {
     border: none;
     border-radius: 0px;
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
     width: 14px;
     margin: 14px 0px 14px 0px;
 }
@@ -190,18 +190,18 @@ QScrollBar::add-line:vertical:pressed {
 }
 
 QTabBar::tab {
-    background: $primary-background;
+    background: $app-background;
     color: $text-color;
-    border-top: 1px solid $secondary-background;
-    border-left: 1px solid $secondary-background;
-    border-right: 1px solid $secondary-background;
+    border-top: 1px solid $app-accent-background;
+    border-left: 1px solid $app-accent-background;
+    border-right: 1px solid $app-accent-background;
     border-top-left-radius: 2px;
 	border-top-right-radius: 2px;
     padding: 5px 10px;
 }
 
 QTabBar::tab:selected {
-    background: $secondary-background;
+    background: $app-accent-background;
 }
 
 QTabBar::tab:!selected {
@@ -276,18 +276,18 @@ QTabBar::tab:!selected {
 }
 
 #KeyReassignmentLine {
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
     border-radius: 2px;
 }
 
 #SettingsLabel {
     color: $text-color;
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
 }
 
 #SettingLine {
     color: $text-color;
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
     border-radius: 2px;
 }
 
@@ -302,17 +302,17 @@ QSplitter::handle:hover {
 }
 
 QPlainTextArea {
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
 }
 
 #StyleTextArea {
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 
 #VarTextArea {
-    background-color: $secondary-background;
+    background-color: $app-accent-background;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
