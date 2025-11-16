@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, QScrollArea, QWidget, QGroupBox
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, \
+    QScrollArea, QWidget, QGroupBox, QLabel
+from PySide6.QtCore import Qt, QTime
 from typing import TYPE_CHECKING
 
 from Popups.ABCSettingTab import ABCSettingTab
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
 from Models.Game import Game, Split
-from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit
+from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit, LabeledNoScrollQTimeEdit
 
 if TYPE_CHECKING:
     from Main import Main
@@ -56,11 +57,14 @@ class GameSettingsTab(ABCSettingTab):
         self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.game.lifetime_attempts, parent=self)
         self.lifetime_attempts_input.setMinimumHeight(35)
 
+        self.timer_start_delay_input = LabeledNoScrollQTimeEdit('Start Delay: ', QTime(0, 0, 0, 0), parent=self, timerFormat='ss.zzz')
+
         # populate the title group
         self.title_group_layout.addWidget(self.title_input)
         self.title_group_layout.addWidget(self.sub_title_input)
         self.title_group_layout.addWidget(self.session_attempts_input)
         self.title_group_layout.addWidget(self.lifetime_attempts_input)
+        self.title_group_layout.addWidget(self.timer_start_delay_input)
 
         # add everything to the main layout
         self.scroll_widget_layout.addWidget(self.title_group)
