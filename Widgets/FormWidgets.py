@@ -165,3 +165,10 @@ class ColorPicker(QFrame):
                 self.color_name = color.name(QColor.HexArgb)
 
                 self.color_preview.setStyleSheet(f"background-color: {self.color_name}")
+
+    def get_color(self):
+        if isinstance(self.color, QColor):
+            return self.color
+
+        else:
+            return QColor(self.color_name)
