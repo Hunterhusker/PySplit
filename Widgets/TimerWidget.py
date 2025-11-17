@@ -20,7 +20,7 @@ class TimerWidget(QFrame):
 
         self.layout.setAlignment(self.main_timer_label, Qt.AlignRight)
 
-        self.setObjectName('TimeFrame')
+        self.setObjectName('TimerFrame')
 
         self.setLayout(self.layout)
 
