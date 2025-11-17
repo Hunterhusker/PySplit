@@ -16,10 +16,11 @@ class SplitsWidget(QWidget):
     SplitReset = Signal()
 
     # TODO : Add better support for the strategy adoption
-    def __init__(self, game: Game):
+    def __init__(self, game: Game, parent: 'Main'):
         super().__init__()
 
         self.visible_splits = 3
+        self.main = parent
 
         # some basic layout setup to keep stuff off the top and bottom but not the sides
         self.layout = QVBoxLayout()
@@ -280,7 +281,7 @@ class SplitsWidget(QWidget):
             pb_segment_total += split.pb_segment_ms
             gold_segment_total += split.gold_segment_ms
 
-            tmp = SingleSplitWidget(split, split_pb_strategy)
+            tmp = SingleSplitWidget(split, split_pb_strategy, parent=self)
             tmp.pb_segment_total = pb_segment_total
             tmp.gold_segment_total = gold_segment_total
 
@@ -312,7 +313,7 @@ class SplitsWidget(QWidget):
             pb_segment_total += split.pb_segment_ms
             gold_segment_total += split.gold_segment_ms
 
-            tmp = SingleSplitWidget(split, split_pb_strategy)
+            tmp = SingleSplitWidget(split, split_pb_strategy, parent=self)
             tmp.pb_segment_total = pb_segment_total
             tmp.gold_segment_total = gold_segment_total
 
