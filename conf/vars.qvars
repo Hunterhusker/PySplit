@@ -1,18 +1,28 @@
+// vars for the widget itself
 primary-background:#2b2b2b
 accent-background:#323232
-app-background:#2b2b2b
-app-accent-background:#323232
 split-background:#323232
 current-split-background:#4c5052
-item-background-color:#4c5052
-hover-background-color:#5c6163
-pressed-background-color:#6b7073
-border-color:#bbbbbb
 text-color:#bbbbbb
-button-background-color:#4c5052
-button-border-color:#616769
-button-text-color:#a3a4ab
 timer-size:24px
 subtitle-size:12px
 title-size:14px
 main-font:""
+best-time-color-ahead:#ffffd700
+best-time-color-behind:#ffdaa520
+saved-time-color-ahead:#ff008000
+saved-time-color-behind:#ff008000
+lost-time-color-ahead:#ffff0000
+lost-time-color-behind:#ffff0000
+
+// vars for the application
+app-background:#2b2b2b
+app-accent-background:#323232
+app-text-color:#bbbbbb
+item-background-color:#4c5052
+hover-background-color:#5c6163
+pressed-background-color:#6b7073
+border-color:#bbbbbb
+button-background-color:#4c5052
+button-border-color:#616769
+button-text-color:#a3a4ab
