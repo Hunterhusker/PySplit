@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import copy
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPlainTextEdit, QFrame, QLabel, \
@@ -27,41 +28,25 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
-        self.testGroup = QGroupBox('Test Box')
-        self.testGroupLayout = QVBoxLayout(self.testGroup)
-
-        # create objects here
-        self.label = QLabel('TEST')
-        self.label2 = QLabel('TEST2')
-
-        self.colorPicker = ColorPicker('Pick A Color', QColor("#ff0000"), parent=self)
-
-        self.colorPicker2 = ColorPicker('Pick A Color', QColor("#00ff00"), parent=self)
-        self.colorPicker2.setFixedSize(300, 60)
-
-        # add them to scroll widget layout here, and it will show up
-        self.testGroupLayout.addWidget(self.label)
-        self.testGroupLayout.addWidget(self.label2)
-        self.testGroupLayout.addWidget(self.colorPicker)
-        self.testGroupLayout.addWidget(self.colorPicker2)
-
         # create a group for selecting colors
         self.colorGroup = QGroupBox('Colors')
         self.colorGroupLayout = QVBoxLayout(self.colorGroup)
 
-        self.backgroundColorPicker = ColorPicker('Background: ', QColor("#2b2b2b"), parent=self)
+        var_map = self.main.configurator.style.variable_map
 
-        self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor("#323232"), parent=self)
-        self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ', QColor("#4c5052"), parent=self)
+        self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
 
-        self.bestTimeAheadPicker = ColorPicker('Best Time: ', QColor('#ffffff'), parent=self)
-        self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor('#ffffff'), parent=self)
+        self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor(var_map['split-background']), parent=self)
+        self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ', QColor(var_map['current-split-background']), parent=self)
 
-        self.savedTimeAheadPicker = ColorPicker('Saved Time: ', QColor('#ffffff'), parent=self)
-        self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor('#ffffff'), parent=self)
+        self.bestTimeAheadPicker = ColorPicker('Best Time: ', QColor(var_map['best-time-color-ahead']), parent=self)
+        self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor(var_map['best-time-color-behind']), parent=self)
 
-        self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor('#ffffff'), parent=self)
-        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor('#ffffff'), parent=self)
+        self.savedTimeAheadPicker = ColorPicker('Saved Time: ', QColor(var_map['saved-time-color-ahead']), parent=self)
+        self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor(var_map['saved-time-color-behind']), parent=self)
+
+        self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor(var_map['lost-time-color-ahead']), parent=self)
+        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']), parent=self)
 
         self.colorGroupLayout.addWidget(self.backgroundColorPicker)
         self.colorGroupLayout.addWidget(self.splitBackgroundColorPicker)
@@ -74,7 +59,6 @@ class BasicSettingsTab(ABCSettingTab):
         self.colorGroupLayout.addWidget(self.lostTimeBehindPicker)
 
         # add all the groups into the scroll
-        self.scroll_widget_layout.addWidget(self.testGroup)
         self.scroll_widget_layout.addWidget(self.colorGroup)
 
         # add a stretch for funsies
@@ -97,4 +81,21 @@ class BasicSettingsTab(ABCSettingTab):
             self.label.setText(color.name())
 
     def apply(self):
-        raise NotImplementedError()
+        self.apply_colors()
+
+    def apply_colors(self):
+        var_map = copy.deepcopy(self.main.configurator.style.variable_map)
+
+        var_map['primary-background'] = self.backgroundColorPicker.color_name
+        var_map['split-background'] = self.splitBackgroundColorPicker.color_name
+        var_map['current-split-background'] = self.currentSplitBackgroundColorPicker.color_name
+
+        # split time colors
+        var_map['best-time-color-ahead'] = self.bestTimeAheadPicker.color_name
+        var_map['best-time-color-behind'] = self.bestTimeBehindPicker.color_name
+        var_map['saved-time-color-ahead'] = self.savedTimeAheadPicker.color_name
+        var_map['saved-time-color-behind'] = self.savedTimeBehindPicker.color_name
+        var_map['lost-time-color-ahead'] = self.lostTimeAheadPicker.color_name
+        var_map['lost-time-color-behind'] = self.lostTimeBehindPicker.color_name
+
+        self.main.configurator.style.update_style(var_map=var_map)
