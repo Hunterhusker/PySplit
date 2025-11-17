@@ -1,11 +1,11 @@
 QWidget {
     background-color: transparent; /*$primary-background;*/
-    color: $text-color;
+    color: $app-text-color;
 }
 
 QFrame {
     background-color: transparent; /*$primary-background;*/
-    color: $text-color;
+    color: $app-text-color;
     border: none;
 }
 
@@ -191,7 +191,7 @@ QScrollBar::add-line:vertical:pressed {
 
 QTabBar::tab {
     background: $app-background;
-    color: $text-color;
+    color: $app-text-color;
     border-top: 1px solid $app-accent-background;
     border-left: 1px solid $app-accent-background;
     border-right: 1px solid $app-accent-background;
@@ -208,11 +208,20 @@ QTabBar::tab:!selected {
     margin-top: 2px; /* makes the unselected tabs look smaller */
 }
 
-#TimeFrame {
+#TimerFrame {
     border-bottom: 1px solid $border-color;
     border-top: 1px solid $border-color;
     border-left: none;
     border-right: none;
+    color: $text-color;
+}
+
+#TimerStatsWidget {
+    color: $text-color;
+}
+
+#TimerStatsWidget QLabel {
+    color: $text-color;
 }
 
 #TimeLabel {
@@ -221,6 +230,7 @@ QTabBar::tab:!selected {
     border-left: none;
     border-right: none;
     font-size: $timer-size;
+    color: $text-color
 }
 
 #SingleSplit {
@@ -281,12 +291,12 @@ QTabBar::tab:!selected {
 }
 
 #SettingsLabel {
-    color: $text-color;
+    color: $app-text-color;
     background-color: $app-accent-background;
 }
 
 #SettingLine {
-    color: $text-color;
+    color: $app-text-color;
     background-color: $app-accent-background;
     border-radius: 2px;
 }
