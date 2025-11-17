@@ -32,6 +32,12 @@ class StyleBuilder(QObject):
         lines = [l for l in raw.split(os.linesep) if l is not None and l != '']
 
         for line in lines:
+            if '//' in line:  # cut off any comments
+                line = line[:line.index('//')].strip(' ')
+
+            if line == '':  # or (len(line) > 2 and line[:2] == '//'):  # skip blank lines and comments
+                continue
+
             k, v = line.split(':')
 
             self.variable_map[k] = v
