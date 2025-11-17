@@ -34,14 +34,27 @@ class SingleSplitWidget(QFrame):
 
     selected = Property(bool, isSelected, setSelected)  # hate the formatting here
 
-    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int]):
+    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent):
         """
         An individual split that can display the times from the PB and the comparison time
         Args:
             split: (Split) The split object that contains the information for the split itself
             comparison_strategy: (Callable[[Split], int]) a strategy function that extracts the value we display and compare against from the Split object
+            parent: (Main) a reference to the parent widget that we can use to get colors and other settings from
         """
         super().__init__()
+
+        self.parent = parent
+
+        # create these so they can be set later
+        self.best_time_color_ahead = None
+        self.best_time_color_behind = None
+        self.saved_time_color_ahead = None
+        self.saved_time_color_behind = None
+        self.lost_time_color_ahead = None
+        self.lost_time_color_behind = None
+
+        self.get_colors_from_style()
 
         self._selected = False
 
@@ -75,6 +88,24 @@ class SingleSplitWidget(QFrame):
         self.setLayout(self.layout)  # set the layout on the frame
         self.setFixedHeight(30)
 
+    def get_colors_from_style(self):
+        """
+        Gets the colors from the style and then saves them to vars
+
+        Returns:
+            None
+        """
+        var_map = self.parent.main.configurator.style.variable_map
+
+        self.best_time_color_ahead = f'color: {var_map['best-time-color-ahead']};'
+        self.best_time_color_behind = f'color: {var_map['best-time-color-behind']};'
+
+        self.saved_time_color_ahead = f'color: {var_map['saved-time-color-ahead']};'
+        self.saved_time_color_behind = f'color: {var_map['saved-time-color-behind']};'
+
+        self.lost_time_color_ahead = f'color: {var_map['lost-time-color-ahead']};'
+        self.lost_time_color_behind = f'color: {var_map['lost-time-color-behind']};'
+
     @Slot(int)
     def update_split(self, curr_time_ms: int):
         """
@@ -102,9 +133,9 @@ class SingleSplitWidget(QFrame):
             self.delta_label.setText(time_delta_str)
 
             if time_delta <= 0:
-                self.delta_label.setStyleSheet('color: green;')
+                self.delta_label.setStyleSheet(self.saved_time_color_ahead)  # TODO : Figure ahead / behind out here
             else:
-                self.delta_label.setStyleSheet('color: red;')
+                self.delta_label.setStyleSheet(self.lost_time_color_ahead)
 
         else:
             self.delta_label.setText('')
@@ -173,23 +204,23 @@ class SingleSplitWidget(QFrame):
             if self.current_segment_ms < self.split.gold_segment_ms:
                 # if we're ahead of the saved time, then a "gold" gold
                 if self.current_segment_ms < self.split.pb_segment_ms:
-                    self.time_label.setStyleSheet('color: gold;')
-                    self.delta_label.setStyleSheet('color: gold;')
+                    self.time_label.setStyleSheet(self.best_time_color_ahead)  # TODO : Figure out ahead / behind here too
+                    self.delta_label.setStyleSheet(self.best_time_color_ahead)
                 else:  # we're behind, but we saved time, then we ought to color it a different color to note the gold but while not ahead
-                    self.time_label.setStyleSheet('color: goldenrod;')
-                    self.delta_label.setStyleSheet('color: goldenrod;')
+                    self.time_label.setStyleSheet(self.best_time_color_behind)
+                    self.delta_label.setStyleSheet(self.best_time_color_behind)
 
             elif self.current_segment_ms < self.split.pb_segment_ms:
-                self.time_label.setStyleSheet('color: blue;')
-                self.delta_label.setStyleSheet('color: blue;')
+                self.time_label.setStyleSheet(self.saved_time_color_ahead)
+                self.delta_label.setStyleSheet(self.saved_time_color_ahead)
 
             elif self.current_time_ms >= self.split.pb_time_ms:
-                self.time_label.setStyleSheet('color: red;')
-                self.delta_label.setStyleSheet('color: red;')
+                self.time_label.setStyleSheet(self.lost_time_color_ahead)
+                self.delta_label.setStyleSheet(self.lost_time_color_ahead)
 
             else:
-                self.time_label.setStyleSheet('color: green;')
-                self.delta_label.setStyleSheet('color: green;')
+                self.time_label.setStyleSheet(self.saved_time_color_ahead)
+                self.delta_label.setStyleSheet(self.saved_time_color_ahead)
 
         elif event == 'RESET':
             self.reset_split()
