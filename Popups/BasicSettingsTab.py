@@ -29,37 +29,12 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
-        self.colorGroup = QGroupBox('Colors')
-        self.colorGroupLayout = QVBoxLayout(self.colorGroup)
-
-        var_map = self.main.configurator.style.variable_map
-
-        self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
-
-        self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor(var_map['split-background']), parent=self)
-        self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ', QColor(var_map['current-split-background']), parent=self)
-
-        self.bestTimeAheadPicker = ColorPicker('Best Time: ', QColor(var_map['best-time-color-ahead']), parent=self)
-        self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor(var_map['best-time-color-behind']), parent=self)
-
-        self.savedTimeAheadPicker = ColorPicker('Saved Time: ', QColor(var_map['saved-time-color-ahead']), parent=self)
-        self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor(var_map['saved-time-color-behind']), parent=self)
-
-        self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor(var_map['lost-time-color-ahead']), parent=self)
-        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']), parent=self)
-
-        self.colorGroupLayout.addWidget(self.backgroundColorPicker)
-        self.colorGroupLayout.addWidget(self.splitBackgroundColorPicker)
-        self.colorGroupLayout.addWidget(self.currentSplitBackgroundColorPicker)
-        self.colorGroupLayout.addWidget(self.bestTimeAheadPicker)
-        self.colorGroupLayout.addWidget(self.bestTimeBehindPicker)
-        self.colorGroupLayout.addWidget(self.savedTimeAheadPicker)
-        self.colorGroupLayout.addWidget(self.savedTimeBehindPicker)
-        self.colorGroupLayout.addWidget(self.lostTimeAheadPicker)
-        self.colorGroupLayout.addWidget(self.lostTimeBehindPicker)
+        self.color_group = _ColorSettings(self.main, parent=self)
+        self.app_settings = _AppSettings(self.main, parent=self)
 
         # add all the groups into the scroll
-        self.scroll_widget_layout.addWidget(self.colorGroup)
+        self.scroll_widget_layout.addWidget(self.color_group)
+        self.scroll_widget_layout.addWidget(self.app_settings)
 
         # add a stretch for funsies
         self.scroll_widget_layout.addStretch()
@@ -74,14 +49,47 @@ class BasicSettingsTab(ABCSettingTab):
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')  # set the object name here so it uses the right QSS
 
-    def pickColor(self):
-        color = QColorDialog.getColor(QColor('#ffffff'), self, "Select A Color")
-
-        if color.isValid():
-            self.label.setText(color.name())
-
     def apply(self):
-        self.apply_colors()
+        self.color_group.apply_colors()
+
+
+class _ColorSettings(QGroupBox):
+    def __init__(self, main: 'Main', parent=None):
+        super().__init__('Colors', parent)
+
+        self.layout = QVBoxLayout(self)
+        self.main = main
+
+        var_map = self.main.configurator.style.variable_map
+
+        self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
+
+        self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor(var_map['split-background']),
+                                                      parent=self)
+        self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ',
+                                                             QColor(var_map['current-split-background']), parent=self)
+
+        self.bestTimeAheadPicker = ColorPicker('Best Time: ', QColor(var_map['best-time-color-ahead']), parent=self)
+        self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor(var_map['best-time-color-behind']),
+                                                parent=self)
+
+        self.savedTimeAheadPicker = ColorPicker('Saved Time: ', QColor(var_map['saved-time-color-ahead']), parent=self)
+        self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor(var_map['saved-time-color-behind']),
+                                                 parent=self)
+
+        self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor(var_map['lost-time-color-ahead']), parent=self)
+        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']),
+                                                parent=self)
+
+        self.layout.addWidget(self.backgroundColorPicker)
+        self.layout.addWidget(self.splitBackgroundColorPicker)
+        self.layout.addWidget(self.currentSplitBackgroundColorPicker)
+        self.layout.addWidget(self.bestTimeAheadPicker)
+        self.layout.addWidget(self.bestTimeBehindPicker)
+        self.layout.addWidget(self.savedTimeAheadPicker)
+        self.layout.addWidget(self.savedTimeBehindPicker)
+        self.layout.addWidget(self.lostTimeAheadPicker)
+        self.layout.addWidget(self.lostTimeBehindPicker)
 
     def apply_colors(self):
         var_map = copy.deepcopy(self.main.configurator.style.variable_map)
@@ -99,3 +107,13 @@ class BasicSettingsTab(ABCSettingTab):
         var_map['lost-time-color-behind'] = self.lostTimeBehindPicker.color_name
 
         self.main.configurator.style.update_style(var_map=var_map)
+
+
+class _AppSettings(QGroupBox):
+    def __init__(self, main: 'Main', parent=None):
+        super().__init__('App Settings')
+
+        self.layout = QVBoxLayout(self)
+
+    def apply_app_settngs(self):
+        pass
