@@ -113,11 +113,13 @@ class Main(QWidget):
         self.settings_window = SettingsWindow(parent=self)
         self.settings_window.setGeometry(900, 900, 600, 400)
         self.settings_window.setMinimumSize(600, 400)
-        self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
+        #self.settings_window.add_tab(StyleTab(mainWindow=self), 'Style')
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
         self.settings_window.add_tab(GameSettingsTab(self.game, mainWindow=self), 'Splits')
         self.settings_window.add_tab(AdvancedStyleTab(mainWindow=self), 'Advanced')
         self.settings_window.add_tab(BasicSettingsTab(mainWindow=self), 'Settings')
+
+        self.settings_window.toggle_tab_visibility('Advanced')
 
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)

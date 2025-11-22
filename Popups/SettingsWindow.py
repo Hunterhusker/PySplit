@@ -24,6 +24,8 @@ class SettingsWindow(QDialog):
 
         self.dialogButtons.clicked.connect(self.button_event)
 
+        self.tab_dict = {}
+
         self.layout.addWidget(self.tabs)
         self.layout.addWidget(self.dialogButtons)
 
@@ -38,6 +40,11 @@ class SettingsWindow(QDialog):
         currWidget = self.tabs.currentWidget()
 
         currWidget.apply()  # and have it apply its changes!
+
+    def toggle_tab_visibility(self, name):
+        idx = self.get_tab_index(name)
+        visible = self.tabs.isTabVisible(idx)
+        self.tabs.setTabVisible(idx, not visible)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
@@ -66,4 +73,12 @@ class SettingsWindow(QDialog):
             tab_widget: (ABCSettingsTab) the settings popup window to add
             name: (str) the name of the tab
         """
+        self.tab_dict[name] = tab_widget
+
         self.tabs.addTab(tab_widget, name)
+
+    def get_tab(self, name: str):
+        return self.tab_dict[name]
+
+    def get_tab_index(self, name: str):
+        return self.tabs.indexOf(self.get_tab(name))
