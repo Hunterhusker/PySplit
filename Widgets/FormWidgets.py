@@ -1,5 +1,5 @@
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, QFontComboBox
 from PySide6.QtCore import Qt, Signal, QTime
 
 from helpers.ColorHelpers import *
@@ -58,7 +58,6 @@ class LabeledSpinBox(QFrame):
 class NoScrollQSpinBox(QSpinBox):
     def __init__(self):
         super().__init__()
-        self.setObjectName('SettingLine')
 
     def wheelEvent(self, event):
         event.ignore()  # prevent scroll changes
@@ -67,7 +66,6 @@ class NoScrollQSpinBox(QSpinBox):
 class NoScrollQTimeEdit(QTimeEdit):
     def __init__(self):
         super().__init__()
-        self.setObjectName('SettingLine')
 
     def wheelEvent(self, event):
         event.ignore()  # prevent scroll changes
@@ -172,3 +170,26 @@ class ColorPicker(QFrame):
 
         else:
             return QColor(self.color_name)
+
+
+class FontPicker(QFrame):
+    def __init__(self, label: str, font):
+        super().__init__()
+
+        self.layout = QHBoxLayout()
+
+        self.label = QLabel(label)
+        self.layout.addWidget(self.label)
+
+        self.size = NoScrollQSpinBox()
+        self.size.setRange(6, 72)
+        self.layout.addWidget(self.size)
+
+        self.font = QFontComboBox()
+        self.layout.addWidget(self.font)
+
+        self.setLayout(self.layout)
+        self.setObjectName('SettingLine')
+
+    def apply(self):
+        pass
