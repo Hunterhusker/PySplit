@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, 
     QGroupBox, QColorDialog, QPushButton
 from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
-from Widgets.FormWidgets import ColorPicker
+from Widgets.FormWidgets import ColorPicker, FontPicker, LabeledSpinBox
 
 from Popups.ABCSettingTab import ABCSettingTab
 
@@ -29,12 +29,16 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
-        self.color_group = _ColorSettings(self.main, parent=self)
+        self.color_group = _AppearanceSettings(self.main, parent=self)
         self.app_settings = _AppSettings(self.main, parent=self)
+        self.timing_settings = _TimingSettings(self.main, parent=self)
+        self.footer_settings = _FooterSettings(self.main, parent=self)
 
         # add all the groups into the scroll
         self.scroll_widget_layout.addWidget(self.color_group)
         self.scroll_widget_layout.addWidget(self.app_settings)
+        self.scroll_widget_layout.addWidget(self.timing_settings)
+        self.scroll_widget_layout.addWidget(self.footer_settings)
 
         # add a stretch for funsies
         self.scroll_widget_layout.addStretch()
@@ -50,12 +54,12 @@ class BasicSettingsTab(ABCSettingTab):
         self.setObjectName('SettingLine')  # set the object name here so it uses the right QSS
 
     def apply(self):
-        self.color_group.apply_colors()
+        self.color_group.apply()
 
 
-class _ColorSettings(QGroupBox):
+class _AppearanceSettings(QGroupBox):
     def __init__(self, main: 'Main', parent=None):
-        super().__init__('Colors', parent)
+        super().__init__('Appearance', parent)
 
         self.layout = QVBoxLayout(self)
         self.main = main
@@ -81,6 +85,8 @@ class _ColorSettings(QGroupBox):
         self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']),
                                                 parent=self)
 
+        self.titleFontPicker = FontPicker('test', 'test')
+
         self.layout.addWidget(self.backgroundColorPicker)
         self.layout.addWidget(self.splitBackgroundColorPicker)
         self.layout.addWidget(self.currentSplitBackgroundColorPicker)
@@ -90,8 +96,9 @@ class _ColorSettings(QGroupBox):
         self.layout.addWidget(self.savedTimeBehindPicker)
         self.layout.addWidget(self.lostTimeAheadPicker)
         self.layout.addWidget(self.lostTimeBehindPicker)
+        self.layout.addWidget(self.titleFontPicker)
 
-    def apply_colors(self):
+    def apply(self):
         var_map = copy.deepcopy(self.main.configurator.style.variable_map)
 
         var_map['primary-background'] = self.backgroundColorPicker.color_name
@@ -115,5 +122,27 @@ class _AppSettings(QGroupBox):
 
         self.layout = QVBoxLayout(self)
 
-    def apply_app_settngs(self):
+    def apply(self):
+        pass
+
+
+class _TimingSettings(QGroupBox):
+    def __init__(self, main: 'Main', parent=None):
+        super().__init__('Timing Settings')
+
+        self.layout = QVBoxLayout(self)
+
+    def apply(self):
+        pass
+
+
+class _FooterSettings(QGroupBox):
+    def __init__(self, main: 'Main', parent=None):
+        super().__init__('Timing Settings')
+
+        # TODO : Make the footer so I can configure it
+
+        self.layout = QVBoxLayout(self)
+
+    def apply(self):
         pass
