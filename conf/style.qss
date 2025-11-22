@@ -68,28 +68,43 @@ QSpinBox::up-button {
     subcontrol-origin: border;
     subcontrol-position: top right;
     width: 13px;
-    background-color: $button-background-color;
-    border-top-right-radius: 2px;
-    border-right: 1px solid $button-border-color;
-    border-top: 1px solid $button-border-color;
+    background-color: transparent;
+    border: none;
 }
 
 QSpinBox::down-button {
     subcontrol-origin: border;
     subcontrol-position: bottom right;
     width: 13px;
-    background-color: $button-background-color;
-    border-bottom-right-radius: 2px;
-    border-right: 1px solid $button-border-color;
-    border-bottom: 1px solid $button-border-color;
+    background-color: transparent;
+    border: none;
 }
 
 QSpinBox::up-arrow {
+    background-color: transparent;
     image: url(Static/up_arrow.svg);
 }
 
 QSpinBox::down-arrow {
+    background-color: transparent;
     image: url(Static/down_arrow.svg);
+}
+
+QComboBox {
+    color: $button-text-color;
+    background-color: $button-background-color;
+    border: 1px solid $button-border-color;
+    border-radius: 2px;
+}
+
+QComboBox::down-arrow {
+    image: url(Static/down_arrow.svg); /* Replace with your icon path */
+    background-color: transparent;
+}
+
+QComboBox::drop-down {
+    background-color: transparent;
+    border: none;
 }
 
 QTimeEdit {
@@ -107,20 +122,16 @@ QTimeEdit::up-button {
     subcontrol-origin: border;
     subcontrol-position: top right;
     width: 13px;
-    background-color: $button-background-color;
-    border-top-right-radius: 2px;
-    border-right: 1px solid $button-border-color;
-    border-top: 1px solid $button-border-color;
+    background-color: transparent;
+    border: none;
 }
 
 QTimeEdit::down-button {
     subcontrol-origin: border;
     subcontrol-position: bottom right;
     width: 13px;
-    background-color: $button-background-color;
-    border-bottom-right-radius: 2px;
-    border-right: 1px solid $button-border-color;
-    border-bottom: 1px solid $button-border-color;
+    background-color: transparent;
+    border: none;
 }
 
 QTimeEdit::up-arrow {
