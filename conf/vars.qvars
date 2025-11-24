@@ -7,7 +7,11 @@ text-color:#bbbbbb
 timer-size:24px
 subtitle-size:12px
 title-size:14px
-main-font:""
+title-font:
+subtitle-font:
+timer-font:
+split-font:Classic Console
+split-font-size:40px
 best-time-color-ahead:#ffffd700
 best-time-color-behind:#ffdaa520
 saved-time-color-ahead:#ff008000
@@ -26,3 +30,4 @@ border-color:#bbbbbb
 button-background-color:#4c5052
 button-border-color:#616769
 button-text-color:#a3a4ab
+main-font:Classic Console
