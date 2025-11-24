@@ -68,24 +68,19 @@ class _AppearanceSettings(QGroupBox):
 
         self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
 
-        self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor(var_map['split-background']),
-                                                      parent=self)
-        self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ',
-                                                             QColor(var_map['current-split-background']), parent=self)
+        self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor(var_map['split-background']), parent=self)
+        self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ', QColor(var_map['current-split-background']), parent=self)
 
         self.bestTimeAheadPicker = ColorPicker('Best Time: ', QColor(var_map['best-time-color-ahead']), parent=self)
-        self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor(var_map['best-time-color-behind']),
-                                                parent=self)
+        self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor(var_map['best-time-color-behind']), parent=self)
 
         self.savedTimeAheadPicker = ColorPicker('Saved Time: ', QColor(var_map['saved-time-color-ahead']), parent=self)
-        self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor(var_map['saved-time-color-behind']),
-                                                 parent=self)
+        self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor(var_map['saved-time-color-behind']), parent=self)
 
         self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor(var_map['lost-time-color-ahead']), parent=self)
-        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']),
-                                                parent=self)
+        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']), parent=self)
 
-        self.titleFontPicker = FontPicker('test', 'test')
+        self.titleFontPicker = FontPicker('Title Font: ', var_map['title-font'], 12)
 
         self.layout.addWidget(self.backgroundColorPicker)
         self.layout.addWidget(self.splitBackgroundColorPicker)
@@ -112,6 +107,10 @@ class _AppearanceSettings(QGroupBox):
         var_map['saved-time-color-behind'] = self.savedTimeBehindPicker.color_name
         var_map['lost-time-color-ahead'] = self.lostTimeAheadPicker.color_name
         var_map['lost-time-color-behind'] = self.lostTimeBehindPicker.color_name
+
+        # apply the fonts
+        var_map['title-font'] = self.titleFontPicker.get_font_family()
+        var_map['title-size'] = f'{self.titleFontPicker.get_size()}px'
 
         self.main.configurator.style.update_style(var_map=var_map)
 
