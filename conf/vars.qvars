@@ -6,12 +6,16 @@ current-split-background:#4c5052
 text-color:#bbbbbb
 title-font:
 title-size:14px
+title-color:#ffbbbbbb
 subtitle-font:
 subtitle-size:12px
+subtitle-color:#ffbbbbbb
 timer-font:
 timer-size:24px
+timer-color:#ffbbbbbb
 split-font:
-split-font-size:14px
+split-size:14px
+split-color:#ffbbbbbb
 best-time-color-ahead:#ffffd700
 best-time-color-behind:#ffdaa520
 saved-time-color-ahead:#ff008000
