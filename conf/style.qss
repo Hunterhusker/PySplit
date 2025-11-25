@@ -10,9 +10,9 @@ QFrame {
 }
 
 QPushButton {
-    color: $button-text-color;
-    background-color: $button-background-color;
-    border: 1px solid $button-border-color;
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
     border-radius: 2px;
 }
 
@@ -47,25 +47,25 @@ QMenu::item:selected {
 }
 
 QLineEdit {
-    color: $button-text-color;
-    background-color: $button-background-color;
-    border: 1px solid $button-border-color;
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
     border-radius: 2px;
 }
 
 QLineEdit:focus {
-    border: 1px solid #aaaaaa;
+    border: 1px solid $item-highlight-border-color;
 }
 
 QSpinBox {
-    color: $button-text-color;
-    background-color: $button-background-color;
-    border: 1px solid $button-border-color;
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
     border-radius: 2px;
 }
 
 QSpinBox:focus {
-    border: 1px solid #aaaaaa;
+    border: 1px solid $item-highlight-border-color;
 }
 
 QSpinBox::up-button {
@@ -95,9 +95,9 @@ QSpinBox::down-arrow {
 }
 
 QComboBox {
-    color: $button-text-color;
-    background-color: $button-background-color;
-    border: 1px solid $button-border-color;
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
     border-radius: 2px;
 }
 
@@ -112,18 +112,18 @@ QComboBox::drop-down {
 }
 
 QComboBox:focus {
-    border: 1px solid #aaaaaa;
+    border: 1px solid $item-highlight-border-color;
 }
 
 QTimeEdit {
-    color: $button-text-color;
-    background-color: $button-background-color;
-    border: 1px solid $button-border-color;
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
     border-radius: 2px;
 }
 
 QTimeEdit:focus {
-    border: 1px solid #aaaaaa;
+    border: 1px solid $item-highlight-border-color;
 }
 
 QTimeEdit::up-button {
@@ -338,16 +338,4 @@ QSplitter::handle:hover {
 
 QPlainTextArea {
     background-color: $app-accent-background;
-}
-
-#StyleTextArea {
-    background-color: $app-accent-background;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-}
-
-#VarTextArea {
-    background-color: $app-accent-background;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
 }
