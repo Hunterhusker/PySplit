@@ -71,6 +71,14 @@ class NoScrollQTimeEdit(QTimeEdit):
         event.ignore()  # prevent scroll changes
 
 
+class NoScrollQFontComboBox(QFontComboBox):
+    def __init__(self):
+        super().__init__()
+
+    def wheelEvent(self, event):
+        event.ignore()
+
+
 class LabeledNoScrollQTimeEdit(QFrame):
     def __init__(self, label: str, time: QTime, parent, timerFormat: str = 'hh:mm:ss.zzz'):
         super().__init__(parent=parent)
@@ -184,12 +192,16 @@ class FontPicker(QFrame):
         if isinstance(size, str):
             size = int(size.strip('px'))
 
-        self.size = NoScrollQSpinBox()
-        self.size.setRange(6, 72)
-        self.size.setValue(size)
-        self.layout.addWidget(self.size)
+        self.size_spinner = NoScrollQSpinBox()
+        self.size_spinner.setRange(6, 72)
+        self.size_spinner.setValue(size)
+        self.size_spinner.setFixedHeight(25)
+        self.size_spinner.setFixedWidth(50)
+        self.layout.addWidget(self.size_spinner)
 
-        self.font_combobox = QFontComboBox()
+        self.font_combobox = NoScrollQFontComboBox()
+        self.font_combobox.setFixedHeight(25)
+        self.font_combobox.setFixedWidth(125)
         if font_family != '':
             self.font_combobox.setCurrentText(font_family)
         else:
@@ -206,4 +218,4 @@ class FontPicker(QFrame):
         return self.get_font().family()
 
     def get_size(self):
-        return self.size.value()
+        return self.size_spinner.value()

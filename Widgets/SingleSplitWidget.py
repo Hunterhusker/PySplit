@@ -147,9 +147,11 @@ class SingleSplitWidget(QFrame):
         """
         Resets the split data to how it would have been when first loaded
         """
+        var_map = self.parent.main.configurator.style.variable_map
+
         self.delta_label.setText('')  # clear the time delta
         self.time_label.setText(format_wall_clock_from_ms(self.get_comparison_time()))
-        self.time_label.setStyleSheet('color: #bbbbbb')
+        self.time_label.setStyleSheet(f'color: {var_map['split-color']}')
 
         self.current_time_ms = 0
         self.current_segment_ms = 0

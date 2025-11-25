@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QLabel, QSizePolicy, QVBoxLayout, QFrame
+from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QFrame
 from PySide6.QtCore import Slot, Qt
 
 from helpers.TimerFormat import format_wall_clock_from_ms
@@ -11,7 +11,7 @@ class TimerWidget(QFrame):
         self.layout = QVBoxLayout()
 
         self.main_timer_label = QLabel("00.000", self)
-        self.main_timer_label.setObjectName('TimeLabel')
+        self.main_timer_label.setObjectName('TimerLabel')
         self.main_timer_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.layout.addStretch(0)

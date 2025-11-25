@@ -53,6 +53,10 @@ QLineEdit {
     border-radius: 2px;
 }
 
+QLineEdit:focus {
+    border: 1px solid #aaaaaa;
+}
+
 QSpinBox {
     color: $button-text-color;
     background-color: $button-background-color;
@@ -105,6 +109,10 @@ QComboBox::down-arrow {
 QComboBox::drop-down {
     background-color: transparent;
     border: none;
+}
+
+QComboBox:focus {
+    border: 1px solid #aaaaaa;
 }
 
 QTimeEdit {
@@ -224,7 +232,7 @@ QTabBar::tab:!selected {
     border-top: 1px solid $border-color;
     border-left: none;
     border-right: none;
-    color: $text-color;
+    color: $timer-color;
 }
 
 #TimerStatsWidget {
@@ -235,36 +243,36 @@ QTabBar::tab:!selected {
     color: $text-color;
 }
 
-#TimeLabel {
+#TimerLabel {
     border-bottom: none;
     border-top: none;
     border-left: none;
     border-right: none;
     font-size: $timer-size;
     font-family: $timer-font;
-    color: $text-color;
+    color: $timer-color;
 }
 
 #SingleSplit {
     background-color: $split-background;
-    color: $text-color;
+    color: $split-color;
 }
 
 #SingleSplit[selected="true"] {
     background-color: $current-split-background;
-    color: $text-color;
+    color: $split-color;
 }
 
 #SingleSplit QLabel {
-    color: $text-color;
+    color: $split-color;
     font-family: $split-font;
-    font-size: $split-font-size;
+    font-size: $split-size;
     background-color: $split-background;
 }
 
 #SingleSplit[selected="true"] QLabel {
     background-color: $current-split-background;
-    color: $text-color;
+    color: $split-color;
 }
 
 #TitleFrame {
@@ -274,29 +282,32 @@ QTabBar::tab:!selected {
     border-right: none;
 }
 
-#TitleFrame QLabel {
-    font-family: $title-font;
-    color: $text-color;
-}
-
 #TitleFrame #TitleLabel {
     qproperty-alignment: AlignCenter;
+    font-family: $title-font;
     font-size: $title-size;
+    color: $title-color;
 }
 
 #TitleFrame #SubLabel {
     qproperty-alignment: AlignCenter;
+    font-family: $subtitle-font;
     font-size: $subtitle-size;
+    color: $subtitle-color;
 }
 
 #TitleFrame #sessionAttemptsLabel {
     qproperty-alignment: AlignLeft;
+    font-family: $subtitle-font;
     font-size: $subtitle-size;
+    color: $subtitle-color;
 }
 
 #TitleFrame #lifetimeAttemptsLabel {
     qproperty-alignment: AlignRight;
+    font-family: $subtitle-font;
     font-size: $subtitle-size;
+    color: $subtitle-color;
 }
 
 #KeyReassignmentLine {

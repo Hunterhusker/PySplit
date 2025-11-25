@@ -122,29 +122,47 @@ class _TextSettings(QGroupBox):
         var_map = self.main.configurator.style.variable_map
 
         self.titleFontPicker = FontPicker('Title Font: ', var_map['title-font'], var_map['title-size'])
+        self.titleColorPicker = ColorPicker('Title Color: ', QColor(var_map['title-color']), parent=parent)
+
         self.subtitleFontPicker = FontPicker('Sub-Title Font: ', var_map['subtitle-font'], var_map['subtitle-size'])
-        self.splitFontPicker = FontPicker('Split Font: ', var_map['split-font'], var_map['split-font-size'])
+        self.subtitleColorPicker = ColorPicker('Sub-Title Color: ', QColor(var_map['subtitle-color']), parent=parent)
+
+        self.splitFontPicker = FontPicker('Split Font: ', var_map['split-font'], var_map['split-size'])
+        self.splitColorPicker = ColorPicker('Split Color: ', QColor(var_map['split-color']), parent=parent)
+
         self.timerFontPicker = FontPicker('Timer Font: ', var_map['timer-font'], var_map['timer-size'])
+        self.timerColorPicker = ColorPicker('Timer Color: ', QColor(var_map['timer-color']), parent=parent)
 
         self.layout.addWidget(self.titleFontPicker)
+        self.layout.addWidget(self.titleColorPicker)
+
         self.layout.addWidget(self.subtitleFontPicker)
+        self.layout.addWidget(self.subtitleColorPicker)
+
         self.layout.addWidget(self.splitFontPicker)
+        self.layout.addWidget(self.splitColorPicker)
+
         self.layout.addWidget(self.timerFontPicker)
+        self.layout.addWidget(self.timerColorPicker)
 
     def apply(self):
         var_map = copy.deepcopy(self.main.configurator.style.variable_map)
 
         var_map['title-font'] = self.titleFontPicker.get_font_family()
         var_map['title-size'] = f'{self.titleFontPicker.get_size()}px'
+        var_map['title-color'] = self.titleColorPicker.color_name
 
         var_map['subtitle-font'] = self.subtitleFontPicker.get_font_family()
         var_map['subtitle-size'] = f'{self.subtitleFontPicker.get_size()}px'
+        var_map['subtitle-color'] = self.subtitleColorPicker.color_name
 
         var_map['split-font'] = self.splitFontPicker.get_font_family()
-        var_map['split-font-size'] = f'{self.splitFontPicker.get_size()}px'
+        var_map['split-size'] = f'{self.splitFontPicker.get_size()}px'
+        var_map['split-color'] = self.splitColorPicker.color_name
 
         var_map['timer-font'] = self.timerFontPicker.get_font_family()
         var_map['timer-size'] = f'{self.timerFontPicker.get_size()}px'
+        var_map['timer-color'] = self.timerColorPicker.color_name
 
         self.main.configurator.style.update_style(var_map=var_map)
 
@@ -173,12 +191,14 @@ class _TimingSettings(QGroupBox):
 
 class _FooterSettings(QGroupBox):
     def __init__(self, main: 'Main', parent=None):
-        super().__init__('Timing Settings')
-
-        # TODO : Make the footer so I can configure it
+        super().__init__('Footer Settings')
 
         self.layout = QVBoxLayout(self)
         self.main = main
+
+        self.todo = QLabel('Gotta make the footer first eh?')
+
+        self.layout.addWidget(self.todo)
 
     def apply(self):
         pass
