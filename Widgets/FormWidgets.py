@@ -173,7 +173,7 @@ class ColorPicker(QFrame):
 
 
 class FontPicker(QFrame):
-    def __init__(self, label: str, font: str, size: int):
+    def __init__(self, label: str, font_family: str, size: int):
         super().__init__()
 
         self.layout = QHBoxLayout()
@@ -181,20 +181,26 @@ class FontPicker(QFrame):
         self.label = QLabel(label)
         self.layout.addWidget(self.label)
 
+        if isinstance(size, str):
+            size = int(size.strip('px'))
+
         self.size = NoScrollQSpinBox()
         self.size.setRange(6, 72)
         self.size.setValue(size)
         self.layout.addWidget(self.size)
 
-        self.font = QFontComboBox()
-        self.font.setCurrentText(font)
-        self.layout.addWidget(self.font)
+        self.font_combobox = QFontComboBox()
+        if font_family != '':
+            self.font_combobox.setCurrentText(font_family)
+        else:
+            self.font_combobox.setCurrentText(self.font().family())
+        self.layout.addWidget(self.font_combobox)
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
 
     def get_font(self):
-        return self.font.currentFont()
+        return self.font_combobox.currentFont()
 
     def get_font_family(self):
         return self.get_font().family()

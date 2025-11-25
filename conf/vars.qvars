@@ -4,14 +4,14 @@ accent-background:#323232
 split-background:#323232
 current-split-background:#4c5052
 text-color:#bbbbbb
-timer-size:24px
-subtitle-size:12px
-title-size:14px
 title-font:
+title-size:14px
 subtitle-font:
+subtitle-size:12px
 timer-font:
-split-font:Classic Console
-split-font-size:25px
+timer-size:24px
+split-font:
+split-font-size:14px
 best-time-color-ahead:#ffffd700
 best-time-color-behind:#ffdaa520
 saved-time-color-ahead:#ff008000
@@ -30,4 +30,3 @@ border-color:#bbbbbb
 button-background-color:#4c5052
 button-border-color:#616769
 button-text-color:#a3a4ab
-main-font:Classic Console
