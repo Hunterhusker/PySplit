@@ -22,6 +22,7 @@ class BasicSettingsTab(ABCSettingTab):
 
         self.scroll_widget = QWidget()
         self.scroll_widget_layout = QVBoxLayout()
+        self.scroll_widget_layout.setSpacing(20)
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
