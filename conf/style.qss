@@ -241,6 +241,7 @@ QTabBar::tab:!selected {
     border-left: none;
     border-right: none;
     font-size: $timer-size;
+    font-family: $timer-font;
     color: $text-color;
 }
 

@@ -29,12 +29,14 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
-        self.color_group = _AppearanceSettings(self.main, parent=self)
+        self.text_group = _TextSettings(self.main, parent=self)
+        self.color_group = _ColorSettings(self.main, parent=self)
         self.app_settings = _AppSettings(self.main, parent=self)
         self.timing_settings = _TimingSettings(self.main, parent=self)
         self.footer_settings = _FooterSettings(self.main, parent=self)
 
         # add all the groups into the scroll
+        self.scroll_widget_layout.addWidget(self.text_group)
         self.scroll_widget_layout.addWidget(self.color_group)
         self.scroll_widget_layout.addWidget(self.app_settings)
         self.scroll_widget_layout.addWidget(self.timing_settings)
@@ -54,12 +56,13 @@ class BasicSettingsTab(ABCSettingTab):
         self.setObjectName('SettingLine')  # set the object name here so it uses the right QSS
 
     def apply(self):
-        self.color_group.apply()
+        for i in range(self.scroll_widget_layout.count() - 1):  # -1 so we don't apply on the stretch
+            self.scroll_widget_layout.itemAt(i).widget().apply()  # for each thing added to the layout, run the apply method on them
 
 
-class _AppearanceSettings(QGroupBox):
+class _ColorSettings(QGroupBox):
     def __init__(self, main: 'Main', parent=None):
-        super().__init__('Appearance', parent)
+        super().__init__('Color', parent)
 
         self.layout = QVBoxLayout(self)
         self.main = main
@@ -80,8 +83,7 @@ class _AppearanceSettings(QGroupBox):
         self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor(var_map['lost-time-color-ahead']), parent=self)
         self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']), parent=self)
 
-        self.titleFontPicker = FontPicker('Title Font: ', var_map['title-font'], 12)
-
+        # add in the colors
         self.layout.addWidget(self.backgroundColorPicker)
         self.layout.addWidget(self.splitBackgroundColorPicker)
         self.layout.addWidget(self.currentSplitBackgroundColorPicker)
@@ -91,7 +93,6 @@ class _AppearanceSettings(QGroupBox):
         self.layout.addWidget(self.savedTimeBehindPicker)
         self.layout.addWidget(self.lostTimeAheadPicker)
         self.layout.addWidget(self.lostTimeBehindPicker)
-        self.layout.addWidget(self.titleFontPicker)
 
     def apply(self):
         var_map = copy.deepcopy(self.main.configurator.style.variable_map)
@@ -108,9 +109,42 @@ class _AppearanceSettings(QGroupBox):
         var_map['lost-time-color-ahead'] = self.lostTimeAheadPicker.color_name
         var_map['lost-time-color-behind'] = self.lostTimeBehindPicker.color_name
 
-        # apply the fonts
+        self.main.configurator.style.update_style(var_map=var_map)
+
+
+class _TextSettings(QGroupBox):
+    def __init__(self, main: 'Main', parent=None):
+        super().__init__('Text')
+
+        self.layout = QVBoxLayout(self)
+        self.main = main
+
+        var_map = self.main.configurator.style.variable_map
+
+        self.titleFontPicker = FontPicker('Title Font: ', var_map['title-font'], var_map['title-size'])
+        self.subtitleFontPicker = FontPicker('Sub-Title Font: ', var_map['subtitle-font'], var_map['subtitle-size'])
+        self.splitFontPicker = FontPicker('Split Font: ', var_map['split-font'], var_map['split-font-size'])
+        self.timerFontPicker = FontPicker('Timer Font: ', var_map['timer-font'], var_map['timer-size'])
+
+        self.layout.addWidget(self.titleFontPicker)
+        self.layout.addWidget(self.subtitleFontPicker)
+        self.layout.addWidget(self.splitFontPicker)
+        self.layout.addWidget(self.timerFontPicker)
+
+    def apply(self):
+        var_map = copy.deepcopy(self.main.configurator.style.variable_map)
+
         var_map['title-font'] = self.titleFontPicker.get_font_family()
         var_map['title-size'] = f'{self.titleFontPicker.get_size()}px'
+
+        var_map['subtitle-font'] = self.subtitleFontPicker.get_font_family()
+        var_map['subtitle-size'] = f'{self.subtitleFontPicker.get_size()}px'
+
+        var_map['split-font'] = self.splitFontPicker.get_font_family()
+        var_map['split-font-size'] = f'{self.splitFontPicker.get_size()}px'
+
+        var_map['timer-font'] = self.timerFontPicker.get_font_family()
+        var_map['timer-size'] = f'{self.timerFontPicker.get_size()}px'
 
         self.main.configurator.style.update_style(var_map=var_map)
 
@@ -120,6 +154,7 @@ class _AppSettings(QGroupBox):
         super().__init__('App Settings')
 
         self.layout = QVBoxLayout(self)
+        self.main = main
 
     def apply(self):
         pass
@@ -130,6 +165,7 @@ class _TimingSettings(QGroupBox):
         super().__init__('Timing Settings')
 
         self.layout = QVBoxLayout(self)
+        self.main = main
 
     def apply(self):
         pass
@@ -142,6 +178,7 @@ class _FooterSettings(QGroupBox):
         # TODO : Make the footer so I can configure it
 
         self.layout = QVBoxLayout(self)
+        self.main = main
 
     def apply(self):
         pass
