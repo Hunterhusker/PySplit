@@ -241,13 +241,12 @@ QTabBar::tab:!selected {
     border-left: none;
     border-right: none;
     font-size: $timer-size;
-    color: $text-color
+    color: $text-color;
 }
 
 #SingleSplit {
     background-color: $split-background;
     color: $text-color;
-    font-size: $split-font-size;
 }
 
 #SingleSplit[selected="true"] {
@@ -258,6 +257,7 @@ QTabBar::tab:!selected {
 #SingleSplit QLabel {
     color: $text-color;
     font-family: $split-font;
+    font-size: $split-font-size;
     background-color: $split-background;
 }
 

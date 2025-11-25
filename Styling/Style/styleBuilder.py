@@ -90,9 +90,9 @@ class StyleBuilder(QObject):
     def format_style(self):
         tmp = copy.deepcopy(self.raw_style_sheet)
 
-        # replace all the colors
+        # replace all the vars
         for k, v in self.variable_map.items():
-            tmp = tmp.replace('$' + k, v)
+            tmp = tmp.replace('$' + k + ';', v + ';')  # fixed bug where it would replace partial matches
 
         self.formatted_style_sheet = tmp
 

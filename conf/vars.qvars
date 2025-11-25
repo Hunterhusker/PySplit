@@ -11,7 +11,7 @@ title-font:
 subtitle-font:
 timer-font:
 split-font:Classic Console
-split-font-size:40px
+split-font-size:25px
 best-time-color-ahead:#ffffd700
 best-time-color-behind:#ffdaa520
 saved-time-color-ahead:#ff008000
