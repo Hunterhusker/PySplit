@@ -1,19 +1,25 @@
-// vars for the widget itself
-primary-background:#2b2b2b
+primary-background:#ff2b2b2b
+background-image:none
 accent-background:#323232
-split-background:#323232
-current-split-background:#4c5052
+split-background:#ff323232
+current-split-background:#ff4c5052
 text-color:#bbbbbb
-title-font:
+title-font:Ubuntu
 title-size:14px
 title-color:#ffbbbbbb
-subtitle-font:
+subtitle-font:Ubuntu
 subtitle-size:12px
 subtitle-color:#ffbbbbbb
-timer-font:
+session-attempts-font:
+session-attempts-size:12px
+session-attempts-color:#ffbbbbbb
+lifetime-attempts-font:
+lifetime-attempts-size:12px
+lifetime-attempts-color:#ffbbbbbb
+timer-font:Ubuntu
 timer-size:24px
 timer-color:#ffbbbbbb
-split-font:
+split-font:Ubuntu
 split-size:14px
 split-color:#ffbbbbbb
 best-time-color-ahead:#ffffd700
@@ -23,8 +29,6 @@ saved-time-color-behind:#ff008000
 lost-time-color-ahead:#ffff0000
 lost-time-color-behind:#ffff0000
 border-color:#ffbbbbbb
-
-// vars for the application
 app-background:#2b2b2b
 app-accent-background:#323232
 app-text-color:#bbbbbb

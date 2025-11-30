@@ -27,7 +27,9 @@ QTabWidget::Pane {
 
 #MainWindow {
     background-color: $primary-background;
+    border-image: $background-image;
     /*border-image: url("/home/hunter/Pictures/Backgrounds/dbpg16g-d0814f5c-4142-4dbb-b50d-f22e0fe1e103.jpg") 0 0 0 0 stretch stretch;*/
+    /*border-image: none;*/
 }
 
 QDialog {
@@ -321,16 +323,16 @@ QCheckBox::indicator:checked {
 
 #TitleFrame #sessionAttemptsLabel {
     qproperty-alignment: AlignLeft;
-    font-family: $subtitle-font;
-    font-size: $subtitle-size;
-    color: $subtitle-color;
+    font-family: $session-attempts-font;
+    font-size: $session-attempts-size;
+    color: $session-attempts-color;
 }
 
 #TitleFrame #lifetimeAttemptsLabel {
     qproperty-alignment: AlignRight;
-    font-family: $subtitle-font;
-    font-size: $subtitle-size;
-    color: $subtitle-color;
+    font-family: $lifetime-attempts-font;
+    font-size: $lifetime-attempts-size;
+    color: $lifetime-attempts-color;
 }
 
 #KeyReassignmentLine {
