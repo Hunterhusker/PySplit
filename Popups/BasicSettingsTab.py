@@ -7,6 +7,8 @@ from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, 
     QGroupBox, QColorDialog, QPushButton, QCheckBox
 from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
+
+from Models.Game import Game
 from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener
 
 from Popups.ABCSettingTab import ABCSettingTab
@@ -62,7 +64,7 @@ class BasicSettingsTab(ABCSettingTab):
 
 class _ColorSettings(QGroupBox):
     def __init__(self, main: 'Main', parent=None):
-        super().__init__('Color', parent)
+        super().__init__('Color Settings', parent)
 
         self.layout = QVBoxLayout(self)
         self.main = main
@@ -117,7 +119,7 @@ class _ColorSettings(QGroupBox):
 
 class _TextSettings(QGroupBox):
     def __init__(self, main: 'Main', parent=None):
-        super().__init__('Text')
+        super().__init__('Text Settings')
 
         self.layout = QVBoxLayout(self)
         self.main = main
@@ -177,16 +179,22 @@ class _AppSettings(QGroupBox):
         self.layout = QVBoxLayout(self)
         self.main = main
 
-        self.checkBox = QCheckBox('Enable Advanced Styling')
-        self.checkBox.setFixedHeight(40)
-        self.layout.addWidget(self.checkBox)
+        self.checkbox = QCheckBox('Enable Advanced Styling')
+        self.checkbox.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
+        self.layout.addWidget(self.checkbox)
 
-        self.test = FileDialogOpener('testLbl')
-        self.layout.addWidget(self.test)
+        # self.theme_file_chooser = FileDialogOpener('Theme File: ')
+        # self.layout.addWidget(self.theme_file_chooser)
+
+        self.splits_file_chooser = FileDialogOpener('Splits File: ')
+        self.layout.addWidget(self.splits_file_chooser)
 
     def apply(self):
         # show / hide the advanced tab
-        self.main.settings_window.set_tab_visibility('Advanced', self.checkBox.isChecked())
+        self.main.settings_window.set_tab_visibility('Advanced', self.checkbox.isChecked())
+
+        self.main.configurator.game.update_from_file(self.splits_file_chooser.file_path)
+        self.main.configurator.game.GameUpdated.emit(self.main.configurator.game)
 
 
 class _TimingSettings(QGroupBox):

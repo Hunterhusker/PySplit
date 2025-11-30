@@ -77,6 +77,58 @@ class Game(QObject):
 
         return cls.from_json_str(data)  # make it with the JSON string in the file
 
+    def update_from_json(self, json_dict: dict) -> Game:
+        """
+        Updates the game object from JSON
+        Args:
+            json_dict: (dict) the JSON representation of the game
+        """
+        self.title = json_dict['title']
+        self.sub_title = json_dict['sub_title']
+        self.lifetime_attempts = json_dict['lifetime_attempts']
+        self.session_attempts = json_dict.get('session_attempts', 0)
+
+        prev_pb_segment_total_ms = 0
+        prev_gold_segment_total_ms = 0
+
+        # build the splits from the JSON in the game dictionary
+        splits = []
+        for split in json_dict['splits']:
+            new_split = Split.from_json(split, prev_pb_segment_total_ms, prev_gold_segment_total_ms)
+
+            prev_pb_segment_total_ms = new_split.pb_segment_total_ms
+            prev_gold_segment_total_ms = new_split.gold_segment_total_ms
+
+            splits.append(new_split)
+
+        self.splits = splits
+
+    def update_from_str(self, json_str: str) -> Game:
+        """
+        Builds a Game object from a string-JSON of the game
+        Args:
+            json_str: (str) the JSON that defines the game as a string
+
+        Returns:
+            (Game) the Game object that the JSON string defined
+        """
+        json_dict = json.loads(json_str)
+        self.update_from_json(json_dict)
+
+    def update_from_file(self, file_path: str) -> Game:
+        """
+        Read the JSON as a string from a file, and then make it into a Game
+        Args:
+            file_path: (str) the path to the file containing the JSON for the Game
+
+        Returns:
+            (Game) the game object outlined in the JSON file
+        """
+        with open(file_path, 'r') as f:  # read the JSON string from the file
+            data = f.read()
+
+        self.update_from_str(data)
+
     def to_dict(self):
         """
         Builds the Game object into a dictionary for use elsewhere

@@ -48,9 +48,9 @@ class Main(QWidget):
 
         # load the settings from the file
         self.configurator = Settings('conf/settings.json')
-        self.game = Game.from_json_file(self.configurator.settings['game_path'])
+        #self.game = Game.from_json_file(self.configurator.settings['game_path'])
 
-        self.title = TitleWidget.from_game(self.game)
+        self.title = TitleWidget.from_game(self.configurator.game)
 
         self.main_timer_widget = TimerWidget()
 
@@ -70,7 +70,7 @@ class Main(QWidget):
         # use the configurations from the file
         self.configurator.style.UpdateStyle.connect(self.set_style)
 
-        self.splits = SplitsWidget(self.game, parent=self)
+        self.splits = SplitsWidget(self.configurator.game, parent=self)
         self.splitStats = TimeStatsWidget()
 
         layout.addWidget(self.title)
@@ -107,14 +107,14 @@ class Main(QWidget):
         self.splits.SplitFinish.connect(self.game_timer.stop_timer)
         self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
-        self.game.GameUpdated.connect(self.splits.load_splits_from_game)
-        self.game.GameUpdated.connect(self.title.update_from_game)
+        self.configurator.game.GameUpdated.connect(self.splits.load_splits_from_game)
+        self.configurator.game.GameUpdated.connect(self.title.update_from_game)
 
         self.settings_window = SettingsWindow(parent=self)
         self.settings_window.setGeometry(900, 900, 600, 400)
         self.settings_window.setMinimumSize(600, 400)
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
-        self.settings_window.add_tab(GameSettingsTab(self.game, mainWindow=self), 'Splits')
+        self.settings_window.add_tab(GameSettingsTab(self.configurator.game, mainWindow=self), 'Splits')
         self.settings_window.add_tab(AdvancedStyleTab(mainWindow=self), 'Advanced')
         self.settings_window.add_tab(BasicSettingsTab(mainWindow=self), 'Settings')
 
@@ -194,7 +194,7 @@ class Main(QWidget):
 
         if result == QMessageBox.StandardButton.Yes:
             self.configurator.write_settings()
-            self.game.to_json_file(self.configurator.settings['game_path'])
+            self.configurator.game.to_json_file(self.configurator.settings['game_path'])
 
         # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
