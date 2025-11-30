@@ -149,48 +149,56 @@ class _TextSettings(QGroupBox):
 
         var_map = self.main.configurator.style.variable_map
 
-        self.titleFontPicker = FontPicker('Title Font: ', var_map['title-font'], var_map['title-size'])
-        self.titleColorPicker = ColorPicker('Title Color: ', QColor(var_map['title-color']), parent=parent)
+        self.title_font_picker = FontPicker('Title Font: ', var_map['title-font'], var_map['title-size'])
+        self.title_color_picker = ColorPicker('Title Color: ', QColor(var_map['title-color']), parent=parent)
+        self.layout.addWidget(self.title_font_picker)
+        self.layout.addWidget(self.title_color_picker)
 
-        self.subtitleFontPicker = FontPicker('Sub-Title Font: ', var_map['subtitle-font'], var_map['subtitle-size'])
-        self.subtitleColorPicker = ColorPicker('Sub-Title Color: ', QColor(var_map['subtitle-color']), parent=parent)
+        self.subtitle_font_picker = FontPicker('Sub-Title Font: ', var_map['subtitle-font'], var_map['subtitle-size'])
+        self.subtitle_color_picker = ColorPicker('Sub-Title Color: ', QColor(var_map['subtitle-color']), parent=parent)
+        self.layout.addWidget(self.subtitle_font_picker)
+        self.layout.addWidget(self.subtitle_color_picker)
 
-        self.splitFontPicker = FontPicker('Split Font: ', var_map['split-font'], var_map['split-size'])
-        self.splitColorPicker = ColorPicker('Split Color: ', QColor(var_map['split-color']), parent=parent)
+        self.attempts_font_picker = FontPicker('Attempts Font: ', var_map['attempts-font'], var_map['attempts-size'])
+        self.session_attempts_color_picker = ColorPicker('Session Attempts Color: ', QColor(var_map['session-attempts-color']), parent=parent)
+        self.lifetime_attempts_color_picker = ColorPicker('Lifetime Attempts Color: ', QColor(var_map['lifetime-attempts-color']), parent=parent)
+        self.layout.addWidget(self.attempts_font_picker)
+        self.layout.addWidget(self.session_attempts_color_picker)
+        self.layout.addWidget(self.lifetime_attempts_color_picker)
 
-        self.timerFontPicker = FontPicker('Timer Font: ', var_map['timer-font'], var_map['timer-size'])
-        self.timerColorPicker = ColorPicker('Timer Color: ', QColor(var_map['timer-color']), parent=parent)
+        self.split_font_picker = FontPicker('Split Font: ', var_map['split-font'], var_map['split-size'])
+        self.split_color_picker = ColorPicker('Split Color: ', QColor(var_map['split-color']), parent=parent)
+        self.layout.addWidget(self.split_font_picker)
+        self.layout.addWidget(self.split_color_picker)
 
-        self.layout.addWidget(self.titleFontPicker)
-        self.layout.addWidget(self.titleColorPicker)
-
-        self.layout.addWidget(self.subtitleFontPicker)
-        self.layout.addWidget(self.subtitleColorPicker)
-
-        self.layout.addWidget(self.splitFontPicker)
-        self.layout.addWidget(self.splitColorPicker)
-
-        self.layout.addWidget(self.timerFontPicker)
-        self.layout.addWidget(self.timerColorPicker)
+        self.timer_font_picker = FontPicker('Timer Font: ', var_map['timer-font'], var_map['timer-size'])
+        self.timer_color_picker = ColorPicker('Timer Color: ', QColor(var_map['timer-color']), parent=parent)
+        self.layout.addWidget(self.timer_font_picker)
+        self.layout.addWidget(self.timer_color_picker)
 
     def apply(self):
         var_map = copy.deepcopy(self.main.configurator.style.variable_map)
 
-        var_map['title-font'] = self.titleFontPicker.get_font_family()
-        var_map['title-size'] = f'{self.titleFontPicker.get_size()}px'
-        var_map['title-color'] = self.titleColorPicker.color_name
+        var_map['title-font'] = self.title_font_picker.get_font_family()
+        var_map['title-size'] = f'{self.title_font_picker.get_size()}px'
+        var_map['title-color'] = self.title_color_picker.color_name
 
-        var_map['subtitle-font'] = self.subtitleFontPicker.get_font_family()
-        var_map['subtitle-size'] = f'{self.subtitleFontPicker.get_size()}px'
-        var_map['subtitle-color'] = self.subtitleColorPicker.color_name
+        var_map['subtitle-font'] = self.subtitle_font_picker.get_font_family()
+        var_map['subtitle-size'] = f'{self.subtitle_font_picker.get_size()}px'
+        var_map['subtitle-color'] = self.subtitle_color_picker.color_name
 
-        var_map['split-font'] = self.splitFontPicker.get_font_family()
-        var_map['split-size'] = f'{self.splitFontPicker.get_size()}px'
-        var_map['split-color'] = self.splitColorPicker.color_name
+        var_map['attempts-font'] = self.attempts_font_picker.get_font_family()
+        var_map['attempts-size'] = f'{self.attempts_font_picker.get_size()}px'
+        var_map['session-attempts-color'] = self.session_attempts_color_picker.color_name
+        var_map['lifetime-attempts-color'] = self.lifetime_attempts_color_picker.color_name
 
-        var_map['timer-font'] = self.timerFontPicker.get_font_family()
-        var_map['timer-size'] = f'{self.timerFontPicker.get_size()}px'
-        var_map['timer-color'] = self.timerColorPicker.color_name
+        var_map['split-font'] = self.split_font_picker.get_font_family()
+        var_map['split-size'] = f'{self.split_font_picker.get_size()}px'
+        var_map['split-color'] = self.split_color_picker.color_name
+
+        var_map['timer-font'] = self.timer_font_picker.get_font_family()
+        var_map['timer-size'] = f'{self.timer_font_picker.get_size()}px'
+        var_map['timer-color'] = self.timer_color_picker.color_name
 
         self.main.configurator.style.update_style(var_map=var_map)
 
