@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Signal
 import json
 
+from Models.Game import Game
 from Styling.Style.styleBuilder import StyleBuilder
 
 
@@ -16,6 +17,7 @@ class Settings(QObject):
 
         # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
         self.style = StyleBuilder(self.settings['style_path'], self.settings['var_path'])
+        self.game = Game.from_json_file(self.settings['game_path'])
 
     def write_settings(self):
         """

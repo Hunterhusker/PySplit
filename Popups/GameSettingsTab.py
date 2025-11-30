@@ -73,7 +73,7 @@ class GameSettingsTab(ABCSettingTab):
         self.scroll_widget_layout.addWidget(self.splits_group)
 
         # import the splits to their layout
-        self.import_splits(self.game, self.split_area)
+        self.import_splits(self.game)
 
         # add a stretch to keep stuff sized right
         self.scroll_widget_layout.addStretch()
@@ -90,8 +90,26 @@ class GameSettingsTab(ABCSettingTab):
 
         # make our connections now that everything is displayed
         self.add_button.clicked.connect(self.addEmptySplit)
+        self.main.configurator.game.GameUpdated.connect(self.update_self)
 
-    def import_splits(self, game: Game, container: QBoxLayout):
+    def update_self(self, game: Game):
+        """
+        Updates itself with the given game object to show the data that it should
+
+        Args:
+            game: (Models.Game) The game object that got updated
+        """
+        self.game = game
+
+        self.title_input.input.setText(game.title)
+        self.sub_title_input.input.setText(game.sub_title)
+        self.lifetime_attempts_input.input.setValue(game.lifetime_attempts)
+        self.session_attempts_input.input.setValue(game.session_attempts)
+
+        self.clear_splits()
+        self.import_splits(self.game)
+
+    def import_splits(self, game: Game):
         """
         Generates a set of splits from the information in the main window
 
@@ -104,7 +122,16 @@ class GameSettingsTab(ABCSettingTab):
         """
         for split in game.splits:
             new_split = SplitLine(split, parent=self)
-            container.addWidget(new_split)
+            self.split_area.addWidget(new_split)
+
+    def clear_splits(self):
+        """
+        Removes all the splits from the edit screen
+        """
+        for i in range(self.split_area.count()):
+            split = self.split_area.itemAt(i).widget()
+
+            self.remove_split(split)
 
     def exportSplits(self):
         """
