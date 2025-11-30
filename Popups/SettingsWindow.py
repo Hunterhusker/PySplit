@@ -46,6 +46,10 @@ class SettingsWindow(QDialog):
         visible = self.tabs.isTabVisible(idx)
         self.tabs.setTabVisible(idx, not visible)
 
+    def set_tab_visibility(self, name, visible):
+        idx = self.get_tab_index(name)
+        self.tabs.setTabVisible(idx, visible)
+
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
             # Ignore Return/Enter to prevent dialog accept

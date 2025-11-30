@@ -227,6 +227,12 @@ QTabBar::tab:!selected {
     margin-top: 2px; /* makes the unselected tabs look smaller */
 }
 
+QCheckBox {
+    background: $app-accent-background;
+    border-radius: 2px;
+    padding-left: 10px;
+}
+
 QCheckBox::indicator {
     width: 14px;
     height: 14px;
