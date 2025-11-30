@@ -247,10 +247,8 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox::indicator:checked {
-    /*image: url(Static/down_arrow.svg);*/
     image: url(Static/checked.svg);
 }
-
 
 #TimerFrame {
     border-bottom: 1px solid $border-color;
