@@ -5,10 +5,10 @@ import copy
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPlainTextEdit, QFrame, QLabel, \
-    QGroupBox, QColorDialog, QPushButton
+    QGroupBox, QColorDialog, QPushButton, QCheckBox
 from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
-from Widgets.FormWidgets import ColorPicker, FontPicker, LabeledSpinBox
+from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener
 
 from Popups.ABCSettingTab import ABCSettingTab
 
@@ -30,16 +30,16 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
+        self.app_settings = _AppSettings(self.main, parent=self)
         self.text_group = _TextSettings(self.main, parent=self)
         self.color_group = _ColorSettings(self.main, parent=self)
-        self.app_settings = _AppSettings(self.main, parent=self)
         self.timing_settings = _TimingSettings(self.main, parent=self)
         self.footer_settings = _FooterSettings(self.main, parent=self)
 
         # add all the groups into the scroll
+        self.scroll_widget_layout.addWidget(self.app_settings)
         self.scroll_widget_layout.addWidget(self.text_group)
         self.scroll_widget_layout.addWidget(self.color_group)
-        self.scroll_widget_layout.addWidget(self.app_settings)
         self.scroll_widget_layout.addWidget(self.timing_settings)
         self.scroll_widget_layout.addWidget(self.footer_settings)
 
@@ -71,6 +71,7 @@ class _ColorSettings(QGroupBox):
         var_map = self.main.configurator.style.variable_map
 
         self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
+        self.separatorColorPicker = ColorPicker('Separator: ', QColor(var_map['border-color']), parent=self)
 
         self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor(var_map['split-background']), parent=self)
         self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ', QColor(var_map['current-split-background']), parent=self)
@@ -86,6 +87,7 @@ class _ColorSettings(QGroupBox):
 
         # add in the colors
         self.layout.addWidget(self.backgroundColorPicker)
+        self.layout.addWidget(self.separatorColorPicker)
         self.layout.addWidget(self.splitBackgroundColorPicker)
         self.layout.addWidget(self.currentSplitBackgroundColorPicker)
         self.layout.addWidget(self.bestTimeAheadPicker)
@@ -99,6 +101,7 @@ class _ColorSettings(QGroupBox):
         var_map = copy.deepcopy(self.main.configurator.style.variable_map)
 
         var_map['primary-background'] = self.backgroundColorPicker.color_name
+        var_map['border-color'] = self.separatorColorPicker.color_name
         var_map['split-background'] = self.splitBackgroundColorPicker.color_name
         var_map['current-split-background'] = self.currentSplitBackgroundColorPicker.color_name
 
@@ -174,6 +177,12 @@ class _AppSettings(QGroupBox):
 
         self.layout = QVBoxLayout(self)
         self.main = main
+
+        self.checkBox = QCheckBox('test')
+        self.layout.addWidget(self.checkBox)
+
+        self.test = FileDialogOpener('testLbl')
+        self.layout.addWidget(self.test)
 
     def apply(self):
         pass

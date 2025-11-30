@@ -1,5 +1,6 @@
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, QFontComboBox
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
+    QFontComboBox, QPushButton, QFileDialog, QStyle
 from PySide6.QtCore import Qt, Signal, QTime
 
 from helpers.ColorHelpers import *
@@ -219,3 +220,35 @@ class FontPicker(QFrame):
 
     def get_size(self):
         return self.size_spinner.value()
+
+
+class FileDialogOpener(QFrame):
+    def __init__(self, label: str, file_path: str = ''):
+        super().__init__()
+
+        self.file_path = file_path
+
+        self.layout = QHBoxLayout()
+
+        self.label = QLabel(label)
+        self.layout.addWidget(self.label)
+
+        self.file_path_label = QLineEdit(file_path if len(file_path) != 0 else '...')
+        self.file_path_label.setReadOnly(True)
+        self.file_path_label.setFixedSize(250, 25)
+        self.layout.addWidget(self.file_path_label)
+
+        self.open_dialog_button = QPushButton('Choose')
+        self.open_dialog_button.setIcon(self.style().standardIcon(QStyle.SP_FileIcon))
+        self.open_dialog_button.clicked.connect(self.on_click)
+        self.open_dialog_button.setFixedSize(80, 25)
+        self.layout.addWidget(self.open_dialog_button)
+
+        self.setLayout(self.layout)
+        self.setObjectName('SettingLine')
+
+    def on_click(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File")
+        if file_path:
+            self.file_path = file_path
+            self.file_path_label.setText(file_path)
