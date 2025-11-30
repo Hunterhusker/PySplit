@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, \
     QScrollArea, QWidget, QGroupBox, QLabel
 from PySide6.QtCore import Qt, QTime
@@ -26,7 +27,8 @@ class GameSettingsTab(ABCSettingTab):
         # keep a copy of the game settings as our local copy that we can work with without effecting the original
         self.game = game
 
-        self.add_button = QPushButton("+")
+        self.add_button = QPushButton()
+        self.add_button.setIcon(QIcon('Static/add.svg'))
         self.add_button.setFixedSize(25, 25)
 
         self.scroll_widget = QWidget()
@@ -215,8 +217,9 @@ class SplitLine(QFrame):
         self.gold_segment_input.setBaseSize(100, 25)
         self.gold_segment_input.setMinimumSize(100, 25)
 
-        self.remove_button = QPushButton("-")
+        self.remove_button = QPushButton()
         self.remove_button.setBaseSize(25, 25)
+        self.remove_button.setIcon(QIcon('Static/delete.svg'))
         self.remove_button.setMinimumSize(25, 25)
 
         # add them all in one block
