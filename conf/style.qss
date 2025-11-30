@@ -227,6 +227,25 @@ QTabBar::tab:!selected {
     margin-top: 2px; /* makes the unselected tabs look smaller */
 }
 
+QCheckBox::indicator {
+    width: 14px;
+    height: 14px;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+    background: $item-background-color;
+    image:none;
+}
+
+QCheckBox::indicator:checked {
+    image: none;
+}
+
+QCheckBox::indicator:checked {
+    /*image: url(Static/down_arrow.svg);*/
+    image: url(Static/checked.svg);
+}
+
+
 #TimerFrame {
     border-bottom: 1px solid $border-color;
     border-top: 1px solid $border-color;
