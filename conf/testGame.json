@@ -3,7 +3,6 @@
     "sub_title": "Any%",
     "lifetime_attempts": 6,
     "display_pb": true,
-    "start_delay_ms": 0,
     "splits": [
         {
             "split_name": "test1",

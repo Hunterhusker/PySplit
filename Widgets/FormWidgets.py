@@ -1,4 +1,4 @@
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QIcon
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
     QFontComboBox, QPushButton, QFileDialog, QStyle
 from PySide6.QtCore import Qt, Signal, QTime
@@ -223,32 +223,52 @@ class FontPicker(QFrame):
 
 
 class FileDialogOpener(QFrame):
-    def __init__(self, label: str, file_path: str = ''):
+    def __init__(self, label: str, file_path: str = 'none', file_filter=''):
         super().__init__()
 
         self.file_path = file_path
+        self.file_filter = file_filter
 
         self.layout = QHBoxLayout()
 
         self.label = QLabel(label)
         self.layout.addWidget(self.label)
 
-        self.file_path_label = QLineEdit(file_path if len(file_path) != 0 else '...')
+        self.layout.addStretch()
+
+        self.file_path_label = QLineEdit(file_path if len(file_path) != 0 else 'none')
         self.file_path_label.setReadOnly(True)
-        self.file_path_label.setFixedSize(250, 25)
+        self.file_path_label.setFixedSize(200, 25)
         self.layout.addWidget(self.file_path_label)
 
-        self.open_dialog_button = QPushButton('Choose')
-        self.open_dialog_button.setIcon(self.style().standardIcon(QStyle.SP_FileIcon))
-        self.open_dialog_button.clicked.connect(self.on_click)
-        self.open_dialog_button.setFixedSize(80, 25)
+        self.open_dialog_button = QPushButton()
+        self.open_dialog_button.setIcon(QIcon('Static/file_open.svg'))
+        self.open_dialog_button.clicked.connect(self.open_file_click)
+        self.open_dialog_button.setFixedSize(25, 25)
         self.layout.addWidget(self.open_dialog_button)
+
+        self.clear_button = QPushButton()
+        self.clear_button.setIcon(QIcon('Static/delete.svg'))
+        self.clear_button.setFixedSize(25, 25)
+        self.clear_button.clicked.connect(self.clear_file_click)
+        self.layout.addWidget(self.clear_button)
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
 
-    def on_click(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File")
-        if file_path:
+    def open_file_click(self):
+        file_dialog = QFileDialog(self)
+        file_dialog.setWindowTitle('Open File')
+        file_dialog.setNameFilter(self.file_filter)
+        file_dialog.setFileMode(QFileDialog.ExistingFile)
+
+        if file_dialog.exec():
+            file_path = file_dialog.selectedFiles()[0]
+
             self.file_path = file_path
             self.file_path_label.setText(file_path)
+
+    def clear_file_click(self):
+        self.file_path = 'none'
+
+        self.file_path_label.setText(self.file_path)

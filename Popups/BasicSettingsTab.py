@@ -72,30 +72,45 @@ class _ColorSettings(QGroupBox):
         var_map = self.main.configurator.style.variable_map
 
         self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
+        self.layout.addWidget(self.backgroundColorPicker)
+
+        curr = var_map.get('background-image', 'none')
+        if curr != 'none' and '"' in curr:
+            start = curr.index('"') + 1
+            end = curr.rindex('"')
+
+            bg_img_path = curr[start:end]
+        else:
+            bg_img_path = curr
+
+        self.backgroundImagePicker = FileDialogOpener('Background Image: ', file_path=bg_img_path, file_filter="Images (*.png *.jpg *.jpeg *.bmp *.svg)")
+        self.layout.addWidget(self.backgroundImagePicker)
+
         self.separatorColorPicker = ColorPicker('Separator: ', QColor(var_map['border-color']), parent=self)
+        self.layout.addWidget(self.separatorColorPicker)
 
         self.splitBackgroundColorPicker = ColorPicker('Split Background: ', QColor(var_map['split-background']), parent=self)
+        self.layout.addWidget(self.splitBackgroundColorPicker)
+
         self.currentSplitBackgroundColorPicker = ColorPicker('Current Split: ', QColor(var_map['current-split-background']), parent=self)
+        self.layout.addWidget(self.currentSplitBackgroundColorPicker)
 
         self.bestTimeAheadPicker = ColorPicker('Best Time: ', QColor(var_map['best-time-color-ahead']), parent=self)
+        self.layout.addWidget(self.bestTimeAheadPicker)
+
         self.bestTimeBehindPicker = ColorPicker('Best Time (Behind): ', QColor(var_map['best-time-color-behind']), parent=self)
+        self.layout.addWidget(self.bestTimeBehindPicker)
 
         self.savedTimeAheadPicker = ColorPicker('Saved Time: ', QColor(var_map['saved-time-color-ahead']), parent=self)
+        self.layout.addWidget(self.savedTimeAheadPicker)
+
         self.savedTimeBehindPicker = ColorPicker('Saved Time (Behind): ', QColor(var_map['saved-time-color-behind']), parent=self)
+        self.layout.addWidget(self.savedTimeBehindPicker)
 
         self.lostTimeAheadPicker = ColorPicker('Lost Time: ', QColor(var_map['lost-time-color-ahead']), parent=self)
-        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']), parent=self)
-
-        # add in the colors
-        self.layout.addWidget(self.backgroundColorPicker)
-        self.layout.addWidget(self.separatorColorPicker)
-        self.layout.addWidget(self.splitBackgroundColorPicker)
-        self.layout.addWidget(self.currentSplitBackgroundColorPicker)
-        self.layout.addWidget(self.bestTimeAheadPicker)
-        self.layout.addWidget(self.bestTimeBehindPicker)
-        self.layout.addWidget(self.savedTimeAheadPicker)
-        self.layout.addWidget(self.savedTimeBehindPicker)
         self.layout.addWidget(self.lostTimeAheadPicker)
+
+        self.lostTimeBehindPicker = ColorPicker('Lost Time (Behind): ', QColor(var_map['lost-time-color-behind']), parent=self)
         self.layout.addWidget(self.lostTimeBehindPicker)
 
     def apply(self):
@@ -113,6 +128,14 @@ class _ColorSettings(QGroupBox):
         var_map['saved-time-color-behind'] = self.savedTimeBehindPicker.color_name
         var_map['lost-time-color-ahead'] = self.lostTimeAheadPicker.color_name
         var_map['lost-time-color-behind'] = self.lostTimeBehindPicker.color_name
+
+        # url("/home/hunter/Pictures/Backgrounds/dbpg16g-d0814f5c-4142-4dbb-b50d-f22e0fe1e103.jpg") 0 0 0 0 stretch stretch;
+        bg_img_path = self.backgroundImagePicker.file_path
+
+        if bg_img_path != 'none':
+            bg_img_path = f'url("{bg_img_path}") 0 0 0 0 stretch stretch'
+
+        var_map['background-image'] = bg_img_path
 
         self.main.configurator.style.update_style(var_map=var_map)
 
@@ -186,7 +209,7 @@ class _AppSettings(QGroupBox):
         # self.theme_file_chooser = FileDialogOpener('Theme File: ')
         # self.layout.addWidget(self.theme_file_chooser)
 
-        self.splits_file_chooser = FileDialogOpener('Splits File: ')
+        self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.main.configurator.game_path)
         self.layout.addWidget(self.splits_file_chooser)
 
     def apply(self):

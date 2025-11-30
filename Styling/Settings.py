@@ -15,6 +15,10 @@ class Settings(QObject):
             settings_data = f.read()
             self.settings = json.loads(settings_data)
 
+        self.style_path = self.settings['style_path']
+        self.var_path = self.settings['var_path']
+        self.game_path = self.settings['game_path']
+
         # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
         self.style = StyleBuilder(self.settings['style_path'], self.settings['var_path'])
         self.game = Game.from_json_file(self.settings['game_path'])
