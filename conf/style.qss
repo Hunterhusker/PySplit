@@ -323,15 +323,15 @@ QCheckBox::indicator:checked {
 
 #TitleFrame #sessionAttemptsLabel {
     qproperty-alignment: AlignLeft;
-    font-family: $session-attempts-font;
-    font-size: $session-attempts-size;
+    font-family: $attempts-font;
+    font-size: $attempts-size;
     color: $session-attempts-color;
 }
 
 #TitleFrame #lifetimeAttemptsLabel {
     qproperty-alignment: AlignRight;
-    font-family: $lifetime-attempts-font;
-    font-size: $lifetime-attempts-size;
+    font-family: $attempts-font;
+    font-size: $attempts-size;
     color: $lifetime-attempts-color;
 }
 

@@ -10,11 +10,9 @@ title-color:#ffbbbbbb
 subtitle-font:Ubuntu
 subtitle-size:12px
 subtitle-color:#ffbbbbbb
-session-attempts-font:
-session-attempts-size:12px
+attempts-font:
+attempts-size:12px
 session-attempts-color:#ffbbbbbb
-lifetime-attempts-font:
-lifetime-attempts-size:12px
 lifetime-attempts-color:#ffbbbbbb
 timer-font:Ubuntu
 timer-size:24px
