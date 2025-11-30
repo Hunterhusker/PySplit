@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import copy
 
 from PySide6.QtGui import QColor
@@ -178,14 +177,16 @@ class _AppSettings(QGroupBox):
         self.layout = QVBoxLayout(self)
         self.main = main
 
-        self.checkBox = QCheckBox('test')
+        self.checkBox = QCheckBox('Enable Advanced Styling')
+        self.checkBox.setFixedHeight(40)
         self.layout.addWidget(self.checkBox)
 
         self.test = FileDialogOpener('testLbl')
         self.layout.addWidget(self.test)
 
     def apply(self):
-        pass
+        # show / hide the advanced tab
+        self.main.settings_window.set_tab_visibility('Advanced', self.checkBox.isChecked())
 
 
 class _TimingSettings(QGroupBox):
