@@ -220,6 +220,8 @@ class _AppSettings(QGroupBox):
         self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.main.configurator.game_path)
         self.layout.addWidget(self.splits_file_chooser)
 
+        # TODO : main app size setting, split height setting, splits on screen setting, icons? (Prolly not here but you get it)
+
     def apply(self):
         # show / hide the advanced tab
         self.main.settings_window.set_tab_visibility('Advanced', self.checkbox.isChecked())
