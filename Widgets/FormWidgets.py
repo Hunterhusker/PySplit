@@ -194,20 +194,19 @@ class ColorPicker(QFrame):
 
             self.hex_entry.setText(to_full_rgba(self.color_name, argb=True))
 
-            self.color_preview.setStyleSheet(f"background-color: {self.color_name}")
+            self.color_preview.setStyleSheet(f"background-color: {self.color_name}; border-radius: 2; border: 1px solid #616769;")
 
     def set_color(self, hex_code: str):
         if hex_code is not None and hex_code != '' and hex_code != '#':  # if there is something to select
             hex_code = hex_code.strip('#')
-            argb_hex_code = to_full_argb(hex_code, rgba=True)
 
-            color = QColor.fromRgba(int(argb_hex_code, 16))
+            color = QColor.fromRgba(int(hex_code, 16))
 
             if color.isValid():
                 self.color = color
                 self.color_name = color.name(QColor.HexArgb)
 
-                self.color_preview.setStyleSheet(f"background-color: {self.color_name}")
+                self.color_preview.setStyleSheet(f"background-color: {self.color_name}; border-radius: 2; border: 1px solid #616769;")
 
     def get_color(self):
         if isinstance(self.color, QColor):
