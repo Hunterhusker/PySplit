@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING
 from Popups.ABCSettingTab import ABCSettingTab
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
 from Models.Game import Game, Split
-from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit, LabeledNoScrollQTimeEdit
+from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit, LabeledNoScrollQTimeEdit, \
+    LabeledDoubleSpinBox
 
 if TYPE_CHECKING:
     from Main import Main
@@ -59,7 +60,8 @@ class GameSettingsTab(ABCSettingTab):
         self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.game.lifetime_attempts, parent=self)
         self.lifetime_attempts_input.setMinimumHeight(35)
 
-        self.timer_start_delay_input = LabeledNoScrollQTimeEdit('Start Delay: ', QTime(0, 0, 0, 0), parent=self, timerFormat='ss.zzz')
+        self.timer_start_delay_input = LabeledDoubleSpinBox('Timer Start Delay: ', 0, 3, 0.01, self)
+        self.timer_start_delay_input.setMinimumHeight(35)
 
         # populate the title group
         self.title_group_layout.addWidget(self.title_input)
@@ -92,7 +94,7 @@ class GameSettingsTab(ABCSettingTab):
 
         # make our connections now that everything is displayed
         self.add_button.clicked.connect(self.addEmptySplit)
-        self.main.configurator.game.GameUpdated.connect(self.update_self)
+        self.main.settings.game.GameUpdated.connect(self.update_self)
 
     def update_self(self, game: Game):
         """

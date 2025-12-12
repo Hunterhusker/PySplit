@@ -128,11 +128,17 @@ class AssignButtonsTab(ABCSettingTab):
         self.event_map = dict(zip(keys, values))  # remake the map and set it
 
     def apply(self):
-        self.main.timer_controller.update_mapping(self.event_map)
-        input_list = self.main.timer_controller.export_mapping()
+        # convert this to the storage format
+        export_list = []
 
-        self.main.configurator.settings['inputs'] = input_list
+        for mapping in self.event_map:
+            tmp = mapping.to_dict()  # our mapped objs must be ABCListenedObjects so we can do this
+            tmp['event'] = self.event_map[mapping]
 
+            export_list.append(tmp)
+
+        # update the settings with the storable keymap  # TODO : Probably want to redo this for multiple input listener support
+        self.main.settings.set_inputs(export_list)
 
 class KeyReassignmentLine(QFrame):
     """

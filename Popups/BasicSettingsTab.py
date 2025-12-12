@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
 
 from Models.Game import Game
-from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener
+from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener, LabeledSpinBox, LabeledDoubleSpinBox
 
 from Popups.ABCSettingTab import ABCSettingTab
 
@@ -69,7 +69,7 @@ class _ColorSettings(QGroupBox):
         self.layout = QVBoxLayout(self)
         self.main = main
 
-        var_map = self.main.configurator.style.variable_map
+        var_map = self.main.settings.style.variable_map
 
         self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
         self.layout.addWidget(self.backgroundColorPicker)
@@ -114,7 +114,7 @@ class _ColorSettings(QGroupBox):
         self.layout.addWidget(self.lostTimeBehindPicker)
 
     def apply(self):
-        var_map = copy.deepcopy(self.main.configurator.style.variable_map)
+        var_map = copy.deepcopy(self.main.settings.style.variable_map)
 
         var_map['primary-background'] = self.backgroundColorPicker.color_name
         var_map['border-color'] = self.separatorColorPicker.color_name
@@ -137,7 +137,7 @@ class _ColorSettings(QGroupBox):
 
         var_map['background-image'] = bg_img_path
 
-        self.main.configurator.style.update_style(var_map=var_map)
+        self.main.settings.style.update_style(var_map=var_map)
 
 
 class _TextSettings(QGroupBox):
@@ -147,7 +147,7 @@ class _TextSettings(QGroupBox):
         self.layout = QVBoxLayout(self)
         self.main = main
 
-        var_map = self.main.configurator.style.variable_map
+        var_map = self.main.settings.style.variable_map
 
         self.title_font_picker = FontPicker('Title Font: ', var_map['title-font'], var_map['title-size'])
         self.title_color_picker = ColorPicker('Title Color: ', QColor(var_map['title-color']), parent=parent)
@@ -177,7 +177,7 @@ class _TextSettings(QGroupBox):
         self.layout.addWidget(self.timer_color_picker)
 
     def apply(self):
-        var_map = copy.deepcopy(self.main.configurator.style.variable_map)
+        var_map = copy.deepcopy(self.main.settings.style.variable_map)
 
         var_map['title-font'] = self.title_font_picker.get_font_family()
         var_map['title-size'] = f'{self.title_font_picker.get_size()}px'
@@ -200,7 +200,7 @@ class _TextSettings(QGroupBox):
         var_map['timer-size'] = f'{self.timer_font_picker.get_size()}px'
         var_map['timer-color'] = self.timer_color_picker.color_name
 
-        self.main.configurator.style.update_style(var_map=var_map)
+        self.main.settings.style.update_style(var_map=var_map)
 
 
 class _AppSettings(QGroupBox):
@@ -210,24 +210,24 @@ class _AppSettings(QGroupBox):
         self.layout = QVBoxLayout(self)
         self.main = main
 
-        self.checkbox = QCheckBox('Enable Advanced Styling')
-        self.checkbox.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
-        self.layout.addWidget(self.checkbox)
+        self.enableAdvancedStyles = QCheckBox('Enable Advanced Styling')
+        self.enableAdvancedStyles.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
+        self.layout.addWidget(self.enableAdvancedStyles)
 
         # self.theme_file_chooser = FileDialogOpener('Theme File: ')
         # self.layout.addWidget(self.theme_file_chooser)
 
-        self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.main.configurator.game_path)
+        self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.main.settings.game_path)
         self.layout.addWidget(self.splits_file_chooser)
 
         # TODO : main app size setting, split height setting, splits on screen setting, icons? (Prolly not here but you get it)
 
     def apply(self):
         # show / hide the advanced tab
-        self.main.settings_window.set_tab_visibility('Advanced', self.checkbox.isChecked())
+        self.main.settings_window.set_tab_visibility('Advanced', self.enableAdvancedStyles.isChecked())
 
-        self.main.configurator.game.update_from_file(self.splits_file_chooser.file_path)
-        self.main.configurator.game.GameUpdated.emit(self.main.configurator.game)
+        self.main.settings.game.update_from_file(self.splits_file_chooser.file_path)
+        self.main.settings.game.GameUpdated.emit(self.main.settings.game)
 
 
 class _TimingSettings(QGroupBox):
@@ -236,6 +236,10 @@ class _TimingSettings(QGroupBox):
 
         self.layout = QVBoxLayout(self)
         self.main = main
+
+        self.pinLastSplit = QCheckBox('Pin Last Split? ')
+        self.pinLastSplit.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
+        self.layout.addWidget(self.pinLastSplit)
 
     def apply(self):
         pass

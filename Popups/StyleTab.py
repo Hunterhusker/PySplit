@@ -13,7 +13,7 @@ class StyleTab(ABCSettingTab):
         super().__init__(parent=mainWindow)
 
         self.main = mainWindow
-        self.var_map = self.main.configurator.style.variable_map
+        self.var_map = self.main.settings.style.variable_map
 
         self.layout = QVBoxLayout()
 
@@ -52,7 +52,7 @@ class StyleTab(ABCSettingTab):
         self.var_map[key] = value
 
     def apply(self):
-        self.main.configurator.style.update_style(var_map=self.var_map)
+        self.main.settings.style.update_style(var_map=self.var_map)
 
 
 class StyleSettingLine(QFrame):

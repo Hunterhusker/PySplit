@@ -19,11 +19,11 @@ class AdvancedStyleTab(ABCSettingTab):
         self.splitter = QSplitter(Qt.Horizontal)
 
         self.style_textarea = QPlainTextEdit()
-        self.style_textarea.setPlainText(self.main.configurator.style.raw_style_sheet)
+        self.style_textarea.setPlainText(self.main.settings.style.raw_style_sheet)
         self.style_textarea.setObjectName("StyleTextArea")
 
         self.var_textarea = QPlainTextEdit()
-        self.var_textarea.setPlainText(self.main.configurator.style.raw_vars)
+        self.var_textarea.setPlainText(self.main.settings.style.raw_vars)
         self.var_textarea.setObjectName("VarTextArea")
 
         self.splitter.addWidget(self.style_textarea)
