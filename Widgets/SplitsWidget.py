@@ -268,11 +268,7 @@ class SplitsWidget(QWidget):
         pb_segment_total = 0
         gold_segment_total = 0
 
-        # clear out the splits from the layout
-        for split in self.splits:
-            self.scroll_widget_layout.removeWidget(split)
-
-        self.splits = []  # and empty our internal list
+        self._remove_all_splits()
 
         # create the new splits, and add them to the screen
         for i in range(len(splits)):
@@ -303,10 +299,7 @@ class SplitsWidget(QWidget):
         pb_segment_total = 0
         gold_segment_total = 0
 
-        # clear out the splits from the widget
-        for split in self.splits:
-            self.scroll_widget_layout.removeWidget(split)
-            self.splits.remove(split)
+        self._remove_all_splits()
 
         # create the new splits, and add them to the screen
         for split in json:
@@ -319,6 +312,15 @@ class SplitsWidget(QWidget):
 
             self.splits.append(tmp)
             self.scroll_widget_layout.addWidget(tmp)
+
+    def _remove_all_splits(self):
+        # clear out the splits from the widget
+        for split in self.splits:
+            self.scroll_widget_layout.removeWidget(split)
+            split.setParent(None)
+            split.deleteLater()
+
+        self.splits = []
 
     def reset_splits(self):
         """
