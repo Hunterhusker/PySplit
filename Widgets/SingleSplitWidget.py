@@ -13,26 +13,17 @@ from Models.Game import Split
 
 
 class SingleSplitWidget(QFrame):
-    def isSelected(self):
+    def is_selected(self):
         return self._selected
 
-    def setSelected(self, state: bool):
+    def set_selected(self, state: bool):
         if self._selected != state:
             self._selected = state
             self.setProperty("selected", state)
-
-            # Repolish self + children
-            def repolish(w):
-                w.style().unpolish(w)
-                w.style().polish(w)
-                for child in w.findChildren(QWidget):
-                    child.style().unpolish(child)
-                    child.style().polish(child)
-
-            repolish(self)
+            self.style().polish(self)
             self.update()
 
-    selected = Property(bool, isSelected, setSelected)  # hate the formatting here
+    selected = Property(bool, is_selected, set_selected)  # hate the formatting here
 
     def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent):
         """
