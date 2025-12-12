@@ -110,10 +110,10 @@ class Main(QWidget):
         self.settings_window = SettingsWindow(parent=self)
         self.settings_window.setGeometry(900, 900, 600, 400)
         self.settings_window.setMinimumSize(600, 400)
-        self.settings_window.add_tab(AssignButtonsTab(settings=self.settings, timer_controller=self.timer_controller), 'Key Bindings')
-        self.settings_window.add_tab(GameSettingsTab(self.settings), 'Splits')
-        self.settings_window.add_tab(AdvancedStyleTab(self.settings), 'Advanced')
-        self.settings_window.add_tab(BasicSettingsTab(self.settings), 'Settings')
+        self.settings_window.add_tab(AssignButtonsTab(settings=self.settings, timer_controller=self.timer_controller, parent=self.settings_window), 'Key Bindings')
+        self.settings_window.add_tab(GameSettingsTab(self.settings, parent=self.settings_window), 'Splits')
+        self.settings_window.add_tab(AdvancedStyleTab(self.settings, parent=self.settings_window), 'Advanced')
+        self.settings_window.add_tab(BasicSettingsTab(self.settings, parent=self.settings_window), 'Settings')
 
         self.settings_window.toggle_tab_visibility('Advanced')
 

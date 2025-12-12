@@ -11,9 +11,10 @@ from Styling.Settings import Settings
 
 
 class AdvancedStyleTab(ABCSettingTab):
-    def __init__(self, settings: Settings):
-        super().__init__()
-        #self.main = mainWindow  # keep a link to the parent for later
+    def __init__(self, settings: Settings, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+
         self.settings = settings
 
         self.layout = QVBoxLayout()
