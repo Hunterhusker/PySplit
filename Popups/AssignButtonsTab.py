@@ -16,8 +16,9 @@ class AssignButtonsTab(ABCSettingTab):
     """
     A custom dialog box that we will use the remap the keys and buttons to control the splitter
     """
-    def __init__(self, settings: Settings, timer_controller: TimerController):  # TODO : Should the timer controller really be here? Could just do the settings obj tbh
-        super().__init__()
+    def __init__(self, settings: Settings, timer_controller: TimerController, parent=None):  # TODO : Should the timer controller really be here? Could just do the settings obj tbh
+        super().__init__(parent)
+        self.parent = parent
 
         # basic window setup
         self.layout = QVBoxLayout()

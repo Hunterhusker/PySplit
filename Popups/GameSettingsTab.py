@@ -21,8 +21,10 @@ class GameSettingsTab(ABCSettingTab):
     """
     A tab to CRUD your splits
     """
-    def __init__(self, settings: Settings):
-        super().__init__()
+    def __init__(self, settings: Settings, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+
         self.layout = QVBoxLayout()
 
         # keep a copy of the game settings as our local copy that we can work with without effecting the original

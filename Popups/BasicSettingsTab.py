@@ -5,14 +5,18 @@ from Popups.ABCSettingTab import ABCSettingTab
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QVBoxLayout, QScrollArea, QWidget, QFrame, QLabel, QGroupBox, QCheckBox
 from PySide6.QtCore import Qt
+
+from Popups.SettingsWindow import SettingsWindow
 from Styling.Settings import Settings
 from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener, LabeledSpinBox, LabeledDoubleSpinBox
 
 
 # checkout QGroupBox for title and then box of settings items
 class BasicSettingsTab(ABCSettingTab):
-    def __init__(self, settings: Settings):
-        super().__init__()
+    def __init__(self, settings: Settings, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+
         self.layout = QVBoxLayout()
         self.settings = settings
 
@@ -26,7 +30,7 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
-        self.app_settings = _AppSettings(self.settings, parent=self)
+        self.app_settings = _AppSettings(self.settings, self.parent, parent=self)
         self.text_group = _TextSettings(self.settings, parent=self)
         self.color_group = _ColorSettings(self.settings, parent=self)
         self.timing_settings = _TimingSettings(self.settings, parent=self)
@@ -199,11 +203,12 @@ class _TextSettings(QGroupBox):
 
 
 class _AppSettings(QGroupBox):
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, settings: Settings, settings_window: SettingsWindow, parent=None):
         super().__init__('App Settings')
 
         self.layout = QVBoxLayout(self)
         self.settings = settings
+        self.settings_window = settings_window
 
         self.enableAdvancedStyles = QCheckBox('Enable Advanced Styling')
         self.enableAdvancedStyles.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
