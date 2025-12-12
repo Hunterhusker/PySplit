@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 from Listeners.KeyboardListener import key_to_str
 from Popups.ABCSettingTab import ABCSettingTab
+from Styling.Settings import Settings
+from Timer.TimerController import TimerController
 
 if TYPE_CHECKING:
     from Main import Main
@@ -14,12 +16,13 @@ class AssignButtonsTab(ABCSettingTab):
     """
     A custom dialog box that we will use the remap the keys and buttons to control the splitter
     """
-    def __init__(self, mainWindow: 'Main', parent: QWidget = None):
-        super().__init__(parent)
+    def __init__(self, settings: Settings, timer_controller: TimerController):  # TODO : Should the timer controller really be here? Could just do the settings obj tbh
+        super().__init__()
 
         # basic window setup
         self.layout = QVBoxLayout()
-        self.main = mainWindow  # save the link to the main that we need to save our changes
+        self.settings = settings
+        self.timer_controller = timer_controller
 
         self.scroll_widget = QWidget()
         self.scroll_widget_layout = QVBoxLayout()
@@ -32,10 +35,10 @@ class AssignButtonsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
         self.scroll_area.setViewportMargins(0, 0, 5, 0)
 
-        self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
+        self.event_map = copy.deepcopy(self.timer_controller.get_mapping())  # save a copy of the event map
 
         # get the listener from the main page so we can listen to it
-        self.listener = mainWindow.timer_controller.listener  # mainWindow.keyboard_listener
+        self.listener = self.timer_controller.listener  # mainWindow.keyboard_listener
         # TODO : Should listen to all things in the timer controller, perhaps it should be a controller type instead??
 
         # pull apart the event mapping, so I can build my assignment GUI
@@ -138,7 +141,7 @@ class AssignButtonsTab(ABCSettingTab):
             export_list.append(tmp)
 
         # update the settings with the storable keymap  # TODO : Probably want to redo this for multiple input listener support
-        self.main.settings.set_inputs(export_list)
+        self.settings.set_inputs(export_list)
 
 class KeyReassignmentLine(QFrame):
     """

@@ -7,23 +7,25 @@ from PySide6.QtCore import Qt
 from typing import TYPE_CHECKING
 
 from Popups.ABCSettingTab import ABCSettingTab
+from Styling.Settings import Settings
 
 
 class AdvancedStyleTab(ABCSettingTab):
-    def __init__(self, mainWindow: 'Main' = None):
-        super().__init__(parent=mainWindow)
-        self.main = mainWindow  # keep a link to the parent for later
+    def __init__(self, settings: Settings):
+        super().__init__()
+        #self.main = mainWindow  # keep a link to the parent for later
+        self.settings = settings
 
         self.layout = QVBoxLayout()
 
         self.splitter = QSplitter(Qt.Horizontal)
 
         self.style_textarea = QPlainTextEdit()
-        self.style_textarea.setPlainText(self.main.settings.style.raw_style_sheet)
+        self.style_textarea.setPlainText(self.settings.style.raw_style_sheet)
         self.style_textarea.setObjectName("StyleTextArea")
 
         self.var_textarea = QPlainTextEdit()
-        self.var_textarea.setPlainText(self.main.settings.style.raw_vars)
+        self.var_textarea.setPlainText(self.settings.style.raw_vars)
         self.var_textarea.setObjectName("VarTextArea")
 
         self.splitter.addWidget(self.style_textarea)
@@ -42,4 +44,4 @@ class AdvancedStyleTab(ABCSettingTab):
             k, v = line.split(':')
             var_map[k] = v
 
-        self.main.configurator.style.update_style(var_map=var_map, style_sheet=self.style_textarea.toPlainText())
+        self.settings.style.update_style(var_map=var_map, style_sheet=self.style_textarea.toPlainText())

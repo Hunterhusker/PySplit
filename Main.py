@@ -6,13 +6,11 @@ from time import sleep
 
 from Listeners.AggregateListener import AggregateListener
 from Listeners.KeyboardListener import KeyboardListener
-from Models.Game import Game
 from Popups.AdvancedStyleTab import AdvancedStyleTab
 from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.BasicSettingsTab import BasicSettingsTab
 from Popups.SettingsWindow import SettingsWindow
 from Popups.GameSettingsTab import GameSettingsTab
-from Popups.StyleTab import StyleTab
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
@@ -112,10 +110,10 @@ class Main(QWidget):
         self.settings_window = SettingsWindow(parent=self)
         self.settings_window.setGeometry(900, 900, 600, 400)
         self.settings_window.setMinimumSize(600, 400)
-        self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
-        self.settings_window.add_tab(GameSettingsTab(self.settings.game, mainWindow=self), 'Splits')
-        self.settings_window.add_tab(AdvancedStyleTab(mainWindow=self), 'Advanced')
-        self.settings_window.add_tab(BasicSettingsTab(mainWindow=self), 'Settings')
+        self.settings_window.add_tab(AssignButtonsTab(settings=self.settings, timer_controller=self.timer_controller), 'Key Bindings')
+        self.settings_window.add_tab(GameSettingsTab(self.settings), 'Splits')
+        self.settings_window.add_tab(AdvancedStyleTab(self.settings), 'Advanced')
+        self.settings_window.add_tab(BasicSettingsTab(self.settings), 'Settings')
 
         self.settings_window.toggle_tab_visibility('Advanced')
 
