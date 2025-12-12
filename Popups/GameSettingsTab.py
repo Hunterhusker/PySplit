@@ -7,6 +7,7 @@ from PySide6.QtCore import Qt, QTime
 from typing import TYPE_CHECKING
 
 from Popups.ABCSettingTab import ABCSettingTab
+from Styling.Settings import Settings
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
 from Models.Game import Game, Split
 from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit, LabeledNoScrollQTimeEdit, \
@@ -20,13 +21,12 @@ class GameSettingsTab(ABCSettingTab):
     """
     A tab to CRUD your splits
     """
-    def __init__(self, game: Game, mainWindow: 'Main' = None):
-        super().__init__(parent=mainWindow)
+    def __init__(self, settings: Settings):
+        super().__init__()
         self.layout = QVBoxLayout()
-        self.main = mainWindow
 
         # keep a copy of the game settings as our local copy that we can work with without effecting the original
-        self.game = game
+        self.game = settings.game
 
         self.add_button = QPushButton()
         self.add_button.setIcon(QIcon('Static/add.svg'))
@@ -94,7 +94,7 @@ class GameSettingsTab(ABCSettingTab):
 
         # make our connections now that everything is displayed
         self.add_button.clicked.connect(self.addEmptySplit)
-        self.main.settings.game.GameUpdated.connect(self.update_self)
+        self.game.GameUpdated.connect(self.update_self)
 
     def update_self(self, game: Game):
         """

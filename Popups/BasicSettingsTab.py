@@ -1,25 +1,20 @@
 from __future__ import annotations
 
 import copy
-
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPlainTextEdit, QFrame, QLabel, \
-    QGroupBox, QColorDialog, QPushButton, QCheckBox
-from PySide6.QtCore import Qt
-from typing import TYPE_CHECKING
-
-from Models.Game import Game
-from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener, LabeledSpinBox, LabeledDoubleSpinBox
-
 from Popups.ABCSettingTab import ABCSettingTab
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QVBoxLayout, QScrollArea, QWidget, QFrame, QLabel, QGroupBox, QCheckBox
+from PySide6.QtCore import Qt
+from Styling.Settings import Settings
+from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener, LabeledSpinBox, LabeledDoubleSpinBox
 
 
 # checkout QGroupBox for title and then box of settings items
 class BasicSettingsTab(ABCSettingTab):
-    def __init__(self, mainWindow: 'Main' = None):
-        super().__init__(parent=mainWindow)
+    def __init__(self, settings: Settings):
+        super().__init__()
         self.layout = QVBoxLayout()
-        self.main = mainWindow
+        self.settings = settings
 
         self.scroll_widget = QWidget()
         self.scroll_widget_layout = QVBoxLayout()
@@ -31,11 +26,11 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
-        self.app_settings = _AppSettings(self.main, parent=self)
-        self.text_group = _TextSettings(self.main, parent=self)
-        self.color_group = _ColorSettings(self.main, parent=self)
-        self.timing_settings = _TimingSettings(self.main, parent=self)
-        self.footer_settings = _FooterSettings(self.main, parent=self)
+        self.app_settings = _AppSettings(self.settings, parent=self)
+        self.text_group = _TextSettings(self.settings, parent=self)
+        self.color_group = _ColorSettings(self.settings, parent=self)
+        self.timing_settings = _TimingSettings(self.settings, parent=self)
+        self.footer_settings = _FooterSettings(self.settings, parent=self)
 
         # add all the groups into the scroll
         self.scroll_widget_layout.addWidget(self.app_settings)
@@ -63,13 +58,13 @@ class BasicSettingsTab(ABCSettingTab):
 
 
 class _ColorSettings(QGroupBox):
-    def __init__(self, main: 'Main', parent=None):
+    def __init__(self, settings: Settings, parent=None):
         super().__init__('Color Settings', parent)
 
         self.layout = QVBoxLayout(self)
-        self.main = main
+        self.settings = settings
 
-        var_map = self.main.settings.style.variable_map
+        var_map = self.settings.style.variable_map
 
         self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
         self.layout.addWidget(self.backgroundColorPicker)
@@ -114,7 +109,7 @@ class _ColorSettings(QGroupBox):
         self.layout.addWidget(self.lostTimeBehindPicker)
 
     def apply(self):
-        var_map = copy.deepcopy(self.main.settings.style.variable_map)
+        var_map = copy.deepcopy(self.settings.style.variable_map)
 
         var_map['primary-background'] = self.backgroundColorPicker.color_name
         var_map['border-color'] = self.separatorColorPicker.color_name
@@ -137,17 +132,17 @@ class _ColorSettings(QGroupBox):
 
         var_map['background-image'] = bg_img_path
 
-        self.main.settings.style.update_style(var_map=var_map)
+        self.settings.style.update_style(var_map=var_map)
 
 
 class _TextSettings(QGroupBox):
-    def __init__(self, main: 'Main', parent=None):
+    def __init__(self, settings: Settings, parent=None):
         super().__init__('Text Settings')
 
         self.layout = QVBoxLayout(self)
-        self.main = main
+        self.settings = settings
 
-        var_map = self.main.settings.style.variable_map
+        var_map = self.settings.style.variable_map
 
         self.title_font_picker = FontPicker('Title Font: ', var_map['title-font'], var_map['title-size'])
         self.title_color_picker = ColorPicker('Title Color: ', QColor(var_map['title-color']), parent=parent)
@@ -177,7 +172,7 @@ class _TextSettings(QGroupBox):
         self.layout.addWidget(self.timer_color_picker)
 
     def apply(self):
-        var_map = copy.deepcopy(self.main.settings.style.variable_map)
+        var_map = copy.deepcopy(self.settings.style.variable_map)
 
         var_map['title-font'] = self.title_font_picker.get_font_family()
         var_map['title-size'] = f'{self.title_font_picker.get_size()}px'
@@ -200,15 +195,15 @@ class _TextSettings(QGroupBox):
         var_map['timer-size'] = f'{self.timer_font_picker.get_size()}px'
         var_map['timer-color'] = self.timer_color_picker.color_name
 
-        self.main.settings.style.update_style(var_map=var_map)
+        self.settings.style.update_style(var_map=var_map)
 
 
 class _AppSettings(QGroupBox):
-    def __init__(self, main: 'Main', parent=None):
+    def __init__(self, settings: Settings, parent=None):
         super().__init__('App Settings')
 
         self.layout = QVBoxLayout(self)
-        self.main = main
+        self.settings = settings
 
         self.enableAdvancedStyles = QCheckBox('Enable Advanced Styling')
         self.enableAdvancedStyles.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
@@ -217,25 +212,25 @@ class _AppSettings(QGroupBox):
         # self.theme_file_chooser = FileDialogOpener('Theme File: ')
         # self.layout.addWidget(self.theme_file_chooser)
 
-        self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.main.settings.game_path)
+        self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.settings.game_path)
         self.layout.addWidget(self.splits_file_chooser)
 
         # TODO : main app size setting, split height setting, splits on screen setting, icons? (Prolly not here but you get it)
 
     def apply(self):
         # show / hide the advanced tab
-        self.main.settings_window.set_tab_visibility('Advanced', self.enableAdvancedStyles.isChecked())
+        self.settings_window.set_tab_visibility('Advanced', self.enableAdvancedStyles.isChecked())
 
-        self.main.settings.game.update_from_file(self.splits_file_chooser.file_path)
-        self.main.settings.game.GameUpdated.emit(self.main.settings.game)
+        self.settings.game.update_from_file(self.splits_file_chooser.file_path)
+        self.settings.game.GameUpdated.emit(self.settings.game)
 
 
 class _TimingSettings(QGroupBox):
-    def __init__(self, main: 'Main', parent=None):
+    def __init__(self, settings: Settings, parent=None):
         super().__init__('Timing Settings')
 
         self.layout = QVBoxLayout(self)
-        self.main = main
+        self.settings = settings
 
         self.pinLastSplit = QCheckBox('Pin Last Split? ')
         self.pinLastSplit.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
@@ -246,11 +241,11 @@ class _TimingSettings(QGroupBox):
 
 
 class _FooterSettings(QGroupBox):
-    def __init__(self, main: 'Main', parent=None):
+    def __init__(self, settings: Settings, parent=None):
         super().__init__('Footer Settings')
 
         self.layout = QVBoxLayout(self)
-        self.main = main
+        self.settings = settings
 
         self.todo = QLabel('Gotta make the footer first eh?')
 
