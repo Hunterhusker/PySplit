@@ -1,6 +1,6 @@
 from PySide6.QtGui import QColor, QIcon
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
-    QFontComboBox, QPushButton, QFileDialog, QStyle
+    QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox
 from PySide6.QtCore import Qt, Signal, QTime
 
 from helpers.ColorHelpers import *
@@ -57,6 +57,42 @@ class LabeledSpinBox(QFrame):
 
 
 class NoScrollQSpinBox(QSpinBox):
+    def __init__(self):
+        super().__init__()
+
+    def wheelEvent(self, event):
+        event.ignore()  # prevent scroll changes
+
+
+class LabeledDoubleSpinBox(QFrame):
+    def __init__(self, label: str, original_value: int, decimals: int, step: float, parent):
+        super().__init__(parent=parent)
+
+        self.layout = QHBoxLayout()
+
+        self.label = QLabel(label)
+        self.label.setMinimumWidth(125)
+        self.label.setFixedHeight(25)
+        self.label.setObjectName('SettingsLabel')
+
+        self.input = NoScrollQDoubleSpinBox()
+        self.input.setMinimumWidth(225)
+        self.input.setFixedHeight(25)
+        self.input.setValue(original_value)
+        self.input.setDecimals(decimals)
+        self.input.setSingleStep(step)
+        self.input.setMinimum(-9999)  # wish I did not have to set a minimum for this, try and find a way plz
+        self.input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        self.layout.addWidget(self.label, stretch=1)
+        self.layout.addWidget(self.input, stretch=1)
+        self.layout.setContentsMargins(10, 0, 10, 0)
+
+        self.setLayout(self.layout)
+        self.setObjectName('SettingLine')
+
+
+class NoScrollQDoubleSpinBox(QDoubleSpinBox):
     def __init__(self):
         super().__init__()
 

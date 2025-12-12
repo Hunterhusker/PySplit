@@ -47,10 +47,9 @@ class Main(QWidget):
         layout.setSpacing(0)
 
         # load the settings from the file
-        self.configurator = Settings('conf/settings.json')
-        #self.game = Game.from_json_file(self.configurator.settings['game_path'])
+        self.settings = Settings('conf/settings.json')
 
-        self.title = TitleWidget.from_game(self.configurator.game)
+        self.title = TitleWidget.from_game(self.settings.game)
 
         self.main_timer_widget = TimerWidget()
 
@@ -68,9 +67,9 @@ class Main(QWidget):
         self.exit_action.triggered.connect(QApplication.instance().quit)
 
         # use the configurations from the file
-        self.configurator.style.UpdateStyle.connect(self.set_style)
+        self.settings.style.UpdateStyle.connect(self.set_style)
 
-        self.splits = SplitsWidget(self.configurator.game, parent=self)
+        self.splits = SplitsWidget(self.settings.game, parent=self)
         self.splitStats = TimeStatsWidget()
 
         layout.addWidget(self.title)
@@ -97,7 +96,7 @@ class Main(QWidget):
         aggregate_listener = AggregateListener(listeners=[KeyboardListener()])
 
         # create the timer controller from the config
-        self.timer_controller = TimerController(listener=aggregate_listener, event_map=self.configurator.settings['inputs'])
+        self.timer_controller = TimerController(listener=aggregate_listener, settings=self.settings)  # event_map=self.settings.settings['inputs'])
 
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
@@ -107,14 +106,14 @@ class Main(QWidget):
         self.splits.SplitFinish.connect(self.game_timer.stop_timer)
         self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
-        self.configurator.game.GameUpdated.connect(self.splits.load_splits_from_game)
-        self.configurator.game.GameUpdated.connect(self.title.update_from_game)
+        self.settings.game.GameUpdated.connect(self.splits.load_splits_from_game)
+        self.settings.game.GameUpdated.connect(self.title.update_from_game)
 
         self.settings_window = SettingsWindow(parent=self)
         self.settings_window.setGeometry(900, 900, 600, 400)
         self.settings_window.setMinimumSize(600, 400)
         self.settings_window.add_tab(AssignButtonsTab(mainWindow=self), 'Key Bindings')
-        self.settings_window.add_tab(GameSettingsTab(self.configurator.game, mainWindow=self), 'Splits')
+        self.settings_window.add_tab(GameSettingsTab(self.settings.game, mainWindow=self), 'Splits')
         self.settings_window.add_tab(AdvancedStyleTab(mainWindow=self), 'Advanced')
         self.settings_window.add_tab(BasicSettingsTab(mainWindow=self), 'Settings')
 
@@ -193,8 +192,8 @@ class Main(QWidget):
         result = save_box.exec()
 
         if result == QMessageBox.StandardButton.Yes:
-            self.configurator.write_settings()
-            self.configurator.game.to_json_file(self.configurator.settings['game_path'])
+            self.settings.write_settings()
+            self.settings.game.to_json_file(self.settings.settings['game_path'])
 
         # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
@@ -229,7 +228,7 @@ if __name__ == "__main__":
     window.setWindowIcon(icon)
 
     # use main's style configurations to get the initial stylesheet
-    style = window.configurator.style.formatted_style_sheet
+    style = window.settings.style.formatted_style_sheet
     app.setStyleSheet(style)
 
     window.show()

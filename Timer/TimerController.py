@@ -2,6 +2,9 @@ from PySide6.QtCore import QObject, Slot, Signal
 import json
 
 from Listeners.ABCListener import ABCListener, ABCListenedObject
+from Styling.Settings import Settings
+
+
 #from Listeners.KeyboardListener import KeyPressObject
 
 
@@ -11,23 +14,27 @@ class TimerController(QObject):
     """
     ControlEvent = Signal(str)
 
-    def __init__(self, listener: ABCListener, event_map):
+    def __init__(self, listener: ABCListener, settings: Settings):
         super().__init__()  # do the basic init
 
         # save our listeners to a list just in case
-        self.event_map = dict()
+        self.event_map = {}
         self.listener = listener
         self.listening = True
+        self.settings = settings
 
         listener.listen()
         listener.on_event.connect(self.input_event)
 
+        self.settings.InputMapUpdate.connect(self.settings_update)
+        self.import_mapping(settings.get_inputs())
+
         # find the format of the input map
-        if isinstance(event_map, dict):
-            self.update_mapping(event_map)
-        else:
-            # update the input mapping
-            self.import_mapping(event_map)
+        # if isinstance(event_map, dict):
+        #     self.update_mapping(event_map)
+        # else:
+        #     # update the input mapping
+        #     self.import_mapping(event_map)
 
     @Slot(object)
     def input_event(self, event_obj):
@@ -38,6 +45,10 @@ class TimerController(QObject):
                 self.toggle_listening()
             elif self.listening:  # as long as we're listening, then we should do this (and if it is not the lock command as that is local to the controller)
                 self.ControlEvent.emit(event)
+
+    @Slot()
+    def settings_update(self):
+        self.import_mapping(self.settings.get_inputs())
 
     def update_mapping(self, event_map: dict[ABCListenedObject, str]):
         """

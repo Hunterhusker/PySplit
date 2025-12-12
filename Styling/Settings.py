@@ -6,6 +6,12 @@ from Styling.Style.styleBuilder import StyleBuilder
 
 
 class Settings(QObject):
+    # create some signals we can subscribe our objects to
+    SettingsUpdate = Signal()
+    InputMapUpdate = Signal()
+    StylePathUpdate = Signal()
+    GamePathUpdate = Signal()
+
     def __init__(self, settings_file_path: str):
         super().__init__()
         self.settings_file_path = settings_file_path
@@ -32,3 +38,11 @@ class Settings(QObject):
 
         with open(self.settings_file_path, 'w') as f:
             f.write(json.dumps(self.settings, indent=4))
+
+    def set_inputs(self, input_map):
+        self.settings['inputs'] = input_map
+
+        self.InputMapUpdate.emit()
+
+    def get_inputs(self):
+        return self.settings.get('inputs', {})

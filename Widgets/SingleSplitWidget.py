@@ -95,7 +95,7 @@ class SingleSplitWidget(QFrame):
         Returns:
             None
         """
-        var_map = self.parent.main.configurator.style.variable_map
+        var_map = self.parent.main.settings.style.variable_map
 
         self.best_time_color_ahead = f'color: {var_map['best-time-color-ahead']};'
         self.best_time_color_behind = f'color: {var_map['best-time-color-behind']};'
@@ -147,7 +147,7 @@ class SingleSplitWidget(QFrame):
         """
         Resets the split data to how it would have been when first loaded
         """
-        var_map = self.parent.main.configurator.style.variable_map
+        var_map = self.parent.main.settings.style.variable_map
 
         self.delta_label.setText('')  # clear the time delta
         self.time_label.setText(format_wall_clock_from_ms(self.get_comparison_time()))
