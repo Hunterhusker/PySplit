@@ -43,14 +43,16 @@ class LabeledSpinBox(QFrame):
         self.label.setObjectName('SettingsLabel')
 
         self.input = NoScrollQSpinBox()
-        self.input.setMinimumWidth(225)
+        self.input.setFixedWidth(205)
         self.input.setFixedHeight(25)
         self.input.setValue(original_value)
         self.input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.layout.addWidget(self.label, stretch=1)
         self.layout.addWidget(self.input, stretch=1)
-        self.layout.setContentsMargins(10, 0, 10, 0)
+        self.layout.setContentsMargins(8, 0, 8, 0)
+
+        self.setMinimumHeight(40)
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
@@ -166,8 +168,7 @@ class ColorPicker(QFrame):
         self.color_name = color.name(QColor.HexArgb)
 
         self.hex_entry = QLineEdit()
-        self.hex_entry.setFixedHeight(25)
-        self.hex_entry.setMaximumWidth(150)
+        self.hex_entry.setFixedSize(175, 25)
         self.hex_entry.setText(self.color_name)
         self.hex_entry.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.hex_entry.textChanged.connect(self.set_color)
@@ -237,7 +238,7 @@ class FontPicker(QFrame):
 
         self.font_combobox = NoScrollQFontComboBox()
         self.font_combobox.setFixedHeight(25)
-        self.font_combobox.setFixedWidth(125)
+        self.font_combobox.setFixedWidth(150)
         if font_family != '':
             self.font_combobox.setCurrentText(font_family)
         else:
@@ -273,7 +274,7 @@ class FileDialogOpener(QFrame):
 
         self.file_path_label = QLineEdit(file_path if len(file_path) != 0 else 'none')
         self.file_path_label.setReadOnly(True)
-        self.file_path_label.setFixedSize(200, 25)
+        self.file_path_label.setFixedSize(145, 25)
         self.layout.addWidget(self.file_path_label)
 
         self.open_dialog_button = QPushButton()

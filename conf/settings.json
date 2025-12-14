@@ -2,6 +2,7 @@
     "style_path": "conf/style.qss",
     "var_path": "conf/vars.qvars",
     "game_path": "conf/testGame.json",
+    "visible_splits": 3,
     "inputs": [
         {
             "source": "pynput",
