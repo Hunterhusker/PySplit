@@ -4,6 +4,8 @@
 from Models.Game import Game, Split
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
+
+from Styling.Settings import Settings
 from Widgets.SingleSplitWidget import SingleSplitWidget
 
 
@@ -16,10 +18,11 @@ class SplitsWidget(QWidget):
     SplitReset = Signal()
 
     # TODO : Add better support for the strategy adoption
-    def __init__(self, game: Game, parent: 'Main'):
+    def __init__(self, settings: Settings, parent: 'Main'):
         super().__init__()
+        self.settings = settings
 
-        self.visible_splits = 3
+        self.visible_splits = self.settings.settings['visible_splits']
         self.main = parent
 
         # some basic layout setup to keep stuff off the top and bottom but not the sides
@@ -49,8 +52,7 @@ class SplitsWidget(QWidget):
         self.done = False
 
         # save the game so we can apply updates to it later
-        self.game = game
-        self.load_splits(game)
+        self.load_splits(self.settings.game)
 
         self.scroll_widget.setLayout(self.scroll_widget_layout)
 
@@ -149,9 +151,9 @@ class SplitsWidget(QWidget):
                 sb = self.scroll_area.verticalScrollBar()
                 sb.setValue(0)
 
-                self.game.session_attempts += 1
-                self.game.lifetime_attempts += 1
-                self.game.GameUpdated.emit(self.game)
+                self.settings.game.session_attempts += 1
+                self.settings.game.lifetime_attempts += 1
+                self.settings.game.GameUpdated.emit(self.settings.game)
 
                 if self.done:
                     for sp in self.splits:

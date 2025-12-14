@@ -220,6 +220,9 @@ class _AppSettings(QGroupBox):
         self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.settings.game_path)
         self.layout.addWidget(self.splits_file_chooser)
 
+        self.splits_on_screen = LabeledSpinBox('Visible Splits: ', self.settings.settings['visible_splits'], self)
+        self.layout.addWidget(self.splits_on_screen)
+
         # TODO : main app size setting, split height setting, splits on screen setting, icons? (Prolly not here but you get it)
 
     def apply(self):
