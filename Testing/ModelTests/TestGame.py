@@ -10,7 +10,6 @@ TEST_GAME_JSON_STRING = """{
     "title": "TEST",
     "sub_title": "SUBTEST",
     "lifetime_attempts": 1,
-    "session_attempts": 0,
     "display_pb": true,
     "splits": [
         {
@@ -38,7 +37,6 @@ TEST_GAME_JSON_DICTIONARY = {
     "title": "TEST",
     "sub_title": "SUBTEST",
     "lifetime_attempts": 1,
-    "session_attempts": 0,
     "display_pb": True,
     "splits": [
         {

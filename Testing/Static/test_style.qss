@@ -1,0 +1,403 @@
+QWidget {
+    background-color: transparent; /*$primary-background;*/
+    color: $app-text-color;
+}
+
+QFrame {
+    background-color: transparent; /*$primary-background;*/
+    color: $app-text-color;
+    border: none;
+}
+
+QPushButton {
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+}
+
+QTabWidget {
+    border: none;
+}
+
+QTabWidget::Pane {
+    border: none;
+    background-color: transparent;
+}
+
+#MainWindow {
+    background-color: $primary-background;
+    border-image: $background-image;
+    /*border-image: url("/home/hunter/Pictures/Backgrounds/dbpg16g-d0814f5c-4142-4dbb-b50d-f22e0fe1e103.jpg") 0 0 0 0 stretch stretch;*/
+    /*border-image: none;*/
+}
+
+QDialog {
+    background-color: $app-background;
+}
+
+QMenu {
+    background-color: $app-background;
+}
+
+QMenu::item {
+    background-color: $app-background;
+}
+
+QMenu::item:selected {
+    background-color: $app-accent-background;
+}
+
+QLineEdit {
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+}
+
+QLineEdit:focus {
+    border: 1px solid $item-highlight-border-color;
+}
+
+QSpinBox {
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+}
+
+QSpinBox:focus {
+    border: 1px solid $item-highlight-border-color;
+}
+
+QSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 13px;
+    background-color: transparent;
+    border: none;
+}
+
+QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    width: 13px;
+    background-color: transparent;
+    border: none;
+}
+
+QSpinBox::up-arrow {
+    background-color: transparent;
+    image: url(Static/up_arrow.svg);
+}
+
+QSpinBox::down-arrow {
+    background-color: transparent;
+    image: url(Static/down_arrow.svg);
+}
+
+QDoubleSpinBox {
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+}
+
+QDoubleSpinBox:focus {
+    border: 1px solid $item-highlight-border-color;
+}
+
+QDoubleSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 13px;
+    background-color: transparent;
+    border: none;
+}
+
+QDoubleSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    width: 13px;
+    background-color: transparent;
+    border: none;
+}
+
+QDoubleSpinBox::up-arrow {
+    background-color: transparent;
+    image: url(Static/up_arrow.svg);
+}
+
+QDoubleSpinBox::down-arrow {
+    background-color: transparent;
+    image: url(Static/down_arrow.svg);
+}
+
+QComboBox {
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+}
+
+QComboBox::down-arrow {
+    image: url(Static/down_arrow.svg); /* Replace with your icon path */
+    background-color: transparent;
+}
+
+QComboBox::drop-down {
+    background-color: transparent;
+    border: none;
+}
+
+QComboBox:focus {
+    border: 1px solid $item-highlight-border-color;
+}
+
+QTimeEdit {
+    color: $app-text-color;
+    background-color: $item-background-color;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+}
+
+QTimeEdit:focus {
+    border: 1px solid $item-highlight-border-color;
+}
+
+QTimeEdit::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 13px;
+    background-color: transparent;
+    border: none;
+}
+
+QTimeEdit::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    width: 13px;
+    background-color: transparent;
+    border: none;
+}
+
+QTimeEdit::up-arrow {
+    image: url(Static/up_arrow.svg);
+}
+
+QTimeEdit::down-arrow {
+    image: url(Static/down_arrow.svg);
+}
+
+QScrollBar:vertical {
+    border: none;
+    border-radius: 0px;
+    background-color: $app-accent-background;
+    width: 14px;
+    margin: 14px 0px 14px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: $item-background-color;
+    min-height: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover{
+	background-color: $hover-background-color;
+}
+
+QScrollBar::handle:vertical:pressed {
+	background-color: $pressed-background-color;
+}
+
+QScrollBar::sub-line:vertical {
+	border: none;
+	background-color: $item-background-color;
+	height: 14px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	subcontrol-position: top;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical:hover {
+	background-color: $hover-background-color;
+}
+
+QScrollBar::sub-line:vertical:pressed {
+	background-color: $pressed-background-color;
+}
+
+QScrollBar::add-line:vertical {
+	border: none;
+	background-color: $item-background-color;
+	height: 14px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	subcontrol-position: bottom;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:vertical:hover {
+	background-color: $hover-background-color;
+}
+
+QScrollBar::add-line:vertical:pressed {
+	background-color: $pressed-background-color;
+}
+
+QTabBar::tab {
+    background: $app-background;
+    color: $app-text-color;
+    border-top: 1px solid $app-accent-background;
+    border-left: 1px solid $app-accent-background;
+    border-right: 1px solid $app-accent-background;
+    border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+    padding: 5px 10px;
+}
+
+QTabBar::tab:selected {
+    background: $app-accent-background;
+}
+
+QTabBar::tab:!selected {
+    margin-top: 2px; /* makes the unselected tabs look smaller */
+}
+
+QCheckBox {
+    background: $app-accent-background;
+    border-radius: 2px;
+    padding-left: 10px;
+}
+
+QCheckBox::indicator {
+    width: 14px;
+    height: 14px;
+    border: 1px solid $item-border-color;
+    border-radius: 2px;
+    background: $item-background-color;
+    image:none;
+}
+
+QCheckBox::indicator:checked {
+    image: none;
+}
+
+QCheckBox::indicator:checked {
+    image: url(Static/checked.svg);
+}
+
+#TimerFrame {
+    border-bottom: 1px solid $border-color;
+    border-top: 1px solid $border-color;
+    border-left: none;
+    border-right: none;
+    color: $timer-color;
+}
+
+#TimerStatsWidget {
+    color: $text-color;
+}
+
+#TimerStatsWidget QLabel {
+    color: $text-color;
+}
+
+#TimerLabel {
+    border-bottom: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-size: $timer-size;
+    font-family: $timer-font;
+    color: $timer-color;
+}
+
+#SingleSplit {
+    background-color: $split-background;
+    color: $split-color;
+}
+
+#SingleSplit[selected="true"] {
+    background-color: $current-split-background;
+    color: $split-color;
+}
+
+#SingleSplit QLabel {
+    color: $split-color;
+    font-family: $split-font;
+    font-size: $split-size;
+    background-color: transparent;
+}
+
+#SingleSplit[selected="true"] QLabel {
+    background-color: transparent;
+    color: $split-color;
+}
+
+#TitleFrame {
+    border-bottom: 1px solid $border-color;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+#TitleFrame #TitleLabel {
+    qproperty-alignment: AlignCenter;
+    font-family: $title-font;
+    font-size: $title-size;
+    color: $title-color;
+}
+
+#TitleFrame #SubLabel {
+    qproperty-alignment: AlignCenter;
+    font-family: $subtitle-font;
+    font-size: $subtitle-size;
+    color: $subtitle-color;
+}
+
+#TitleFrame #sessionAttemptsLabel {
+    qproperty-alignment: AlignLeft;
+    font-family: $attempts-font;
+    font-size: $attempts-size;
+    color: $session-attempts-color;
+}
+
+#TitleFrame #lifetimeAttemptsLabel {
+    qproperty-alignment: AlignRight;
+    font-family: $attempts-font;
+    font-size: $attempts-size;
+    color: $lifetime-attempts-color;
+}
+
+#KeyReassignmentLine {
+    background-color: $app-accent-background;
+    border-radius: 2px;
+}
+
+#SettingsLabel {
+    color: $app-text-color;
+    background-color: $app-accent-background;
+}
+
+#SettingLine {
+    color: $app-text-color;
+    background-color: $app-accent-background;
+    border-radius: 2px;
+}
+
+QSplitter::handle {
+    background-color: darkgray;
+    width: 2px; /* For horizontal splitter */
+    height: 2px; /* For vertical splitter */
+}
+
+QSplitter::handle:hover {
+    background-color: gray;
+}
+
+QPlainTextArea {
+    background-color: $app-accent-background;
+}
