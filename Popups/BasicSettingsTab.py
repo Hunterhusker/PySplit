@@ -5,7 +5,6 @@ from Popups.ABCSettingTab import ABCSettingTab, ABCSettingGroupBox
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QVBoxLayout, QScrollArea, QWidget, QFrame, QLabel, QGroupBox, QCheckBox
 from PySide6.QtCore import Qt
-
 from Popups.SettingsWindow import SettingsWindow
 from Styling.Settings import Settings
 from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener, LabeledSpinBox, LabeledDoubleSpinBox
@@ -142,7 +141,21 @@ class _ColorSettings(ABCSettingGroupBox):
         self.settings.style.update_style(var_map=var_map)
 
     def opened(self):
-        pass
+        var_map = self.settings.style.variable_map
+
+        self.backgroundColorPicker.set_color(var_map['primary-background'])
+        self.separatorColorPicker.set_color(var_map['border-color'])
+        self.splitBackgroundColorPicker.set_color(var_map['split-background'])
+        self.currentSplitBackgroundColorPicker.set_color(var_map['current-split-background'])
+
+        self.bestTimeAheadPicker.set_color(var_map['best-time-color-ahead'])
+        self.bestTimeBehindPicker.set_color(var_map['best-time-color-behind'])
+        self.savedTimeAheadPicker.set_color(var_map['saved-time-color-ahead'])
+        self.savedTimeBehindPicker.set_color(var_map['saved-time-color-behind'])
+        self.lostTimeAheadPicker.set_color(var_map['lost-time-color-ahead'])
+        self.lostTimeBehindPicker.set_color(var_map['lost-time-color-behind'])
+
+        self.backgroundImagePicker.set_file_path(var_map['background-image'])
 
 
 class _TextSettings(ABCSettingGroupBox):

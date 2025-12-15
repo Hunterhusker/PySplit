@@ -1,3 +1,5 @@
+import re
+
 from PySide6.QtGui import QColor, QIcon
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
     QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox
@@ -303,6 +305,16 @@ class FileDialogOpener(QFrame):
 
             self.file_path = file_path
             self.file_path_label.setText(file_path)
+
+    def set_file_path(self, file_path: str):
+        if 'url("' in file_path:
+            match = re.search(r'url\("([^"]+)"\)', file_path)
+
+            if match:
+                file_path = match.group(1)
+
+        self.file_path_label.setText(file_path)
+        self.file_path = file_path
 
     def clear_file_click(self):
         self.file_path = 'none'
