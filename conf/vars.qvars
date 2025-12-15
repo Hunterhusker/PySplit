@@ -1,8 +1,8 @@
 primary-background:#ff2b2b2b
 background-image:none
 accent-background:#323232
-split-background:#33323232
-current-split-background:#334c5052
+split-background:#ff323232
+current-split-background:#ff4c5052
 text-color:#bbbbbb
 title-font:Ubuntu
 title-size:14px
