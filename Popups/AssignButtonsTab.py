@@ -144,6 +144,9 @@ class AssignButtonsTab(ABCSettingTab):
         # update the settings with the storable keymap  # TODO : Probably want to redo this for multiple input listener support
         self.settings.set_inputs(export_list)
 
+    def opened(self):
+        pass  # changes in other tabs do not affect the inputs, skipping this implementation for now
+
 class KeyReassignmentLine(QFrame):
     """
     A single key reassignment widget to use multiple instances of to update the input mapping with

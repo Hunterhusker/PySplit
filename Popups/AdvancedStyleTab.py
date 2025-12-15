@@ -46,3 +46,8 @@ class AdvancedStyleTab(ABCSettingTab):
             var_map[k] = v
 
         self.settings.style.update_style(var_map=var_map, style_sheet=self.style_textarea.toPlainText())
+
+    def opened(self):
+        # when opening, resync the settings so they match anything changed via the GUI
+        self.style_textarea.setPlainText(self.settings.style.raw_style_sheet)
+        self.var_textarea.setPlainText(self.settings.style.raw_vars)

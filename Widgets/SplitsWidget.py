@@ -51,17 +51,25 @@ class SplitsWidget(QWidget):
         self.started = False
         self.done = False
 
-        # save the game so we can apply updates to it later
+        # load the splits in from the settings
         self.load_splits(self.settings.game)
 
         self.scroll_widget.setLayout(self.scroll_widget_layout)
 
         self.scroll_area.setWidget(self.scroll_widget)
-        self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
         self.scroll_area.verticalScrollBar().setSingleStep(self.splits[0].height())
+
+        self.apply_settings()
 
         self.layout.addWidget(self.scroll_area)
         self.setLayout(self.layout)
+
+    def apply_settings(self):
+        """
+        This method sets the size of the current window
+        """
+        self.visible_splits = self.settings.settings['visible_splits']
+        self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
 
     def get_current_split(self):
         return self.splits[self.index]
@@ -270,7 +278,7 @@ class SplitsWidget(QWidget):
         pb_segment_total = 0
         gold_segment_total = 0
 
-        self._remove_all_splits()
+        self.remove_all_splits()
 
         # create the new splits, and add them to the screen
         for i in range(len(splits)):
@@ -290,18 +298,10 @@ class SplitsWidget(QWidget):
         self.load_splits_from_list(game.splits)
 
     def load_splits_from_json(self, json: dict[str]):
-        """
-
-        Args:
-            json:
-
-        Returns:
-
-        """
         pb_segment_total = 0
         gold_segment_total = 0
 
-        self._remove_all_splits()
+        self.remove_all_splits()
 
         # create the new splits, and add them to the screen
         for split in json:
@@ -315,8 +315,10 @@ class SplitsWidget(QWidget):
             self.splits.append(tmp)
             self.scroll_widget_layout.addWidget(tmp)
 
-    def _remove_all_splits(self):
-        # clear out the splits from the widget
+    def remove_all_splits(self):
+        """
+        clear out the splits from the widget
+        """
         for split in self.splits:
             self.scroll_widget_layout.removeWidget(split)
             split.setParent(None)

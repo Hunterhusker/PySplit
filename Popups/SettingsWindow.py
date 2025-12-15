@@ -25,6 +25,7 @@ class SettingsWindow(QDialog):
         self.dialogButtons.clicked.connect(self.button_event)
 
         self.tab_dict = {}
+        self.tabs.currentChanged.connect(self.tab_opened)
 
         self.layout.addWidget(self.tabs)
         self.layout.addWidget(self.dialogButtons)
@@ -40,6 +41,11 @@ class SettingsWindow(QDialog):
         currWidget = self.tabs.currentWidget()
 
         currWidget.apply()  # and have it apply its changes!
+
+    def tab_opened(self, index: int):
+        widget = self.tabs.widget(index)
+        if hasattr(widget, "opened"):
+            widget.opened()
 
     def toggle_tab_visibility(self, name):
         idx = self.get_tab_index(name)

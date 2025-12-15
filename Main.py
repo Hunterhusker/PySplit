@@ -68,6 +68,8 @@ class Main(QWidget):
         self.settings.style.UpdateStyle.connect(self.set_style)
 
         self.splits = SplitsWidget(self.settings, parent=self)
+        self.settings.SettingsUpdate.connect(self.splits.apply_settings)
+
         self.splitStats = TimeStatsWidget()
 
         layout.addWidget(self.title)
