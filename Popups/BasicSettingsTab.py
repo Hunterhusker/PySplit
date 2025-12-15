@@ -30,18 +30,16 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
-        self.app_settings = _AppSettings(self.settings, self.parent, parent=self)
+        self.timer_settings = _TimerSettings(self.settings, self.parent, parent=self)
         self.text_group = _TextSettings(self.settings, parent=self)
         self.color_group = _ColorSettings(self.settings, parent=self)
-        self.timing_settings = _TimingSettings(self.settings, parent=self)
-        self.footer_settings = _FooterSettings(self.settings, parent=self)
+        self.stats_settings = _StatsSettings(self.settings, parent=self)
 
         # add all the groups into the scroll
-        self.scroll_widget_layout.addWidget(self.app_settings)
+        self.scroll_widget_layout.addWidget(self.timer_settings)
         self.scroll_widget_layout.addWidget(self.text_group)
         self.scroll_widget_layout.addWidget(self.color_group)
-        self.scroll_widget_layout.addWidget(self.timing_settings)
-        self.scroll_widget_layout.addWidget(self.footer_settings)
+        self.scroll_widget_layout.addWidget(self.stats_settings)
 
         # add a stretch for funsies
         self.scroll_widget_layout.addStretch()
@@ -213,9 +211,9 @@ class _TextSettings(ABCSettingGroupBox):
         pass
 
 
-class _AppSettings(ABCSettingGroupBox):
+class _TimerSettings(ABCSettingGroupBox):
     def __init__(self, settings: Settings, settings_window: SettingsWindow, parent=None):
-        super().__init__('App Settings')
+        super().__init__('Timer Settings')
 
         self.layout = QVBoxLayout(self)
         self.settings = settings
@@ -234,6 +232,10 @@ class _AppSettings(ABCSettingGroupBox):
         self.splits_on_screen = LabeledSpinBox('Visible Splits: ', self.settings.settings['visible_splits'], self)
         self.splits_on_screen.input.setMinimum(1)
         self.layout.addWidget(self.splits_on_screen)
+
+        self.pinLastSplit = QCheckBox('Pin Last Split? ')
+        self.pinLastSplit.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
+        self.layout.addWidget(self.pinLastSplit)
 
         # TODO : need to figure out layouts and stuff along that line
         # self.application_height = LabeledSpinBox('App Height: ', self.settings.settings['visible_splits'], self)
@@ -259,25 +261,7 @@ class _AppSettings(ABCSettingGroupBox):
         self.splits_on_screen.input.setMaximum(len(self.settings.game.splits))
 
 
-class _TimingSettings(ABCSettingGroupBox):
-    def __init__(self, settings: Settings, parent=None):
-        super().__init__('Timing Settings')
-
-        self.layout = QVBoxLayout(self)
-        self.settings = settings
-
-        self.pinLastSplit = QCheckBox('Pin Last Split? ')
-        self.pinLastSplit.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
-        self.layout.addWidget(self.pinLastSplit)
-
-    def apply(self):
-        pass
-
-    def opened(self):
-        pass
-
-
-class _FooterSettings(ABCSettingGroupBox):
+class _StatsSettings(ABCSettingGroupBox):
     def __init__(self, settings: Settings, parent=None):
         super().__init__('Footer Settings')
 
