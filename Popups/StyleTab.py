@@ -54,6 +54,9 @@ class StyleTab(ABCSettingTab):
     def apply(self):
         self.main.settings.style.update_style(var_map=self.var_map)
 
+    def opened(self):
+        pass
+
 
 class StyleSettingLine(QFrame):
     UpdateKey = Signal(str, str)

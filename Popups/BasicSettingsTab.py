@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from Popups.ABCSettingTab import ABCSettingTab
+from Popups.ABCSettingTab import ABCSettingTab, ABCSettingGroupBox
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QVBoxLayout, QScrollArea, QWidget, QFrame, QLabel, QGroupBox, QCheckBox
 from PySide6.QtCore import Qt
@@ -60,8 +60,14 @@ class BasicSettingsTab(ABCSettingTab):
         for i in range(self.scroll_widget_layout.count() - 1):  # -1 so we don't apply on the stretch
             self.scroll_widget_layout.itemAt(i).widget().apply()  # for each thing added to the layout, run the apply method on them
 
+        self.settings.SettingsUpdate.emit()
 
-class _ColorSettings(QGroupBox):
+    def opened(self):
+        for i in range(self.scroll_widget_layout.count() - 1):  # -1 so we don't open the stretch
+            self.scroll_widget_layout.itemAt(i).widget().opened()  # for each thing added to the layout, run the open method on them
+
+
+class _ColorSettings(ABCSettingGroupBox):
     def __init__(self, settings: Settings, parent=None):
         super().__init__('Color Settings', parent)
 
@@ -128,7 +134,6 @@ class _ColorSettings(QGroupBox):
         var_map['lost-time-color-ahead'] = self.lostTimeAheadPicker.color_name
         var_map['lost-time-color-behind'] = self.lostTimeBehindPicker.color_name
 
-        # url("/home/hunter/Pictures/Backgrounds/dbpg16g-d0814f5c-4142-4dbb-b50d-f22e0fe1e103.jpg") 0 0 0 0 stretch stretch;
         bg_img_path = self.backgroundImagePicker.file_path
 
         if bg_img_path != 'none':
@@ -138,8 +143,11 @@ class _ColorSettings(QGroupBox):
 
         self.settings.style.update_style(var_map=var_map)
 
+    def opened(self):
+        pass
 
-class _TextSettings(QGroupBox):
+
+class _TextSettings(ABCSettingGroupBox):
     def __init__(self, settings: Settings, parent=None):
         super().__init__('Text Settings')
 
@@ -201,8 +209,11 @@ class _TextSettings(QGroupBox):
 
         self.settings.style.update_style(var_map=var_map)
 
+    def opened(self):
+        pass
 
-class _AppSettings(QGroupBox):
+
+class _AppSettings(ABCSettingGroupBox):
     def __init__(self, settings: Settings, settings_window: SettingsWindow, parent=None):
         super().__init__('App Settings')
 
@@ -217,10 +228,11 @@ class _AppSettings(QGroupBox):
         # self.theme_file_chooser = FileDialogOpener('Theme File: ')
         # self.layout.addWidget(self.theme_file_chooser)
 
-        self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.settings.game_path)
-        self.layout.addWidget(self.splits_file_chooser)
+        # self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.settings.game_path)
+        # self.layout.addWidget(self.splits_file_chooser)
 
         self.splits_on_screen = LabeledSpinBox('Visible Splits: ', self.settings.settings['visible_splits'], self)
+        self.splits_on_screen.input.setMinimum(1)
         self.layout.addWidget(self.splits_on_screen)
 
         # TODO : main app size setting, split height setting, splits on screen setting, icons? (Prolly not here but you get it)
@@ -229,11 +241,16 @@ class _AppSettings(QGroupBox):
         # show / hide the advanced tab
         self.settings_window.set_tab_visibility('Advanced', self.enableAdvancedStyles.isChecked())
 
-        self.settings.game.update_from_file(self.splits_file_chooser.file_path)
-        self.settings.game.GameUpdated.emit(self.settings.game)
+        self.settings.settings['visible_splits'] = self.splits_on_screen.input.value()
+
+        # self.settings.game.update_from_file(self.splits_file_chooser.file_path)
+        # self.settings.game.GameUpdated.emit(self.settings.game)
+
+    def opened(self):
+        self.splits_on_screen.input.setMaximum(len(self.settings.game.splits))
 
 
-class _TimingSettings(QGroupBox):
+class _TimingSettings(ABCSettingGroupBox):
     def __init__(self, settings: Settings, parent=None):
         super().__init__('Timing Settings')
 
@@ -247,8 +264,11 @@ class _TimingSettings(QGroupBox):
     def apply(self):
         pass
 
+    def opened(self):
+        pass
 
-class _FooterSettings(QGroupBox):
+
+class _FooterSettings(ABCSettingGroupBox):
     def __init__(self, settings: Settings, parent=None):
         super().__init__('Footer Settings')
 
@@ -260,4 +280,7 @@ class _FooterSettings(QGroupBox):
         self.layout.addWidget(self.todo)
 
     def apply(self):
+        pass
+
+    def opened(self):
         pass

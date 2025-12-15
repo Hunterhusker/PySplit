@@ -186,6 +186,9 @@ class GameSettingsTab(ABCSettingTab):
 
         self.game.GameUpdated.emit(self.game)
 
+    def open(self):
+        pass
+
 
 class SplitLine(QFrame):
     def __init__(self, split: Split, parent: GameSettingsTab = None):
