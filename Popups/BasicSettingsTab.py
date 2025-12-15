@@ -235,6 +235,15 @@ class _AppSettings(ABCSettingGroupBox):
         self.splits_on_screen.input.setMinimum(1)
         self.layout.addWidget(self.splits_on_screen)
 
+        # TODO : need to figure out layouts and stuff along that line
+        # self.application_height = LabeledSpinBox('App Height: ', self.settings.settings['visible_splits'], self)
+        # self.application_height.input.setMinimum(1)
+        # self.layout.addWidget(self.application_height)
+        #
+        # self.application_width = LabeledSpinBox('App Width: ', self.settings.settings['visible_splits'], self)
+        # self.application_width.input.setMinimum(1)
+        # self.layout.addWidget(self.application_width)
+
         # TODO : main app size setting, split height setting, splits on screen setting, icons? (Prolly not here but you get it)
 
     def apply(self):
