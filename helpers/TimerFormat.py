@@ -22,8 +22,8 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     # else we should add only what we need
     base = f'{s:02}.{ms:03}'
 
-    m = f'{m:02}:' if m != 0 else ''
     h = f'{h:02}:' if h != 0 else ''
+    m = f'{m:02}:' if m != 0 or h != '' else ''
 
     return result + "".join([h, m, base])
 
@@ -80,6 +80,6 @@ def qtime_to_ms(time: QTime) -> int:
     total_time += time.msec()
     total_time += time.second() * 1000
     total_time += time.minute() * 60000
-    total_time += time.hour() * 1440000
+    total_time += time.hour() * 3600000
 
     return total_time
