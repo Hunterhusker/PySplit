@@ -32,7 +32,7 @@ class Main(QWidget):
 
     _widget_starting_location = None  # the starting location of the widget, used for click and drag actions
 
-    def __init__(self):
+    def __init__(self, settings_path: str = 'conf/settings.json'):
         super().__init__()
         self.setWindowTitle('PySplit v0.0')
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint)
@@ -45,7 +45,7 @@ class Main(QWidget):
         layout.setSpacing(0)
 
         # load the settings from the file
-        self.settings = Settings('conf/settings.json')
+        self.settings = Settings(settings_path)
 
         self.title = TitleWidget.from_game(self.settings.game)
 
