@@ -38,7 +38,7 @@ class SingleSplitWidget(QFrame):
         self.parent = parent
 
         # create these so they can be set later
-        self.best_time_color_ahead = None
+        self.best_time_color_ahead = None  # TODO : Finish the better Palette color conversion
         self.best_time_color_behind = None
         self.saved_time_color_ahead = None
         self.saved_time_color_behind = None
