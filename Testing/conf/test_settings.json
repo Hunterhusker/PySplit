@@ -1,7 +1,7 @@
 {
-    "style_path": "Testing/Static/test_style.qss",
-    "var_path": "Testing/Static/test_vars.qvars",
-    "game_path": "Testing/Static/test_game.json",
+    "style_path": "Testing/conf/test_style.qss",
+    "var_path": "Testing/conf/test_vars.qvars",
+    "game_path": "Testing/conf/test_game.json",
     "visible_splits": 3,
     "inputs": [
         {
