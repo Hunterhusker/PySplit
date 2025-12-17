@@ -32,6 +32,12 @@ class LabeledTextEntry(QFrame):
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
 
+    def setText(self, text: str):
+        self.input.setText(text)
+
+    def getText(self):
+        return self.input.text()
+
 
 class LabeledSpinBox(QFrame):
     def __init__(self, label: str, original_value: int, parent):
