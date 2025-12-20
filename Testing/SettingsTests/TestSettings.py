@@ -1,9 +1,17 @@
 from helpers.TimerFormat import format_wall_clock_from_ms
 from Main import Main
+from pathlib import Path
 from PySide6.QtWidgets import QApplication, QMessageBox
 import sys
 import unittest
 from unittest.mock import patch
+
+
+def _get_a_main():
+    BASE_DIR = Path(__file__).resolve().parents[1]  # Testing/
+    CONFIG_PATH = BASE_DIR / "conf" / "test_settings.json"
+
+    return Main(CONFIG_PATH)
 
 
 class TestSettings(unittest.TestCase):
@@ -13,7 +21,7 @@ class TestSettings(unittest.TestCase):
             self._app = QApplication(sys.argv)
 
     def test_game_load(self):
-        main = Main('Testing/conf/test_settings.json')
+        main = _get_a_main()
 
         settings = main.settings
         game = settings.game
@@ -50,7 +58,7 @@ class TestSettings(unittest.TestCase):
             main.deleteLater()
 
     def test_game_settings_update(self):
-        main = Main('Testing/conf/test_settings.json')
+        main = _get_a_main()
 
         settings = main.settings
         game = settings.game

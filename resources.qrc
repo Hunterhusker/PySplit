@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>Static/add.svg</file>
+        <file>Static/alarm_add.svg</file>
+        <file>Static/checked.svg</file>
+        <file>Static/delete.svg</file>
+        <file>Static/down_arrow.svg</file>
+        <file>Static/file_open.svg</file>
+        <file>Static/pysplitIcon.png</file>
+        <file>Static/up_arrow.svg</file>
+    </qresource>
+</RCC>
