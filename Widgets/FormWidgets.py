@@ -1,10 +1,8 @@
 import re
-
 from PySide6.QtGui import QColor, QIcon
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
     QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox
 from PySide6.QtCore import Qt, Signal, QTime
-
 from helpers.ColorHelpers import *
 
 
@@ -286,13 +284,13 @@ class FileDialogOpener(QFrame):
         self.layout.addWidget(self.file_path_label)
 
         self.open_dialog_button = QPushButton()
-        self.open_dialog_button.setIcon(QIcon('Static/file_open.svg'))
+        self.open_dialog_button.setIcon(QIcon(':/icons/Static/file_open.svg'))
         self.open_dialog_button.clicked.connect(self.open_file_click)
         self.open_dialog_button.setFixedSize(25, 25)
         self.layout.addWidget(self.open_dialog_button)
 
         self.clear_button = QPushButton()
-        self.clear_button.setIcon(QIcon('Static/delete.svg'))
+        self.clear_button.setIcon(QIcon(':/icons/Static/delete.svg'))
         self.clear_button.setFixedSize(25, 25)
         self.clear_button.clicked.connect(self.clear_file_click)
         self.layout.addWidget(self.clear_button)

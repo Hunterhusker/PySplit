@@ -88,12 +88,12 @@ QSpinBox::down-button {
 
 QSpinBox::up-arrow {
     background-color: transparent;
-    image: url(Static/up_arrow.svg);
+    image: url(:/icons/Static/up_arrow.svg);
 }
 
 QSpinBox::down-arrow {
     background-color: transparent;
-    image: url(Static/down_arrow.svg);
+    image: url(:/icons/Static/down_arrow.svg);
 }
 
 QDoubleSpinBox {
@@ -125,12 +125,12 @@ QDoubleSpinBox::down-button {
 
 QDoubleSpinBox::up-arrow {
     background-color: transparent;
-    image: url(Static/up_arrow.svg);
+    image: url(:/icons/Static/up_arrow.svg);
 }
 
 QDoubleSpinBox::down-arrow {
     background-color: transparent;
-    image: url(Static/down_arrow.svg);
+    image: url(:/icons/Static/down_arrow.svg);
 }
 
 QComboBox {
@@ -141,7 +141,7 @@ QComboBox {
 }
 
 QComboBox::down-arrow {
-    image: url(Static/down_arrow.svg); /* Replace with your icon path */
+    image: url(:/icons/Static/down_arrow.svg); /* Replace with your icon path */
     background-color: transparent;
 }
 
@@ -182,11 +182,11 @@ QTimeEdit::down-button {
 }
 
 QTimeEdit::up-arrow {
-    image: url(Static/up_arrow.svg);
+    image: url(:/icons/Static/up_arrow.svg);
 }
 
 QTimeEdit::down-arrow {
-    image: url(Static/down_arrow.svg);
+    image: url(:/icons/Static/down_arrow.svg);
 }
 
 QScrollBar:vertical {
@@ -286,7 +286,7 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox::indicator:checked {
-    image: url(Static/checked.svg);
+    image: url(:/icons/Static/checked.svg);
 }
 
 #TimerFrame {

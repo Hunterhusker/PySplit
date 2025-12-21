@@ -1,9 +1,10 @@
+import resources_rc
+
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QMessageBox, QMainWindow
-from PySide6.QtCore import Slot, Signal, QThread, Qt
+from PySide6.QtCore import Slot, Signal, QThread, Qt, QFile
 from PySide6.QtGui import QIcon
 import sys
 from time import sleep
-
 from Listeners.AggregateListener import AggregateListener
 from Listeners.KeyboardListener import KeyboardListener
 from Popups.AdvancedStyleTab import AdvancedStyleTab
