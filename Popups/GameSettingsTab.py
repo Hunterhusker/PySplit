@@ -31,7 +31,7 @@ class GameSettingsTab(ABCSettingTab):
         self.game = settings.game
 
         self.add_button = QPushButton()
-        self.add_button.setIcon(QIcon('Static/add.svg'))
+        self.add_button.setIcon(QIcon(':/icons/Static/add.svg'))
         self.add_button.setFixedSize(25, 25)
 
         self.scroll_widget = QWidget()
@@ -226,7 +226,7 @@ class SplitLine(QFrame):
 
         self.remove_button = QPushButton()
         self.remove_button.setBaseSize(25, 25)
-        self.remove_button.setIcon(QIcon('Static/delete.svg'))
+        self.remove_button.setIcon(QIcon(':/icons/Static/delete.svg'))
         self.remove_button.setMinimumSize(25, 25)
 
         # add them all in one block
