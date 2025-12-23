@@ -29,7 +29,8 @@ class StyleBuilder(QObject):
 
         self.raw_vars = raw
 
-        lines = [l for l in raw.split(os.linesep) if l is not None and l != '']
+        #lines = [l for l in raw.split(os.linesep) if l is not None and l != '']
+        lines = [l for l in raw.split('\n') if l is not None and l != '']  # os.linesep works but my file is not crlf somehow...
 
         for line in lines:
             if '//' in line:  # cut off any comments
