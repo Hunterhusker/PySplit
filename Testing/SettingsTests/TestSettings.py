@@ -108,3 +108,71 @@ class TestSettings(unittest.TestCase):
         with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):  # patch out the popup
             main.close()
             main.deleteLater()
+
+    def test_basic_color_settings(self):
+        main = _get_a_main()
+        settings = main.settings
+        basic_settings = main.settings_window.tab_dict['Settings']
+        color_group = basic_settings.color_group
+
+        # setup
+        color_group.backgroundColorPicker.set_color('#ffffffff')
+        color_group.separatorColorPicker.set_color('#ffffffff')
+        color_group.splitBackgroundColorPicker.set_color('#ffffffff')
+        color_group.currentSplitBackgroundColorPicker.set_color('#ffffffff')
+        color_group.bestTimeAheadPicker.set_color('#ffffffff')
+        color_group.bestTimeBehindPicker.set_color('#ffffffff')
+        color_group.savedTimeAheadPicker.set_color('#ffffffff')
+        color_group.savedTimeBehindPicker.set_color('#ffffffff')
+        color_group.lostTimeAheadPicker.set_color('#ffffffff')
+        color_group.lostTimeBehindPicker.set_color('#ffffffff')
+
+        # act
+        basic_settings.apply()
+
+        # assert
+        self.assertEqual(color_group.backgroundColorPicker.color_name, settings.style.variable_map['primary-background'])
+        self.assertEqual(color_group.separatorColorPicker.color_name, settings.style.variable_map['border-color'])
+        self.assertEqual(color_group.splitBackgroundColorPicker.color_name, settings.style.variable_map['split-background'])
+        self.assertEqual(color_group.currentSplitBackgroundColorPicker.color_name, settings.style.variable_map['current-split-background'])
+        self.assertEqual(color_group.bestTimeAheadPicker.color_name, settings.style.variable_map['best-time-color-ahead'])
+        self.assertEqual(color_group.bestTimeBehindPicker.color_name, settings.style.variable_map['best-time-color-behind'])
+        self.assertEqual(color_group.savedTimeAheadPicker.color_name, settings.style.variable_map['saved-time-color-ahead'])
+        self.assertEqual(color_group.savedTimeBehindPicker.color_name, settings.style.variable_map['saved-time-color-behind'])
+        self.assertEqual(color_group.lostTimeAheadPicker.color_name, settings.style.variable_map['lost-time-color-ahead'])
+        self.assertEqual(color_group.lostTimeBehindPicker.color_name, settings.style.variable_map['lost-time-color-behind'])
+
+
+        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):
+            main.close()
+            main.deleteLater()
+
+    def test_basic_color_bg_image_setting(self):
+        main = _get_a_main()
+        settings = main.settings
+        basic_settings = main.settings_window.tab_dict['Settings']
+        color_group = basic_settings.color_group
+
+        # setup
+        color_group.backgroundColorPicker.set_color('#ffffffff')
+
+        # act
+        basic_settings.apply()
+
+        # assert
+        self.assertEqual(color_group.backgroundColorPicker.color_name, settings.style.variable_map['primary-background'])
+        self.assertEqual(settings.style.variable_map['background-image'], 'none')
+
+        # set the background image
+        color_group.backgroundImagePicker.set_file_path = 'TEST'
+
+        # act II
+        basic_settings.apply()
+
+        # assert again
+        self.assertEqual(color_group.backgroundColorPicker.color_name, settings.style.variable_map['primary-background'])
+        self.assertEqual(color_group.backgroundImagePicker.file_path, 'TEST')
+
+        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):
+            main.close()
+            main.deleteLater()
