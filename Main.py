@@ -177,7 +177,7 @@ class Main(QWidget):
         self.timer_controller.toggle_listening()
 
         # make a popup to ask the user if they would like to save changes before exiting
-        save_box = QMessageBox()
+        save_box = QMessageBox(self)
         save_box.setWindowTitle('Save Changes?')
         save_box.setText('Would you like to save any configuration changes and new PBs?')
         save_box.setStandardButtons(QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes)
