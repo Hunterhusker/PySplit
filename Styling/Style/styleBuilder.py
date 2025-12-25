@@ -44,7 +44,15 @@ class StyleBuilder(QObject):
             self.variable_map[k] = v
 
     def set_vars(self, variable_map):
-        self.variable_map = variable_map
+        #self.variable_map = variable_map
+        for k, v in variable_map.items():
+            self.variable_map[k] = v
+
+        # delete deleted vars
+        removals = [k for k in self.variable_map if k not in variable_map]
+        for r in removals:
+            del self.variable_map[r]
+
         new_raw = ""
 
         for k in variable_map:

@@ -123,7 +123,7 @@ class _ColorSettings(ABCSettingGroupBox):
         self.layout.addWidget(self.lostTimeBehindPicker)
 
     def apply(self):
-        var_map = copy.deepcopy(self.settings.style.variable_map)
+        var_map = self.settings.style.variable_map
 
         var_map['primary-background'] = self.backgroundColorPicker.color_name
         var_map['border-color'] = self.separatorColorPicker.color_name
@@ -202,7 +202,7 @@ class _TextSettings(ABCSettingGroupBox):
         self.layout.addWidget(self.timer_color_picker)
 
     def apply(self):
-        var_map = copy.deepcopy(self.settings.style.variable_map)
+        var_map = self.settings.style.variable_map
 
         var_map['title-font'] = self.title_font_picker.get_font_family()
         var_map['title-size'] = f'{self.title_font_picker.get_size()}px'
@@ -252,9 +252,6 @@ class _TextSettings(ABCSettingGroupBox):
 
         if timer_family not in font_families:
             self.timer_font_picker.set_font(default_font)
-
-
-
 
 
 class _TimerSettings(ABCSettingGroupBox):
