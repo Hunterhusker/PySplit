@@ -1,5 +1,5 @@
 import re
-from PySide6.QtGui import QColor, QIcon
+from PySide6.QtGui import QColor, QIcon, QFont
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
     QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox
 from PySide6.QtCore import Qt, Signal, QTime
@@ -255,14 +255,26 @@ class FontPicker(QFrame):
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
 
-    def get_font(self):
+    def get_font(self) -> QFont:
         return self.font_combobox.currentFont()
 
-    def get_font_family(self):
+    def set_font(self, font: QFont):
+        self.font_combobox.setCurrentFont(QFont)
+
+    def get_font_family(self) -> str:
         return self.get_font().family()
 
-    def get_size(self):
+    def set_font_family(self, font_family: str):
+        tmp = self.get_font()
+        tmp.setFamily(font_family)
+
+        self.set_font(tmp)
+
+    def get_size(self) -> int:
         return self.size_spinner.value()
+
+    def set_size(self, size: int):
+        self.size_spinner.setValue(size)
 
 
 class FileDialogOpener(QFrame):
