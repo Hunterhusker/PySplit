@@ -259,7 +259,7 @@ class FontPicker(QFrame):
         return self.font_combobox.currentFont()
 
     def set_font(self, font: QFont):
-        self.font_combobox.setCurrentFont(QFont)
+        self.font_combobox.setCurrentFont(font)
 
     def get_font_family(self) -> str:
         return self.get_font().family()
