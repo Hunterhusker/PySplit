@@ -161,6 +161,7 @@ class ClickableFrame(QFrame):
 
 
 class ColorPicker(QFrame):
+    # TODO : This should start using our own custom color picker
     def __init__(self, label: str, color: QColor, parent):
         super().__init__(parent=parent)
 
