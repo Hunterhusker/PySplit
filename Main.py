@@ -221,7 +221,7 @@ class Main(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    icon = QIcon('Static/pysplitIcon.png')
+    icon = QIcon(':icons/Static/pysplitIcon.png')
 
     window = Main()
 
