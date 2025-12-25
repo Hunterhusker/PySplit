@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from Popups.ABCSettingTab import ABCSettingTab, ABCSettingGroupBox
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QFontDatabase, QFont
 from PySide6.QtWidgets import QVBoxLayout, QScrollArea, QWidget, QFrame, QLabel, QGroupBox, QCheckBox
 from PySide6.QtCore import Qt
 from Popups.SettingsWindow import SettingsWindow
@@ -48,6 +48,13 @@ class BasicSettingsTab(ABCSettingTab):
 
         self.scroll_widget.setLayout(self.scroll_widget_layout)
         self.layout.addWidget(self.scroll_area)
+
+        # make sure all the settings are in place and the UI is ready to be opened after being created
+        for i in range(self.scroll_widget_layout.count() - 1):  # -1 so we don't apply on the stretch
+            curr = self.scroll_widget_layout.itemAt(i).widget()
+
+            curr.opened()
+            curr.apply()
 
         # link it all up so that this displays
         self.setLayout(self.layout)
@@ -221,7 +228,33 @@ class _TextSettings(ABCSettingGroupBox):
         self.settings.style.update_style(var_map=var_map)
 
     def opened(self):
-        pass
+        # if the selected font is not in the system, use whatever we are using for the application
+        font_families = QFontDatabase().families()
+        default_font = self.font()
+
+        title_family = self.title_font_picker.get_font_family()
+        subtitle_family = self.subtitle_font_picker.get_font_family()
+        attempts_family = self.attempts_font_picker.get_font_family()
+        split_family = self.split_font_picker.get_font_family()
+        timer_family = self.timer_font_picker.get_font_family()
+
+        if title_family not in font_families:
+            self.title_font_picker.set_font(default_font)
+
+        if subtitle_family not in font_families:
+            self.subtitle_font_picker.set_font(default_font)
+
+        if attempts_family not in font_families:
+            self.attempts_font_picker.set_font(default_font)
+
+        if split_family not in font_families:
+            self.split_font_picker.set_font(default_font)
+
+        if timer_family not in font_families:
+            self.timer_font_picker.set_font(default_font)
+
+
+
 
 
 class _TimerSettings(ABCSettingGroupBox):
@@ -263,7 +296,8 @@ class _TimerSettings(ABCSettingGroupBox):
 
     def apply(self):
         # show / hide the advanced tab
-        self.settings_window.set_tab_visibility('Advanced', self.enableAdvancedStyles.isChecked())
+        if 'Advanced' in self.settings_window.tab_dict.keys():
+            self.settings_window.set_tab_visibility('Advanced', self.enableAdvancedStyles.isChecked())
 
         self.settings.settings['visible_splits'] = self.splits_on_screen.input.value()
 
