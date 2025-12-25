@@ -229,7 +229,7 @@ class _TextSettings(ABCSettingGroupBox):
 
     def opened(self):
         # if the selected font is not in the system, use whatever we are using for the application
-        font_families = QFontDatabase().families()
+        font_families = QFontDatabase.families()
         default_font = self.font()
 
         title_family = self.title_font_picker.get_font_family()
