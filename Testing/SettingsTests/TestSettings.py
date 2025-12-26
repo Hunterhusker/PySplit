@@ -1,4 +1,3 @@
-from helpers.QtABCMetas import QFrameABCMeta
 from helpers.TimerFormat import format_wall_clock_from_ms
 from Main import Main
 from pathlib import Path
@@ -22,21 +21,28 @@ class TestSettings(unittest.TestCase):
         if self._app is None:
             self._app = QApplication(sys.argv)
 
-    def test_game_load(self):
-        main = _get_a_main()
+        self.main = _get_a_main()
 
-        settings = main.settings
+    def tearDown(self):
+        if self.main is not None:
+            with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):  # patch out the popup
+                self.main.close()
+                self.main.deleteLater()
+
+
+    def test_game_load(self):
+        settings = self.main.settings
         game = settings.game
 
         # make assertions about the game
-        title = main.title
+        title = self.main.title
 
         self.assertEqual(game.title, title.title_label.text())
         self.assertEqual(game.sub_title, title.subtitle_label.text())
         self.assertEqual(str(game.session_attempts), title.session_attempts_label.text())
         self.assertEqual(str(game.lifetime_attempts), title.lifetime_attempts_label.text())
 
-        splits_widget = main.splits.splits
+        splits_widget = self.main.splits.splits
         game_splits = game.splits
 
         self.assertEqual(len(game_splits), len(splits_widget))
@@ -54,18 +60,11 @@ class TestSettings(unittest.TestCase):
 
             self.assertEqual(game_split, widget_split.split)
 
-        # cleanup main properly by calling its close methods, and patching out the Dialog popup
-        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):  # patch out the popup
-            main.close()
-            main.deleteLater()
-
     def test_game_settings_update(self):
-        main = _get_a_main()
-
-        settings = main.settings
+        settings = self.main.settings
         game = settings.game
 
-        game_settings = main.settings_window.tab_dict['Splits']
+        game_settings = self.main.settings_window.tab_dict['Splits']
         game_settings.title_input.setText('TEST')
         game_settings.sub_title_input.setText('TEST')
 
@@ -77,7 +76,7 @@ class TestSettings(unittest.TestCase):
         game_settings.apply()
 
         # make assertions about the game
-        title = main.title
+        title = self.main.title
 
         self.assertEqual(game.title, 'TEST')
         self.assertEqual(title.title_label.text(), 'TEST')
@@ -86,7 +85,7 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(str(game.session_attempts), title.session_attempts_label.text())
         self.assertEqual(str(game.lifetime_attempts), title.lifetime_attempts_label.text())
 
-        splits_widget = main.splits.splits
+        splits_widget = self.main.splits.splits
         game_splits = game.splits
 
         self.assertEqual(len(game_splits), len(splits_widget))
@@ -106,15 +105,9 @@ class TestSettings(unittest.TestCase):
 
             self.assertEqual(game_split, widget_split.split)
 
-        # cleanup main properly by calling its close methods, and patching out the Dialog popup
-        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):  # patch out the popup
-            main.close()
-            main.deleteLater()
-
     def test_basic_color_settings(self):
-        main = _get_a_main()
-        settings = main.settings
-        basic_settings = main.settings_window.tab_dict['Settings']
+        settings = self.main.settings
+        basic_settings = self.main.settings_window.tab_dict['Settings']
         color_group = basic_settings.color_group
 
         # setup
@@ -144,15 +137,9 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(color_group.lostTimeAheadPicker.color_name, settings.style.variable_map['lost-time-color-ahead'])
         self.assertEqual(color_group.lostTimeBehindPicker.color_name, settings.style.variable_map['lost-time-color-behind'])
 
-
-        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):
-            main.close()
-            main.deleteLater()
-
     def test_basic_color_bg_image_setting(self):
-        main = _get_a_main()
-        settings = main.settings
-        basic_settings = main.settings_window.tab_dict['Settings']
+        settings = self.main.settings
+        basic_settings = self.main.settings_window.tab_dict['Settings']
         color_group = basic_settings.color_group
 
         # setup
@@ -176,16 +163,11 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(color_group.backgroundImagePicker.file_path, 'TEST')
         self.assertEqual(settings.style.variable_map['background-image'], 'url("TEST") 0 0 0 0 stretch stretch')
 
-        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):
-            main.close()
-            main.deleteLater()
-
     def test_basic_text_setting_update_font(self):
-        main = _get_a_main()
-        settings = main.settings
+        settings = self.main.settings
         var_map = settings.style.variable_map
 
-        basic_settings = main.settings_window.tab_dict['Settings']
+        basic_settings = self.main.settings_window.tab_dict['Settings']
         text_settings = basic_settings.text_group
         font_families = QFontDatabase.families()
 
@@ -237,16 +219,11 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(new_split_family, var_map['split-font'])
         self.assertEqual(new_timer_family, var_map['timer-font'])
 
-        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):
-            main.close()
-            main.deleteLater()
-
     def test_basic_text_setting_update_size(self):
-        main = _get_a_main()
-        settings = main.settings
+        settings = self.main.settings
         var_map = settings.style.variable_map
 
-        basic_settings = main.settings_window.tab_dict['Settings']
+        basic_settings = self.main.settings_window.tab_dict['Settings']
         text_settings = basic_settings.text_group
 
         # setup
@@ -284,16 +261,11 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(f'{text_settings.split_font_picker.get_size()}px', var_map['split-size'])
         self.assertEqual(f'{text_settings.timer_font_picker.get_size()}px', var_map['timer-size'])
 
-        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):
-            main.close()
-            main.deleteLater()
-
     def test_basic_text_setting_update_color(self):
-        main = _get_a_main()
-        settings = main.settings
+        settings = self.main.settings
         var_map = settings.style.variable_map
 
-        basic_settings = main.settings_window.tab_dict['Settings']
+        basic_settings = self.main.settings_window.tab_dict['Settings']
         text_settings = basic_settings.text_group
 
         # setup
@@ -335,7 +307,3 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(text_settings.lifetime_attempts_color_picker.get_color(), QColor(var_map['lifetime-attempts-color']))
         self.assertEqual(text_settings.split_color_picker.get_color(), QColor(var_map['split-color']))
         self.assertEqual(text_settings.timer_color_picker.get_color(), QColor(var_map['timer-color']))
-
-        with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):
-            main.close()
-            main.deleteLater()
