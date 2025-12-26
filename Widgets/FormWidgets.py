@@ -7,7 +7,7 @@ from helpers.ColorHelpers import *
 
 
 class LabeledTextEntry(QFrame):
-    def __init__(self, label: str, original_value: str, parent):
+    def __init__(self, label: str, original_value: str, parent=None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
@@ -22,6 +22,7 @@ class LabeledTextEntry(QFrame):
         self.input.setFixedHeight(25)
         self.input.setText(original_value)
         self.input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.textChanged = self.input.textChanged
 
         self.layout.addWidget(self.label, stretch=1)
         self.layout.addWidget(self.input, stretch=1)
@@ -33,12 +34,18 @@ class LabeledTextEntry(QFrame):
     def setText(self, text: str):
         self.input.setText(text)
 
-    def getText(self):
+    def text(self):
         return self.input.text()
+
+    def setLabel(self, label: str):
+        self.label.setText(label)
+
+    def getLabel(self):
+        return self.label.text()
 
 
 class LabeledSpinBox(QFrame):
-    def __init__(self, label: str, original_value: int, parent):
+    def __init__(self, label: str, original_value: int, parent=None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
@@ -53,6 +60,7 @@ class LabeledSpinBox(QFrame):
         self.input.setFixedHeight(25)
         self.input.setValue(original_value)
         self.input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.valueChanged = self.input.valueChanged
 
         self.layout.addWidget(self.label, stretch=1)
         self.layout.addWidget(self.input, stretch=1)
@@ -62,6 +70,18 @@ class LabeledSpinBox(QFrame):
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
+
+    def value(self):
+        return self.input.value()
+
+    def setValue(self, value):
+        self.input.setValue(value)
+
+    def getLabel(self):
+        return self.label.text()
+
+    def setLabel(self, label: str):
+        self.label.setText(label)
 
 
 class NoScrollQSpinBox(QSpinBox):
@@ -98,6 +118,12 @@ class LabeledDoubleSpinBox(QFrame):
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
+
+    def setValue(self, value):
+        self.input.setValue(value)
+
+    def value(self):
+        return self.input.value()
 
 
 class NoScrollQDoubleSpinBox(QDoubleSpinBox):
