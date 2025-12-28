@@ -1,5 +1,5 @@
 from helpers.QtABCMetas import QFrameABCMeta
-from helpers.TimerFormat import format_wall_clock_from_ms
+from helpers.TimerFormat import format_wall_clock_from_ms, ms_to_qtime
 from Main import Main
 from pathlib import Path
 from PySide6.QtGui import QFontDatabase, QColor
@@ -74,6 +74,21 @@ class TestSettings(unittest.TestCase):
 
             curr_split_edit.split_name_input.setText(curr_split_edit.split_name_input.text() + '_TEST')
 
+            curr_ms = (i + 1) * 1000
+            curr_split_edit.best_time_input.setTime(ms_to_qtime(curr_ms))
+            curr_split_edit.best_segment_input.setTime(ms_to_qtime(curr_ms + 1))
+            curr_split_edit.gold_segment_input.setTime(ms_to_qtime(curr_ms - 1))
+
+        game_settings.addEmptySplit()
+        curr_split_edit = game_settings.split_area.itemAt(i + 1).widget()  # get the new last widget
+        curr_split_edit.split_name_input.setText('NEW_TEST')
+
+        curr_ms = (i + 2) * 1000
+
+        curr_split_edit.best_time_input.setTime(ms_to_qtime(curr_ms))
+        curr_split_edit.best_segment_input.setTime(ms_to_qtime(curr_ms + 1))
+        curr_split_edit.gold_segment_input.setTime(ms_to_qtime(curr_ms - 1))
+
         game_settings.apply()
 
         # make assertions about the game
@@ -105,6 +120,12 @@ class TestSettings(unittest.TestCase):
             self.assertEqual(widget_split.current_start_time, 0)
 
             self.assertEqual(game_split, widget_split.split)
+
+            curr_ms = (i + 1) * 1000
+
+            self.assertEqual(game_split.pb_time_ms, curr_ms)
+            self.assertEqual(game_split.pb_segment_ms, (curr_ms + 1))
+            self.assertEqual(game_split.gold_segment_ms, (curr_ms - 1))
 
         # cleanup main properly by calling its close methods, and patching out the Dialog popup
         with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):  # patch out the popup
