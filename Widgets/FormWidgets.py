@@ -188,7 +188,7 @@ class ClickableFrame(QFrame):
 
 class ColorPicker(QFrame):
     # TODO : This should start using our own custom color picker
-    def __init__(self, label: str, color: QColor, parent):
+    def __init__(self, label: str, color: QColor, parent=None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
@@ -226,7 +226,7 @@ class ColorPicker(QFrame):
             self.color = color
             self.color_name = color.name(QColor.HexArgb)
 
-            self.hex_entry.setText(to_full_rgba(self.color_name, argb=True))
+            self.hex_entry.setText(self.color_name)
 
             self.color_preview.setStyleSheet(f"background-color: {self.color_name}; border-radius: 2; border: 1px solid #616769;")
 
@@ -239,6 +239,9 @@ class ColorPicker(QFrame):
             if color.isValid():
                 self.color = color
                 self.color_name = color.name(QColor.HexArgb)
+
+                if self.hex_entry.text() != f'#{hex_code}':
+                    self.hex_entry.setText(f'#{hex_code}')
 
                 self.color_preview.setStyleSheet(f"background-color: {self.color_name}; border-radius: 2; border: 1px solid #616769;")
 
