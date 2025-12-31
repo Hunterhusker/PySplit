@@ -5,6 +5,38 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, 
 from PySide6.QtCore import Qt, Signal, QTime
 from helpers.ColorHelpers import *
 
+# a set of subclasses to remove the wheelEvent that I don't like on my "scrollable" boxes
+class NoScrollQSpinBox(QSpinBox):
+    def __init__(self):
+        super().__init__()
+
+    def wheelEvent(self, event):
+        event.ignore()  # prevent scroll changes
+
+
+class NoScrollQDoubleSpinBox(QDoubleSpinBox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def wheelEvent(self, event):
+        event.ignore()  # prevent scroll changes
+
+
+class NoScrollQTimeEdit(QTimeEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def wheelEvent(self, event):
+        event.ignore()  # prevent scroll changes
+
+
+class NoScrollQFontComboBox(QFontComboBox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def wheelEvent(self, event):
+        event.ignore()
+
 
 class LabeledTextEntry(QFrame):
     def __init__(self, label: str, original_value: str, parent=None):
@@ -84,14 +116,6 @@ class LabeledSpinBox(QFrame):
         self.label.setText(label)
 
 
-class NoScrollQSpinBox(QSpinBox):
-    def __init__(self):
-        super().__init__()
-
-    def wheelEvent(self, event):
-        event.ignore()  # prevent scroll changes
-
-
 class LabeledDoubleSpinBox(QFrame):
     def __init__(self, label: str, original_value: int, decimals: int, step: float, parent):
         super().__init__(parent=parent)
@@ -124,30 +148,6 @@ class LabeledDoubleSpinBox(QFrame):
 
     def value(self):
         return self.input.value()
-
-
-class NoScrollQDoubleSpinBox(QDoubleSpinBox):
-    def __init__(self):
-        super().__init__()
-
-    def wheelEvent(self, event):
-        event.ignore()  # prevent scroll changes
-
-
-class NoScrollQTimeEdit(QTimeEdit):
-    def __init__(self):
-        super().__init__()
-
-    def wheelEvent(self, event):
-        event.ignore()  # prevent scroll changes
-
-
-class NoScrollQFontComboBox(QFontComboBox):
-    def __init__(self):
-        super().__init__()
-
-    def wheelEvent(self, event):
-        event.ignore()
 
 
 class LabeledNoScrollQTimeEdit(QFrame):
@@ -296,6 +296,7 @@ class FontPicker(QFrame):
     def set_font_family(self, font_family: str):
         tmp = self.get_font()
         tmp.setFamily(font_family)
+        tmp.setPixelSize(self.get_size())
 
         self.set_font(tmp)
 
@@ -304,6 +305,7 @@ class FontPicker(QFrame):
 
     def set_size(self, size: int):
         self.size_spinner.setValue(size)
+        self.font_combobox.currentFont().setPixelSize(size)
 
 
 class FileDialogOpener(QFrame):
@@ -361,6 +363,9 @@ class FileDialogOpener(QFrame):
 
         self.file_path_label.setText(file_path)
         self.file_path = file_path
+
+    def get_file_path(self) -> str:
+        return self.file_path
 
     def clear_file_click(self):
         self.file_path = 'none'
