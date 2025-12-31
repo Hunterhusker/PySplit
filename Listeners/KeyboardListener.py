@@ -1,5 +1,6 @@
 from abc import ABC
 
+import Xlib.error
 from pynput.keyboard import Listener, Key, KeyCode
 from PySide6.QtCore import Slot
 from Listeners.ABCListener import ABCListener, ABCListenedObject
@@ -121,7 +122,13 @@ class KeyboardListener(ABCListener, ABC):
         """
         Stops the keyboard listener cleanly
         """
-        self.listener.stop()
+        if self.listener is not None:
+            try:
+                self.listener.stop()
+            except Xlib.error.ConnectionClosedError:  # happens when the stop is called on this twice, just pass it since we're quitting and pynput is already dead
+                pass  # TODO : Probably want to log this in the logging update
+
+        self.listener = None
 
     def event_object_from_dict(self, event_dict: dict[str, str]):
         return self.event_type().from_dict(event_dict)
