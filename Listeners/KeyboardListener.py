@@ -125,7 +125,7 @@ class KeyboardListener(ABCListener, ABC):
         if self.listener is not None:
             try:
                 self.listener.stop()
-            except Xlib.error.ConnectionClosedError:  # happens when the stop is called on this twice, just pass it since we're quitting and pynput is already dead
+            except (Xlib.error.ConnectionClosedError, AttributeError):  # happens when the stop is called on this twice, just pass it since we're quitting and pynput is already dead
                 pass  # TODO : Probably want to log this in the logging update
 
         self.listener = None
