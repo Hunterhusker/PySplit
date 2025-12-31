@@ -1,11 +1,11 @@
 import sys
-import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from PySide6.QtGui import QWheelEvent, QFontDatabase
 from PySide6.QtTest import QSignalSpy, QTest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPointF, QPoint
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from Main import Main
@@ -25,13 +25,58 @@ class TestFormWidgets(unittest.TestCase):
         if self._app is None:
             self._app = QApplication(sys.argv)
 
-        self.main = _get_a_main()
+        self._main = _get_a_main()
 
     def tearDown(self):
-        if self.main is not None:
+        if self._main is not None:
             with patch.object(QMessageBox, "exec", return_value=QMessageBox.No):  # patch out the popup
-                self.main.close()
-                self.main.deleteLater()
+                self._main.close()
+                self._main.deleteLater()
+
+    def send_wheel_event(self, widget, delta_y=120):
+        event = QWheelEvent(
+            QPointF(widget.rect().center()),  # local position
+            QPointF(widget.mapToGlobal(widget.rect().center())),  # global
+            QPoint(0, 0),  # pixelDelta
+            QPoint(0, delta_y),  # angleDelta
+            Qt.NoButton,
+            Qt.NoModifier,
+            Qt.ScrollBegin,
+            False
+        )
+        self._app.sendEvent(widget, event)
+
+    def test_send_wheel_event(self):
+        widget = QSpinBox()
+        self.assertEqual(widget.value(), 0, 'The SpinBox did not start at 0.')
+        self.send_wheel_event(widget)  # do a mock scroll on this widget
+
+        # ensures that the scroll event goes through
+        self.assertNotEqual(widget.value(), 0, 'The SpinBox did not respond to the mocked scroll event.')
+
+    def test_NoScrollQSpinBox(self):
+        widget = NoScrollQSpinBox()
+        self.assertEqual(widget.value(), 0, 'The NoScrollQSpinBox did not start at 0.')
+        self.send_wheel_event(widget)  # do a mock scroll on this widget
+        self.assertEqual(widget.value(), 0, 'The NoScrollQSpinBox did respond to the mock scroll event, and it should not have.')
+
+    def test_NoScrollQDoubleSpinBox(self):
+        widget = NoScrollQDoubleSpinBox()
+        self.assertEqual(widget.value(), 0, 'The NoScrollQDoubleSpinBox did not start at 0.')
+        self.send_wheel_event(widget)  # do a mock scroll on this widget
+        self.assertEqual(widget.value(), 0, 'The NoScrollQDoubleSpinBox did respond to the mock scroll event, and it should not have.')
+
+    def test_NoScrollQTimeEdit(self):
+        widget = NoScrollQTimeEdit()
+        curr_time = widget.time()
+        self.send_wheel_event(widget)
+        self.assertEqual(widget.time(), curr_time, 'The NoScrollQTimeEdit did respond to the mock scroll event, and it should not have.')
+
+    def test_NoScrollQFontComboBox(self):
+        widget = NoScrollQFontComboBox()
+        curr_font = widget.font()
+        self.send_wheel_event(widget)
+        self.assertEqual(widget.font(), curr_font, 'The NoScrollQFontComboBox did respond to the mock scroll event, and it should not have.')
 
     def test_LabeledTextEntry_init(self):
         widget = LabeledTextEntry('label', 'foo')
@@ -83,6 +128,17 @@ class TestFormWidgets(unittest.TestCase):
         self.assertEqual(widget.label.text(), 'NEW')
         self.assertEqual(widget.getLabel(), 'NEW')
 
+    def test_LabeledSpinBox_ignore_scroll(self):
+        widget = LabeledSpinBox('label', 5)
+
+        self.assertEqual(widget.value(), 5)
+        self.assertEqual(widget.input.value(), 5)
+
+        self.send_wheel_event(widget.input)
+
+        self.assertEqual(widget.value(), 5)
+        self.assertEqual(widget.input.value(), 5)
+
     def test_ClickableFrame(self):
         widget = ClickableFrame()
         spy = QSignalSpy(widget.clicked)
@@ -132,3 +188,70 @@ class TestFormWidgets(unittest.TestCase):
 
         self.assertEqual(spy.count(), 1)
         self.assertEqual(widget.hex_entry.text(), '#ff0000ff')
+
+    def test_FontPicker(self):
+        main_font = self._main.font()
+        widget = FontPicker('label', main_font.family(), 10)
+
+        self.assertEqual(widget.get_font().family(), main_font.family())
+        self.assertEqual(widget.font_combobox.currentFont(), main_font)
+
+        self.assertEqual(widget.get_size(), 10)
+        self.assertEqual(widget.size_spinner.value(), 10)
+
+    def test_FontPicker_set_size(self):
+        main_font = self._main.font()
+        widget = FontPicker('label', main_font.family(), 10)
+
+        widget.set_size(15)
+
+        self.assertEqual(widget.get_size(), 15)
+        self.assertEqual(widget.size_spinner.value(), 15)
+
+    def test_FontPicker_set_font(self):
+        font_families = QFontDatabase.families()
+        main_font = self._main.font()
+        main_font_idx = font_families.index(main_font.family())
+
+        widget = FontPicker('label', main_font.family(), 10)
+
+        new_font = QFont(font_families[min(main_font_idx + 5, len(font_families) - 1)], 10)
+        widget.set_font(new_font)
+
+        self.assertNotEqual(main_font, new_font, 'Bad test, the new font was the old font!')
+
+        self.assertEqual(widget.get_font(), new_font, 'The new font was not the font returned by the FontPicker.')
+        self.assertEqual(widget.font_combobox.currentFont(), new_font, 'The new font was not the current font for the NoScrollQFontCombobox.')
+
+    def test_FontPicker_set_font_family(self):
+        font_families = QFontDatabase.families()
+        main_font = self._main.font()
+        main_font_idx = font_families.index(main_font.family())
+
+        widget = FontPicker('label', main_font.family(), 10)
+
+        new_family = QFont(font_families[min(main_font_idx + 5, len(font_families) - 1)], 10).family()
+        widget.set_font_family(new_family)
+
+        self.assertNotEqual(main_font, new_family, 'Bad test, the new font family was the old font!')
+
+        self.assertEqual(widget.get_font().family(), new_family, 'The new font family was not the font returned by the FontPicker.')
+        self.assertEqual(widget.font_combobox.currentFont().family(), new_family,'The new font family was not the current font for the NoScrollQFontCombobox.')
+
+    def test_FileDialogOpener(self):
+        widgetSansPath = FileDialogOpener('label')
+        widgetWithPath = FileDialogOpener('label2', '/test/path/file.txt')
+
+        self.assertEqual(widgetSansPath.label.text(), 'label')
+        self.assertEqual(widgetWithPath.label.text(), 'label2')
+
+        self.assertEqual(widgetSansPath.get_file_path(), 'none')
+        self.assertEqual(widgetSansPath.file_path_label.text(), 'none')
+
+        self.assertEqual(widgetWithPath.get_file_path(), '/test/path/file.txt')
+        self.assertEqual(widgetWithPath.file_path_label.text(), '/test/path/file.txt')
+
+    def test_FileDialogOpener_open_file_click(self):
+        widget = FileDialogOpener('label')
+
+        # TODO mock out the dialog and test the signals are sent properly
