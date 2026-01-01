@@ -253,5 +253,36 @@ class TestFormWidgets(unittest.TestCase):
 
     def test_FileDialogOpener_open_file_click(self):
         widget = FileDialogOpener('label')
+        spy = QSignalSpy(widget.open_dialog_button.clicked)
 
-        # TODO mock out the dialog and test the signals are sent properly
+        test_path = "test/path/file.txt"
+
+        self.assertEqual(spy.count(), 0)
+
+        with patch.object(QFileDialog, "exec", return_value=True), patch.object(QFileDialog, "selectedFiles", return_value=[test_path]):
+            QTest.mouseClick(widget.open_dialog_button, Qt.LeftButton)
+
+        self.assertEqual(spy.count(), 1)
+        self.assertEqual(widget.file_path_label.text(), test_path)
+        self.assertEqual(widget.file_path, test_path)
+
+    def test_FileDialogOpener_set_file_path(self):
+        widget = FileDialogOpener('label')
+
+        new_path = "test/path/file.txt"
+        self.assertNotEqual(widget.file_path, new_path)
+
+        widget.set_file_path(new_path)
+        self.assertEqual(widget.file_path, new_path)
+
+    def test_FileDialogOpener_set_file_path_url(self):
+        widget = FileDialogOpener('label')
+
+        new_path = "test/path/file.txt"
+        new_url = f"url({new_path}) asdf asdf asdf"
+        self.assertNotEqual(widget.file_path, new_path)
+        self.assertNotEqual(widget.file_path, new_url)
+
+        widget.set_file_path(new_path)
+        self.assertEqual(widget.file_path, new_path)
+        self.assertNotEqual(widget.file_path, new_url)  # still don't want all the URL bits in there
