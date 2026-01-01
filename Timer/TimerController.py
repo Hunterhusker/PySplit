@@ -1,8 +1,11 @@
 from PySide6.QtCore import QObject, Slot, Signal
 import json
 
-from Listeners.ABCListener import ABCListener
-from Listeners.KeyboardListener import KeyPressObject
+from Listeners.ABCListener import ABCListener, ABCListenedObject
+from Styling.Settings import Settings
+
+
+#from Listeners.KeyboardListener import KeyPressObject
 
 
 class TimerController(QObject):
@@ -11,23 +14,27 @@ class TimerController(QObject):
     """
     ControlEvent = Signal(str)
 
-    def __init__(self, Listeners: list[ABCListener], event_map):
+    def __init__(self, listener: ABCListener, settings: Settings):
         super().__init__()  # do the basic init
 
         # save our listeners to a list just in case
-        self.event_map = dict()
-        self.listeners = []
+        self.event_map = {}
+        self.listener = listener
         self.listening = True
+        self.settings = settings
 
-        # subscribe to all the on_press events from the different listeners
-        self.add_listeners(Listeners)
+        listener.listen()
+        listener.on_event.connect(self.input_event)
+
+        self.settings.InputMapUpdate.connect(self.settings_update)
+        self.import_mapping(settings.get_inputs())
 
         # find the format of the input map
-        if type(event_map) == dict:
-            self.update_mapping(event_map)
-        else:
-            # update the input mapping
-            self.import_mapping(event_map)
+        # if isinstance(event_map, dict):
+        #     self.update_mapping(event_map)
+        # else:
+        #     # update the input mapping
+        #     self.import_mapping(event_map)
 
     @Slot(object)
     def input_event(self, event_obj):
@@ -36,13 +43,17 @@ class TimerController(QObject):
 
             if event == 'LOCK':  # the lock event is local and should be pressable w/o the listening turned on
                 self.toggle_listening()
-            elif self.listening:  # as long as we're listening then we should do this (and if it is not the lock command as that is local to the controller)
+            elif self.listening:  # as long as we're listening, then we should do this (and if it is not the lock command as that is local to the controller)
                 self.ControlEvent.emit(event)
 
-    def update_mapping(self, event_map: dict[KeyPressObject, str]):
+    @Slot()
+    def settings_update(self):
+        self.import_mapping(self.settings.get_inputs())
+
+    def update_mapping(self, event_map: dict[ABCListenedObject, str]):
         """
         Takes in a mapping of objects that an added listener can output and maps them to a string that the timer can read for control commands
-            - will completely overwrite the
+            - will completely overwrite the mapping
 
         Args:
             event_map: (dict[KeyPressObject, str]) A dictionary keyed by the output the listener will give when it sees this
@@ -88,17 +99,17 @@ class TimerController(QObject):
 
         return self.event_map  # return what is left of the map
 
-    def export_mapping(self) -> str:
+    def export_mapping(self):
         """
         Exports the current input config as a JSON string that we can store and load in later
 
         Returns:
-            (dict[str, str]) : The JSON string representing the current inputs
+            (dict[str, str]): The JSON string representing the current inputs
         """
         export_list = []
 
         for mapping in self.event_map:
-            tmp = mapping.serialize()  # our mapped objs must be ABCListenedObjects so we can do this
+            tmp = mapping.to_dict()  # our mapped objs must be ABCListenedObjects so we can do this
             tmp['event'] = self.event_map[mapping]
 
             export_list.append(tmp)
@@ -114,47 +125,52 @@ class TimerController(QObject):
         new_map = {}
 
         for mapping in serialized_event_map:
-            tmp = KeyPressObject().deserialize(mapping)
+            # from Listeners.KeyboardListener import KeyPressObject
+            # tmp = KeyPressObject().from_dict(mapping)
+            # tmp = f'Pynput({mapping['value']})'
 
-            if tmp.value == '':  # deal with unbound keys
-                tmp.value = None
+            # if tmp.value == '':  # deal with unbound keys
+            #     tmp.value = None
+            tmp = self.listener.event_object_from_dict(mapping)
 
             new_map[tmp] = mapping['event']
 
+        #print(new_map)
         self.event_map = new_map
 
-    def add_listener(self, listener: ABCListener):
-        """
-        Adds a single listener and starts listening to it
-
-        Args:
-            listener: (ABCListener) The listener to add to the list and begin listening to
-        """
-        self.listeners.append(listener)  # save it for later
-
-        listener.on_press.connect(self.input_event)  # start listening to events from this
-
-    def add_listeners(self, listeners: list[ABCListener]):
-        """
-        Adds a whole list of listeners to the controller and listens to them all
-
-        Args:
-            listeners: (list[ABCListener]) the list of listeners to add to this controller
-        """
-        for listener in listeners:
-            self.add_listener(listener)
-
-    def remove_listener(self, listener: ABCListener):
-        """
-        Removes a listener from the set of listeners that the controller is listening to
-
-        Args:
-            listener: (ABCListener) A listener that will emit an on_press signal with user input data that can perform actions
-        """
-        if listener in self.listeners:
-            self.listeners.remove(listener)
-
-            listener.on_press.disconnect(self.input_event)
+    # def add_listener(self, listener: ABCListener):
+    #     """
+    #     Adds a single listener and starts listening to it
+    #
+    #     Args:
+    #         listener: (ABCListener) The listener to add to the list and begin listening to
+    #     """
+    #     listener.listen()
+    #     self.listeners.append(listener)  # save it for later
+    #
+    #     listener.on_event.connect(self.input_event)  # start listening to events from this
+    #
+    # def add_listeners(self, listeners: list[ABCListener]):
+    #     """
+    #     Adds a whole list of listeners to the controller and listens to them all
+    #
+    #     Args:
+    #         listeners: (list[ABCListener]) the list of listeners to add to this controller
+    #     """
+    #     for listener in listeners:
+    #         self.add_listener(listener)
+    #
+    # def remove_listener(self, listener: ABCListener):
+    #     """
+    #     Removes a listener from the set of listeners that the controller is listening to
+    #
+    #     Args:
+    #         listener: (ABCListener) A listener that will emit an on_press signal with user input data that can perform actions
+    #     """
+    #     if listener in self.listeners:
+    #         self.listeners.remove(listener)
+    #
+    #         listener.on_event.disconnect(self.input_event)
 
     def pause_listeners(self):
         if self.listening:

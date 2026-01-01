@@ -20,3 +20,6 @@ class LayoutTab(ABCSettingTab):
 
     def apply(self):
         pass
+
+    def opened(self):
+        pass

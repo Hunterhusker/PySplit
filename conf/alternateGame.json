@@ -1,35 +1,36 @@
 {
-    "title": "Game Test",
+    "title": "Other Game",
     "sub_title": "Any%",
-    "lifetime_attempts": 8,
+    "lifetime_attempts": 6,
     "display_pb": true,
+    "start_delay_ms": 0,
     "splits": [
         {
-            "split_name": "test1",
+            "split_name": "1test",
             "pb_time_ms": 2230,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 1230
         },
         {
-            "split_name": "test2",
+            "split_name": "2test",
             "pb_time_ms": 3630,
             "pb_segment_ms": 1400,
             "gold_segment_ms": 1100
         },
         {
-            "split_name": "test3",
+            "split_name": "3test",
             "pb_time_ms": 6650,
             "pb_segment_ms": 3020,
             "gold_segment_ms": 2220
         },
         {
-            "split_name": "test4",
+            "split_name": "4test",
             "pb_time_ms": 8880,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 3330
         },
         {
-            "split_name": "test5",
+            "split_name": "5test",
             "pb_time_ms": 10080,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 3330

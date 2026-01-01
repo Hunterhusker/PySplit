@@ -17,3 +17,4 @@ class TimeStatsWidget(QWidget):
 
         # finish up and set everything properly
         self.setLayout(self.layout)
+        self.setObjectName("TimerStatsWidget")

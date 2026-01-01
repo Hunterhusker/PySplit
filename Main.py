@@ -1,19 +1,24 @@
-from PySide6.QtGui import QFontDatabase
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QMenu, QSizePolicy, QFrame, QScrollArea
-from PySide6.QtCore import Slot, Signal, QThread, Qt
-import sys
-import json
-from time import sleep
+import resources_rc
 
-from Listeners.KeyboardListener import KeyboardListener, KeyPressObject
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QMessageBox, QMainWindow
+from PySide6.QtCore import Slot, Signal, QThread, Qt, QFile
+from PySide6.QtGui import QIcon
+import sys
+from time import sleep
+from Listeners.AggregateListener import AggregateListener
+from Listeners.KeyboardListener import KeyboardListener
+from Popups.AdvancedStyleTab import AdvancedStyleTab
+from Popups.AssignButtonsTab import AssignButtonsTab
+from Popups.BasicSettingsTab import BasicSettingsTab
 from Popups.SettingsWindow import SettingsWindow
+from Popups.GameSettingsTab import GameSettingsTab
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
 from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
 from Widgets.TitleWidget import TitleWidget
-from Configurator.Configurator import Configurator
+from Styling.Settings import Settings
 
 
 class Main(QWidget):
@@ -26,20 +31,26 @@ class Main(QWidget):
     Quit = Signal()
     SaveSettings = Signal()
 
-    def __init__(self):
+    _widget_starting_location = None  # the starting location of the widget, used for click and drag actions
+
+    def __init__(self, settings_path: str = 'conf/settings.json'):
         super().__init__()
         self.setWindowTitle('PySplit v0.0')
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint)
+
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setAutoFillBackground(True)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        self.Title = TitleWidget('Game', 'SubTitle')
-        self.Title.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)  # allows title to expand in the x (no shrinking) and leaves the y fixed
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
-        self._start_pos = None
+        # load the settings from the file
+        self.settings = Settings(settings_path)
 
-        self.MainTimerWidget = TimerWidget()
+        self.title = TitleWidget.from_game(self.settings.game)
+
+        self.main_timer_widget = TimerWidget()
 
         self.context_menu = QMenu(self)
 
@@ -54,28 +65,21 @@ class Main(QWidget):
         self.exit_action = self.context_menu.addAction('Exit')
         self.exit_action.triggered.connect(QApplication.instance().quit)
 
-        # load the settings from the file
-        self.configurator = Configurator('conf/settings.json')
-
         # use the configurations from the file
-        self.configurator.ConfigureStyle.connect(self.set_style)
+        self.settings.style.UpdateStyle.connect(self.set_style)
 
-        self.splits = SplitsWidget('')
+        self.splits = SplitsWidget(self.settings, parent=self)
+        self.settings.SettingsUpdate.connect(self.splits.apply_settings)
+
         self.splitStats = TimeStatsWidget()
 
-        layout.addWidget(self.Title)
+        layout.addWidget(self.title)
         layout.addWidget(self.splits)
-        layout.addWidget(self.MainTimerWidget)
+        layout.addWidget(self.main_timer_widget)
         layout.addWidget(self.splitStats)
 
         self.setLayout(layout)
         self.setGeometry(800, 800, 225, 200)
-
-        # create a keyboard listener
-        self.keyboard_listener = KeyboardListener()
-
-        # start the keyboard listener, it already runs the listener on its own thread so there is no need to add another thread
-        self.keyboard_listener.run()
 
         # create and connect to the timer thread
         self.game_timer = Timer()
@@ -83,15 +87,17 @@ class Main(QWidget):
         self.game_timer.moveToThread(self.game_timer_thread)
 
         # connect the game timer signals to the desired slots
-        self.game_timer.update.connect(self.MainTimerWidget.update_time)
+        self.game_timer.update.connect(self.main_timer_widget.update_time)
         self.game_timer.update.connect(self.splits.update_split)
         self.game_timer_thread.started.connect(self.game_timer.run)
         self.game_timer_thread.destroyed.connect(self.game_timer.stop_timer)
 
         self.game_timer_thread.start()
 
+        aggregate_listener = AggregateListener(listeners=[KeyboardListener()])
+
         # create the timer controller from the config
-        self.timer_controller = TimerController(Listeners=[self.keyboard_listener], event_map=self.configurator.settings['inputs'])
+        self.timer_controller = TimerController(listener=aggregate_listener, settings=self.settings)  # event_map=self.settings.settings['inputs'])
 
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
@@ -101,30 +107,37 @@ class Main(QWidget):
         self.splits.SplitFinish.connect(self.game_timer.stop_timer)
         self.splits.SplitReset.connect(self.game_timer.reset_timer)
 
+        self.settings.game.GameUpdated.connect(self.splits.load_splits_from_game)
+        self.settings.game.GameUpdated.connect(self.title.update_from_game)
+
+        self.settings_window = SettingsWindow(parent=self)
+        self.settings_window.setGeometry(900, 900, 600, 400)
+        self.settings_window.setMinimumSize(600, 400)
+        self.settings_window.add_tab(AssignButtonsTab(settings=self.settings, timer_controller=self.timer_controller, parent=self.settings_window), 'Key Bindings')
+        self.settings_window.add_tab(GameSettingsTab(self.settings, parent=self.settings_window), 'Splits')
+        self.settings_window.add_tab(BasicSettingsTab(self.settings, parent=self.settings_window), 'Settings')
+        self.settings_window.add_tab(AdvancedStyleTab(self.settings, parent=self.settings_window), 'Advanced')
+
+        self.settings_window.toggle_tab_visibility('Advanced')
+
         # connect up the closing signals to the closing slots
         self.Quit.connect(self.game_timer.quit)
-        self.Quit.connect(self.keyboard_listener.quit)
+        self.Quit.connect(self.timer_controller.listener.quit)
+
+        self.setObjectName('MainWindow')
 
     def contextMenuEvent(self, event):
-        self.context_menu.exec(event.globalPos())
+        if not self.game_timer.running:  # only open if the timer is not running, don't play with settings! PLAY THE GAME!
+            self.context_menu.exec(event.globalPos())
 
     def open_settings_popup(self):
         """
         Opens the keybinding assignment dialog popup and lets you reassign any key
         """
-        dialog = SettingsWindow(self)
-        dialog.setGeometry(900, 900, 400, 400)
-
         # lock the splitter
         self.timer_controller.listening = False
 
-        clickedOk = dialog.exec()  # open the popup and wait for it to close
-
-        if clickedOk:
-            # give the controller the new mapping
-            self.timer_controller.update_mapping(dialog.keyWidget.event_map)
-
-            tmp = json.dumps(self.timer_controller.export_mapping(), indent=4)
+        self.settings_window.exec()  # open the popup and wait for it to close
 
         # unlock the splitter
         self.timer_controller.listening = True
@@ -141,14 +154,14 @@ class Main(QWidget):
         self.context_menu.show()  # try and keep the menu open
 
     @Slot(str)
-    def set_style(self, style):
+    def set_style(self, stylesheet):
         """
         Sets the global stylesheet for the application
 
         Args:
-            style: (str) the style sheet data, probably read from file
+            stylesheet: (str) the style sheet data, probably read from file
         """
-        self.setStyleSheet(style)
+        self.setStyleSheet(stylesheet)
 
     def get_style(self):
         """
@@ -160,7 +173,30 @@ class Main(QWidget):
         return self.styleSheet()
 
     def closeEvent(self, event):
-        # emit a close so the threads clean up themselves
+        # stop listening to events
+        self.timer_controller.toggle_listening()
+
+        # make a popup to ask the user if they would like to save changes before exiting
+        save_box = QMessageBox(self)
+        save_box.setWindowTitle('Save Changes?')
+        save_box.setText('Would you like to save any configuration changes and new PBs?')
+        save_box.setStandardButtons(QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes)
+        save_box.setIcon(QMessageBox.Icon.Question)
+
+        # resize the buttons
+        save_no = save_box.button(QMessageBox.StandardButton.No)
+        save_no.setMinimumSize(75, 25)
+
+        save_yes = save_box.button(QMessageBox.StandardButton.Yes)
+        save_yes.setMinimumSize(75, 25)
+
+        result = save_box.exec()
+
+        if result == QMessageBox.StandardButton.Yes:
+            self.settings.write_settings()
+            self.settings.game.to_json_file(self.settings.settings['game_path'])
+
+        # emit a close so the threads clean themselves up
         self.Quit.emit()  # emit a quit signal
         sleep(0.125)  # wait for the quits to go through, not my proudest work, but it works
 
@@ -168,31 +204,32 @@ class Main(QWidget):
         self.game_timer_thread.quit()
         self.game_timer_thread.wait()
 
-        # save the configurations to their files
-        #self.configurator.write_settings()
-
         # accept the close event and actually close
         event.accept()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self._start_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+            self._widget_starting_location = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
 
     def mouseMoveEvent(self, event):
-        if self._start_pos is not None and event.buttons() & Qt.LeftButton:
-            self.move(event.globalPosition().toPoint() - self._start_pos)
+        if self._widget_starting_location is not None and event.buttons() & Qt.LeftButton:
+            self.move(event.globalPosition().toPoint() - self._widget_starting_location)
 
     def mouseReleaseEvent(self, event):
-        self._start_pos = None
+        self._widget_starting_location = None
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    icon = QIcon(':icons/Static/pysplitIcon.png')
 
     window = Main()
 
+    # set the window's icon
+    window.setWindowIcon(icon)
+
     # use main's style configurations to get the initial stylesheet
-    style = window.configurator.style.formatted_style_sheet
+    style = window.settings.style.formatted_style_sheet
     app.setStyleSheet(style)
 
     window.show()

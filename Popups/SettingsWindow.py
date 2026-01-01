@@ -1,8 +1,7 @@
 from PySide6.QtWidgets import QVBoxLayout, QDialog, QDialogButtonBox, QPushButton, QWidget, QTabWidget
 from PySide6.QtCore import Qt
 
-from Popups.AssignButtonsTab import AssignButtonsTab
-from Popups.StyleTab import StyleTab
+from Popups.ABCSettingTab import ABCSettingTab
 
 
 class SettingsWindow(QDialog):
@@ -10,18 +9,10 @@ class SettingsWindow(QDialog):
         super().__init__(parent)
 
         self.layout = QVBoxLayout()
-
-        self.keyWidget = AssignButtonsTab(mainWindow=parent)
-        self.styleWidget = StyleTab(mainWindow=parent)
-
+        
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.styleWidget, 'Style')
-        self.tabs.addTab(self.keyWidget, 'Key Bindings')
-
-        # set up our standard dialog buttons
+        
         self.dialogButtons = QDialogButtonBox()
-
-        # create buttons for the button dialog
         self.dialogButtons.addButton(QDialogButtonBox.Ok)
         self.dialogButtons.addButton(QDialogButtonBox.Apply)
         self.dialogButtons.addButton(QDialogButtonBox.Cancel)
@@ -33,6 +24,9 @@ class SettingsWindow(QDialog):
 
         self.dialogButtons.clicked.connect(self.button_event)
 
+        self.tab_dict = {}
+        self.tabs.currentChanged.connect(self.tab_opened)
+
         self.layout.addWidget(self.tabs)
         self.layout.addWidget(self.dialogButtons)
 
@@ -43,11 +37,24 @@ class SettingsWindow(QDialog):
         """
         Applies the settings to the application, since each page will know what to emit
         """
-        # get the current tab
-        idx = self.tabs.currentIndex()
+        # get the currently open widget
         currWidget = self.tabs.currentWidget()
 
-        print(f'Curr: {idx}: {str(currWidget)}')
+        currWidget.apply()  # and have it apply its changes!
+
+    def tab_opened(self, index: int):
+        widget = self.tabs.widget(index)
+        if hasattr(widget, "opened"):
+            widget.opened()
+
+    def toggle_tab_visibility(self, name):
+        idx = self.get_tab_index(name)
+        visible = self.tabs.isTabVisible(idx)
+        self.tabs.setTabVisible(idx, not visible)
+
+    def set_tab_visibility(self, name, visible):
+        idx = self.get_tab_index(name)
+        self.tabs.setTabVisible(idx, visible)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
@@ -68,3 +75,20 @@ class SettingsWindow(QDialog):
 
         elif role == QDialogButtonBox.ApplyRole:
             self.apply_settings()
+
+    def add_tab(self, tab_widget: ABCSettingTab, name: str):
+        """
+        Adds the provided tab to the end of the tab list. Must provide an ABCSettingsTab so that it has the required structure.
+        Args:
+            tab_widget: (ABCSettingsTab) the settings popup window to add
+            name: (str) the name of the tab
+        """
+        self.tab_dict[name] = tab_widget
+
+        self.tabs.addTab(tab_widget, name)
+
+    def get_tab(self, name: str):
+        return self.tab_dict[name]
+
+    def get_tab_index(self, name: str):
+        return self.tabs.indexOf(self.get_tab(name))

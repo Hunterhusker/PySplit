@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 from Listeners.KeyboardListener import key_to_str
 from Popups.ABCSettingTab import ABCSettingTab
+from Styling.Settings import Settings
+from Timer.TimerController import TimerController
 
 if TYPE_CHECKING:
     from Main import Main
@@ -14,28 +16,31 @@ class AssignButtonsTab(ABCSettingTab):
     """
     A custom dialog box that we will use the remap the keys and buttons to control the splitter
     """
-    def __init__(self, mainWindow: 'Main', parent: QWidget = None):
+    def __init__(self, settings: Settings, timer_controller: TimerController, parent=None):  # TODO : Should the timer controller really be here? Could just do the settings obj tbh
         super().__init__(parent)
+        self.parent = parent
 
         # basic window setup
-        # self.setWindowTitle('Assign Hotkeys!')
         self.layout = QVBoxLayout()
+        self.settings = settings
+        self.timer_controller = timer_controller
 
-        self.scrollWidget = QWidget()
-        self.scrollWidgetLayout = QVBoxLayout()
-        self.scrollWidgetLayout.setSpacing(3)
-        self.scrollWidgetLayout.setContentsMargins(0, 0, 0, 0)
+        self.scroll_widget = QWidget()
+        self.scroll_widget_layout = QVBoxLayout()
+        self.scroll_widget_layout.setSpacing(3)
+        self.scroll_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.scrollArea = QScrollArea()
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setFrameStyle(QFrame.NoFrame)
-        self.scrollArea.setViewportMargins(0, 0, 5, 0)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setFrameStyle(QFrame.NoFrame)
+        self.scroll_area.setViewportMargins(0, 0, 5, 0)
 
-        self.event_map = copy.deepcopy(mainWindow.timer_controller.get_mapping())  # save a copy of the event map
+        self.event_map = copy.deepcopy(self.timer_controller.get_mapping())  # save a copy of the event map
 
         # get the listener from the main page so we can listen to it
-        self.listener = mainWindow.keyboard_listener
+        self.listener = self.timer_controller.listener  # mainWindow.keyboard_listener
+        # TODO : Should listen to all things in the timer controller, perhaps it should be a controller type instead??
 
         # pull apart the event mapping, so I can build my assignment GUI
         keys = list(self.event_map.keys())
@@ -63,23 +68,23 @@ class AssignButtonsTab(ABCSettingTab):
             'LOCK': self.assignLock
         }
 
-        self.scrollWidgetLayout.addWidget(self.assignStartSplit)
-        self.scrollWidgetLayout.addWidget(self.assignUnsplit)
-        self.scrollWidgetLayout.addWidget(self.assignPause)
-        self.scrollWidgetLayout.addWidget(self.assignResume)
-        self.scrollWidgetLayout.addWidget(self.assignStop)
-        self.scrollWidgetLayout.addWidget(self.assignReset)
-        self.scrollWidgetLayout.addWidget(self.assignSkipSplit)
-        self.scrollWidgetLayout.addWidget(self.assignLock)
+        self.scroll_widget_layout.addWidget(self.assignStartSplit)
+        self.scroll_widget_layout.addWidget(self.assignUnsplit)
+        self.scroll_widget_layout.addWidget(self.assignPause)
+        self.scroll_widget_layout.addWidget(self.assignResume)
+        self.scroll_widget_layout.addWidget(self.assignStop)
+        self.scroll_widget_layout.addWidget(self.assignReset)
+        self.scroll_widget_layout.addWidget(self.assignSkipSplit)
+        self.scroll_widget_layout.addWidget(self.assignLock)
 
         # add a stretch to keep stuff sized right
-        self.scrollWidgetLayout.addStretch()
+        self.scroll_widget_layout.addStretch()
 
-        self.scrollWidget.setLayout(self.scrollWidgetLayout)
-        self.scrollArea.setWidget(self.scrollWidget)
+        self.scroll_widget.setLayout(self.scroll_widget_layout)
+        self.scroll_area.setWidget(self.scroll_widget)
 
-        self.scrollWidget.setLayout(self.scrollWidgetLayout)
-        self.layout.addWidget(self.scrollArea)
+        self.scroll_widget.setLayout(self.scroll_widget_layout)
+        self.layout.addWidget(self.scroll_area)
 
         # link it all up so that this displays
         self.setLayout(self.layout)
@@ -127,8 +132,20 @@ class AssignButtonsTab(ABCSettingTab):
         self.event_map = dict(zip(keys, values))  # remake the map and set it
 
     def apply(self):
-        pass
+        # convert this to the storage format
+        export_list = []
 
+        for mapping in self.event_map:
+            tmp = mapping.to_dict()  # our mapped objs must be ABCListenedObjects so we can do this
+            tmp['event'] = self.event_map[mapping]
+
+            export_list.append(tmp)
+
+        # update the settings with the storable keymap  # TODO : Probably want to redo this for multiple input listener support
+        self.settings.set_inputs(export_list)
+
+    def opened(self):
+        pass  # changes in other tabs do not affect the inputs, skipping this implementation for now
 
 class KeyReassignmentLine(QFrame):
     """
@@ -159,25 +176,25 @@ class KeyReassignmentLine(QFrame):
             label = timer_event
 
         self.event_label = QLabel(label)
-        self.event_label.setObjectName('KeyAssignmentLabel')
+        self.event_label.setObjectName('SettingsLabel')
 
         # create the button
-        self.triggerButton = QPushButton(self.key_str)
-        self.triggerButton.setFixedSize(80, 25)
+        self.trigger_button = QPushButton(self.key_str)
+        self.trigger_button.setFixedSize(80, 25)
 
         # add the elements to the widget
         self.line_layout.addWidget(self.event_label)
-        self.line_layout.addWidget(self.triggerButton)
+        self.line_layout.addWidget(self.trigger_button)
         self.line_layout.setContentsMargins(10, 0, 10, 0)
 
         self.setLayout(self.line_layout)
 
         # align our items in the line
-        self.line_layout.setAlignment(self.triggerButton, Qt.AlignRight | Qt.AlignVCenter)
+        self.line_layout.setAlignment(self.trigger_button, Qt.AlignRight | Qt.AlignVCenter)
         self.line_layout.setAlignment(self.event_label, Qt.AlignLeft | Qt.AlignVCenter)
 
         # hookup the slots and signals
-        self.triggerButton.clicked.connect(self.toggle_listening)
+        self.trigger_button.clicked.connect(self.toggle_listening)
 
         # name this thing so we can globally style it different from the rest
         self.setObjectName('KeyReassignmentLine')
@@ -186,23 +203,23 @@ class KeyReassignmentLine(QFrame):
         self.event_object = obj
         self.key_str = key_to_str(self.event_object)
 
-        self.triggerButton.setText(self.key_str)
+        self.trigger_button.setText(self.key_str)
 
     @Slot()
     def toggle_listening(self):
         if self.listening:
             self.listening = False
-            self.listener.on_press.disconnect(self.listen_for_key)
+            self.listener.on_event.disconnect(self.listen_for_key)
 
             # update the label on the button too
-            self.triggerButton.setText(self.key_str)
-            self.triggerButton.clearFocus()  # lose the focus on this button too
+            self.trigger_button.setText(self.key_str)
+            self.trigger_button.clearFocus()  # lose the focus on this button too
 
         else:
             self.listening = True
-            self.listener.on_press.connect(self.listen_for_key)
+            self.listener.on_event.connect(self.listen_for_key)
 
-            self.triggerButton.setText('...')  # TODO: setup a QTimer to count down from 5 and then untoggle
+            self.trigger_button.setText('...')  # TODO: setup a QTimer to count down from 5 and then untoggle
 
     @Slot(object)
     def listen_for_key(self, event_object):

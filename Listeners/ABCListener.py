@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABCMeta, ABC
-from PySide6.QtCore import QObject, Slot
+from PySide6.QtCore import QObject, Signal, Slot
+from typing import ClassVar
 
 
 class ABCQObjectMeta(type(QObject), ABCMeta):
@@ -9,20 +10,30 @@ class ABCQObjectMeta(type(QObject), ABCMeta):
     ...
 
 
-class ABCListener(QObject, metaclass=ABCQObjectMeta):
+class ABCListener(QObject, ABC, metaclass=ABCQObjectMeta):
     """
     An abstract object that we can define a template for all listeners for
     """
-    @abstractmethod
-    def run(self):
-        ...
+    on_event = Signal(object)  # this is the way that our listeners broadcast an event, the on_press should probably emit this!
+
+    listening = False
+    event_type = type(None)
+    _source = None  # fallback for the _source value check
 
     @abstractmethod
     def listen(self):
         ...
 
     @abstractmethod
-    def on_input_event(self, key):
+    def on_input_event(self, event):
+        """
+        This is the thing that does the reacting to the event and passes it along to the subscribers
+        Args:
+            event: (object) how the event comes in to this listener
+
+        emits:
+            on_event: The signal to pass the events down the line
+        """
         ...
 
     @Slot()
@@ -41,15 +52,12 @@ class ABCListener(QObject, metaclass=ABCQObjectMeta):
         ...
 
     @abstractmethod
-    def on_press(self):  # a getter for the signal
+    def event_object_from_dict(self, event_dict: dict[str, str]):
         ...
 
+    @property
     @abstractmethod
-    def obj_to_str(self, obj):
-        ...
-
-    @abstractmethod
-    def str_to_obj(self, obj_str):
+    def source(self):
         ...
 
 
@@ -78,9 +86,10 @@ class ABCListenedObject(ABC):
         ...
 
     @abstractmethod
-    def serialize(self):
+    def to_dict(self):
         ...
 
+    @classmethod
     @abstractmethod
-    def deserialize(self):
+    def from_dict(self):
         ...
