@@ -47,7 +47,7 @@ classDiagram
         layout: QVBoxLayout
         Title: TitleWidget
         context_menu: QMenu
-        configurator: Configurator
+        settings: Settings
         splits: SplitsWidget
         game_timer: Timer
         timer_controller: TimerController
@@ -61,14 +61,14 @@ classDiagram
         mouseReleaseEvent(event)
     }
     main "1" --* "1" TitleWidget
-    main "1" --* "1" Configurator
+    main "1" --* "1" Settings
     main "1" --* "1" TimerWidget
     main "1" --* "0..1" SplitsWidget
     main "1" --*"0..1" TimeStatsWidget
     main "1" --*"0..1" SplitGraphWidget
     main "1" --o "1" Timer
     main "1" --o "1" TimerController
-    main "1" --o "1" Game
+    main "1" --o "1" SettingsWindow
 
     class Game {
         from_json(json_dict: dict)
@@ -107,7 +107,7 @@ classDiagram
         update_time(time: int)
     }
 
-    class Configurator {
+    class Settings {
         Configure: Signal[dict]
         ConfigureGame: Signal[dict]
         settings_file_path: str
@@ -116,7 +116,7 @@ classDiagram
         game_settings: dict[str, any]
         style: StyleBuilder
     }
-    Configurator --o StyleBuilder
+    Settings --o StyleBuilder
 
     class StyleBuilder {
         UpdateStyle: Signal
@@ -134,6 +134,8 @@ classDiagram
         update_style(style_sheet: str, var_map: dict[str, str])
         update_style_from_paths(style_path: str, vars_paths: str)
     }
+
+    Settings --o Game
 
     class TimerWidget {
         layout: QVBoxLayout
@@ -287,6 +289,8 @@ classDiagram
     }
     TimerController --> ABCListener
 
+    cla
+
     class SettingsWindow {
         layout: QVBoxLayout
         keyWidget: AssignButtonsTab
@@ -296,11 +300,19 @@ classDiagram
     class ABCSettingsTab {
         <<abstract>>
         apply()
+        opened()
+    }
+
+    class ABCSettingsGroupBox {
+        <<abstract>>
+        apply()
+        opened()
     }
 
     class AssignButtonsTab {
         layout: QVBoxLayout
-        main: main
+        settings: SettingsWindow
+        timer_controller: TimerController
         scroll_widget: QWidget
         scroll_widget_layout: QVBoxLayout
         scroll_area: QScrollArea
@@ -336,6 +348,8 @@ classDiagram
         listen_for_key(event_object)
     }
     AssignButtonsTab --* KeyReassignmentLine
+    AssignButtonsTab ..> Settings
+    AssignButtonsTab ..> TimerController
 
     class LayoutTab {
         TODO
@@ -353,7 +367,7 @@ classDiagram
         remove_split(split: SplitLine)
         apply()
     }
-    SplitsTab ..> Game
+    SplitsTab ..> Settings
 
     class SplitLine {
         layout: QHBoxLayout
@@ -373,6 +387,7 @@ classDiagram
         \_\_init\_\_(mainWindow: main)
         apply()
     }
+    StyleTab ..> Settings
 
     class StyleSettingLine {
         UpdateKey: Signal[str, str]
