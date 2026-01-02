@@ -19,12 +19,12 @@ class TimerWidget(QFrame):
         label.style().polish(label)
         label.update()
 
-    def __init__(self, splitsWidget: SplitsWidget):
+    def __init__(self, splits_widget: SplitsWidget):
         super().__init__()
 
         self.layout = QVBoxLayout()
         self._negative = None
-        self._splits_widget = splitsWidget
+        self._splits_widget = splits_widget
 
         self.main_timer_label = QLabel("", self)
         self.main_timer_label.setObjectName('TimerLabel')
