@@ -14,10 +14,12 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     """
     result = ''
 
+    sign = '-' if millis < 0 else ''
+
     h, m, s, ms = millis_to_wallclock_components(millis)
 
     if full_length:  # if we want the fully expressed time as a string then return it
-        return f'{h:02}:{m:02}:{s:02}.{ms:03}'
+        return f'{sign}{h:02}:{m:02}:{s:02}.{ms:03}'
 
     # else we should add only what we need
     base = f'{s:02}.{ms:03}'
@@ -25,7 +27,7 @@ def format_wall_clock_from_ms(millis: int, full_length: bool = False):
     h = f'{h:02}:' if h != 0 else ''
     m = f'{m:02}:' if m != 0 or h != '' else ''
 
-    return result + "".join([h, m, base])
+    return result + "".join([sign, h, m, base])
 
 
 def millis_to_wallclock_components(millis: int):

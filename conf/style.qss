@@ -305,7 +305,7 @@ QCheckBox::indicator:checked {
     color: $text-color;
 }
 
-#TimerLabel {
+#TimerLabel[negative="false"] {
     border-bottom: none;
     border-top: none;
     border-left: none;
@@ -313,6 +313,16 @@ QCheckBox::indicator:checked {
     font-size: $timer-size;
     font-family: $timer-font;
     color: $timer-color;
+}
+
+#TimerLabel[negative="true"] {
+    border-bottom: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-size: $timer-size;
+    font-family: $timer-font;
+    color: $timer-negative-color;
 }
 
 #SingleSplit {

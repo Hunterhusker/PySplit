@@ -29,6 +29,29 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(format_wall_clock_from_ms(360000000), "100:00:00.000")
         self.assertEqual(format_wall_clock_from_ms(3600000000), "1000:00:00.000")
 
+    def test_format_wall_clock_from_ms_negative(self):
+        # < 1 second
+        self.assertEqual(format_wall_clock_from_ms(-5), "-00.005")
+        self.assertEqual(format_wall_clock_from_ms(-15), "-00.015")
+        self.assertEqual(format_wall_clock_from_ms(-250), "-00.250")
+        self.assertEqual(format_wall_clock_from_ms(-999), "-00.999")
+
+        # >= 1 second
+        self.assertEqual(format_wall_clock_from_ms(-1000), "-01.000")
+        self.assertEqual(format_wall_clock_from_ms(-10000), "-10.000")
+        self.assertEqual(format_wall_clock_from_ms(-59999), "-59.999")
+
+        # >= 1 minute
+        self.assertEqual(format_wall_clock_from_ms(-60000), "-01:00.000")
+        self.assertEqual(format_wall_clock_from_ms(-600000), "-10:00.000")
+        self.assertEqual(format_wall_clock_from_ms(-3599999), "-59:59.999")
+
+        # >= 1 hour
+        self.assertEqual(format_wall_clock_from_ms(-3600000), "-01:00:00.000")
+        self.assertEqual(format_wall_clock_from_ms(-36000000), "-10:00:00.000")
+        self.assertEqual(format_wall_clock_from_ms(-360000000), "-100:00:00.000")
+        self.assertEqual(format_wall_clock_from_ms(-3600000000), "-1000:00:00.000")
+
     def test_millis_to_wallclock_components(self):
         self.assertEqual(millis_to_wallclock_components(0), (0, 0, 0, 0))
         self.assertEqual(millis_to_wallclock_components(5), (0, 0, 0, 5))

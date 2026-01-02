@@ -1,5 +1,7 @@
 from PySide6.QtCore import QElapsedTimer, QObject, QTimer, Slot, Signal
 
+from Styling.Settings import Settings
+
 
 class Timer(QObject):
     update = Signal(int)
@@ -8,11 +10,14 @@ class Timer(QObject):
     running = False
     prevTime = 0
 
-    def __init__(self):
+    def __init__(self, settings: Settings):
         super().__init__()
+        self.settings = settings
+
         self.timer = None
         self.update_timer = None
         self.prevTime = 0
+        self.offset = settings.game.start_offset * 1000
 
         # set up the function map so we can take in inputs
         self.event_map = {  # mapping is constant for now, we don't want them to remap these on the fly
@@ -34,7 +39,7 @@ class Timer(QObject):
         self.update_timer.setInterval(1)
         self.update_timer.timeout.connect(self.read)
 
-        self.update.emit(0)
+        self.update.emit(self.offset)
 
     @Slot(str)
     def handle_control(self, control_message: str):
@@ -63,7 +68,7 @@ class Timer(QObject):
             self.running = True
             self.paused = False
 
-            self.update.emit(0)  # just started so it should be 0
+            self.update.emit(self.offset)  # just started so it should be 0
 
     @Slot()
     def reset_timer(self):
@@ -74,7 +79,7 @@ class Timer(QObject):
         self.paused = False
         self.prevTime = 0  # prev time of 0 so we can't resume from here
 
-        self.update.emit(0)  # reset to 0, since the timer was stopped
+        self.update.emit(self.offset)  # reset to 0, since the timer was stopped
 
     @Slot()
     def stop_timer(self):
@@ -116,11 +121,14 @@ class Timer(QObject):
 
     @Slot(str)
     def read_str(self):
-        curr = self.timer.elapsed() + self.prevTime
+        if self.timer is not None and self.timer.isActive():
+            curr = self.timer.elapsed() + self.prevTime + self.offset
+        else:
+            curr = self.prevTime + self.offset
 
         s, ms = divmod(curr, 1000)
 
-        self.update.emit(f'{s}.{ms}')
+        self.update.emit(f'{int(s)}.{int(ms)}')
 
     @Slot(int)
     def read(self):
@@ -128,10 +136,18 @@ class Timer(QObject):
         Returns:
             (int) The current time on the timer in milliseconds
         """
-        curr = self.timer.elapsed()
-        self.update.emit(curr + self.prevTime)
+        if self.update_timer is not None and self.update_timer.isActive():
+            curr = self.timer.elapsed()
+            self.update.emit(curr + self.prevTime + self.offset)
+
+        else:
+            self.update.emit(self.prevTime + self.offset)
 
     @Slot()
     def quit(self):
         if self.update_timer.isActive():
             self.update_timer.stop()
+
+    def update_settings(self):
+        self.offset = self.settings.game.start_offset * 1000
+        self.update.emit(self.offset)

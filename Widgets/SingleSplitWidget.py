@@ -118,9 +118,6 @@ class SingleSplitWidget(QFrame):
             if time_delta >= 0:
                 time_delta_str = '+' + time_delta_str
 
-            else:
-                time_delta_str = '-' + time_delta_str
-
             self.delta_label.setText(time_delta_str)
 
             if time_delta <= 0:
@@ -188,8 +185,6 @@ class SingleSplitWidget(QFrame):
 
             if time_delta >= 0:
                 time_delta_str = '+' + time_delta_str
-            else:
-                time_delta_str = '-' + time_delta_str
 
             self.delta_label.setText(time_delta_str)  # update the +/- time delta label
             self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))  # set the text to show the time taken

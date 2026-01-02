@@ -1,6 +1,3 @@
-"""
-
-"""
 from Models.Game import Game, Split
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
@@ -152,6 +149,9 @@ class SplitsWidget(QWidget):
         current_split.handle_control(str)
 
         if event == 'STARTSPLIT':  # if we are splitting, then we ought to move on to the next one
+            if self.splits[self.index].current_time_ms < 0:
+                return  # ignore splits before the time offset finishes
+
             self.splits[self.index].handle_control(event)
 
             if not self.started:

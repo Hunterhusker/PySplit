@@ -50,8 +50,6 @@ class Main(QWidget):
 
         self.title = TitleWidget.from_game(self.settings.game)
 
-        self.main_timer_widget = TimerWidget()
-
         self.context_menu = QMenu(self)
 
         self.settings_action = self.context_menu.addAction('Settings')
@@ -71,6 +69,7 @@ class Main(QWidget):
         self.splits = SplitsWidget(self.settings, parent=self)
         self.settings.SettingsUpdate.connect(self.splits.apply_settings)
 
+        self.main_timer_widget = TimerWidget(self.splits)
         self.splitStats = TimeStatsWidget()
 
         layout.addWidget(self.title)
@@ -82,9 +81,10 @@ class Main(QWidget):
         self.setGeometry(800, 800, 225, 200)
 
         # create and connect to the timer thread
-        self.game_timer = Timer()
+        self.game_timer = Timer(self.settings)
         self.game_timer_thread = QThread()
         self.game_timer.moveToThread(self.game_timer_thread)
+        self.settings.game.GameUpdated.connect(self.game_timer.update_settings)
 
         # connect the game timer signals to the desired slots
         self.game_timer.update.connect(self.main_timer_widget.update_time)
