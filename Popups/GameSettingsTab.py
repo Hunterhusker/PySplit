@@ -62,7 +62,7 @@ class GameSettingsTab(ABCSettingTab):
         self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.game.lifetime_attempts, parent=self)
         self.lifetime_attempts_input.setMinimumHeight(35)
 
-        self.timer_start_delay_input = LabeledDoubleSpinBox('Timer Start Delay: ', 0, 3, 0.01, self)
+        self.timer_start_delay_input = LabeledDoubleSpinBox('Timer Start Delay: ', self.game.start_offset, 3, 0.01, self)
         self.timer_start_delay_input.setMinimumHeight(35)
 
         # populate the title group
@@ -111,6 +111,7 @@ class GameSettingsTab(ABCSettingTab):
         self.sub_title_input.input.setText(game.sub_title)
         self.lifetime_attempts_input.input.setValue(game.lifetime_attempts)
         self.session_attempts_input.input.setValue(game.session_attempts)
+        self.timer_start_delay_input.input.setValue(game.start_offset)
 
         self.clear_splits()
         self.import_splits(self.game)
@@ -174,6 +175,7 @@ class GameSettingsTab(ABCSettingTab):
         self.game.sub_title = self.sub_title_input.input.text()
         self.game.session_attempts = self.session_attempts_input.input.value()
         self.game.lifetime_attempts = self.lifetime_attempts_input.input.value()
+        self.game.start_offset = self.timer_start_delay_input.input.value()
 
         self.game.splits = []  # make this into an empty list
 

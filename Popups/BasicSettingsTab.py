@@ -198,8 +198,10 @@ class _TextSettings(ABCSettingGroupBox):
 
         self.timer_font_picker = FontPicker('Timer Font: ', var_map['timer-font'], var_map['timer-size'])
         self.timer_color_picker = ColorPicker('Timer Color: ', QColor(var_map['timer-color']), parent=parent)
+        self.timer_negative_color_picker = ColorPicker('Timer Color (Negative): ', QColor(var_map['timer-negative-color']), parent=parent)
         self.layout.addWidget(self.timer_font_picker)
         self.layout.addWidget(self.timer_color_picker)
+        self.layout.addWidget(self.timer_negative_color_picker)
 
     def apply(self):
         var_map = self.settings.style.variable_map
@@ -224,6 +226,7 @@ class _TextSettings(ABCSettingGroupBox):
         var_map['timer-font'] = self.timer_font_picker.get_font_family()
         var_map['timer-size'] = f'{self.timer_font_picker.get_size()}px'
         var_map['timer-color'] = self.timer_color_picker.color_name
+        var_map['timer-negative-color'] = self.timer_negative_color_picker.color_name
 
         self.settings.style.update_style(var_map=var_map)
 

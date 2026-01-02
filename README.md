@@ -134,7 +134,6 @@ classDiagram
         update_style(style_sheet: str, var_map: dict[str, str])
         update_style_from_paths(style_path: str, vars_paths: str)
     }
-
     Settings --o Game
 
     class TimerWidget {
@@ -164,6 +163,7 @@ classDiagram
         update_splits()
     }
     SplitsWidget "1" --* "0..n" SingleSplitWidget
+    TimerWidget ..> SplitsWidget
 
     class SingleSplitWidget {
         split_name: str
@@ -256,7 +256,7 @@ classDiagram
         timer: QElapsedTimer
         update_timer: QTimer
         event_map: dict[str, func]
-        \_\_init\_\_()
+        \_\_init\_\_(settings: Settings)
         run()
         handle_control()
         doNothing()
@@ -269,6 +269,7 @@ classDiagram
         read()
         quit()
     }
+    Timer ..> Settings
 
     class TimerController {
         ControlEvent: Signal[str]
@@ -288,8 +289,6 @@ classDiagram
         toggle_listening()
     }
     TimerController --> ABCListener
-
-    cla
 
     class SettingsWindow {
         layout: QVBoxLayout
@@ -406,5 +405,4 @@ classDiagram
     ABCSettingsTab <|-- StyleTab
     StyleTab --* StyleSettingLine
     SplitsTab --* SplitLine
-
 ```

@@ -8,7 +8,7 @@ class Game(QObject):
     """A representation of a game and the splits we'd like to track during a run"""
     GameUpdated = Signal(QObject)
 
-    def __init__(self, title: str, sub_title: str, splits: list[Split], lifetime_attempts: int, session_attempts: int, display_pb: bool = True):
+    def __init__(self, title: str, sub_title: str, splits: list[Split], lifetime_attempts: int, session_attempts: int, start_offset: float, display_pb: bool = True):
         super().__init__()
 
         self.title = title
@@ -17,6 +17,7 @@ class Game(QObject):
         self.lifetime_attempts = lifetime_attempts
         self.session_attempts = session_attempts
         self.display_pb = display_pb
+        self.start_offset = start_offset
 
     @classmethod
     def from_json(cls, json_dict: dict) -> Game:
@@ -32,6 +33,7 @@ class Game(QObject):
         sub_title = json_dict['sub_title']
         lifetime_attempts = json_dict['lifetime_attempts']
         session_attempts = json_dict.get('session_attempts', 0)
+        start_offset = json_dict.get('start_offset', 0.0)
 
         prev_pb_segment_total_ms = 0
         prev_gold_segment_total_ms = 0
@@ -47,7 +49,7 @@ class Game(QObject):
             splits.append(new_split)
 
         # call the constructor on the data we extracted from the JSON
-        return cls(title, sub_title, splits, lifetime_attempts, session_attempts)
+        return cls(title, sub_title, splits, lifetime_attempts, session_attempts, start_offset)
 
     @classmethod
     def from_json_str(cls, json_str: str) -> Game:
@@ -87,6 +89,7 @@ class Game(QObject):
         self.sub_title = json_dict['sub_title']
         self.lifetime_attempts = json_dict['lifetime_attempts']
         self.session_attempts = json_dict.get('session_attempts', 0)
+        self.start_offset = json_dict.get('start_delay', 0.0)
 
         prev_pb_segment_total_ms = 0
         prev_gold_segment_total_ms = 0
@@ -145,6 +148,7 @@ class Game(QObject):
             'title': self.title,
             'sub_title': self.sub_title,
             'lifetime_attempts': self.lifetime_attempts,
+            'start_offset': self.start_offset,
             'display_pb': self.display_pb,
             'splits': splits
         }
