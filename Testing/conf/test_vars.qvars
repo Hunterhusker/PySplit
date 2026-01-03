@@ -17,6 +17,7 @@ lifetime-attempts-color:#ffbbbbbb
 timer-font:Ubuntu
 timer-size:24px
 timer-color:#ffbbbbbb
+timer-negative-color:#ff888888
 split-font:Ubuntu
 split-size:14px
 split-color:#ffbbbbbb
