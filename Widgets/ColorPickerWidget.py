@@ -210,7 +210,7 @@ class CustomSlider(QLabel):
 
     def generate_slider_background(self):
         tmp = QImage(self.bar_width, self.bar_height, QImage.Format.Format_RGB32)
-        for y in range(self.bar_height - 1):
+        for y in range(self.bar_height):
             for x in range(self.bar_width):
                 if y > self.y:
                     tmp.setPixelColor(x, y, self.highlight_color)
