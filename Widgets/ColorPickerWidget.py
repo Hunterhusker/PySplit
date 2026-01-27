@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt, Signal, QPoint
 from PySide6.QtGui import QImage, QColor, Qt, QPixmap, QPainter, QPen
 from PySide6.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QVBoxLayout, QSpinBox, QGroupBox, QLineEdit, \
-    QFrame, QSizePolicy
+    QFrame, QSizePolicy, QStackedLayout
 
 
 class SVImage(QLabel):
@@ -150,7 +150,7 @@ class HueSlider(QLabel):
 
         pen = QPen(Qt.white, 1)
         painter.setPen(pen)
-        painter.setBrush(QColor.fromHsv(self.hue, 255, 255))
+        painter.setBrush(QColor.fromHsv(min(max(self.hue, 0), 359), 255, 255))
 
         r = self.indicator_width / 2
         painter.drawEllipse(
@@ -184,7 +184,6 @@ class CustomSlider(QLabel):
     def __init__(self, value: int, bar_width: int, bar_height: int, indicator_width: int, background_color: QColor,
                  highlight_color: QColor, min_value: int = 0, max_value: int = 100, parent=None):
         super().__init__(parent)
-        # self.y = max(min(value, bar_height), 0)  # set the value to the value capped between 0 and the height
 
         self.bar_width = bar_width
         self.bar_height = bar_height
@@ -243,7 +242,7 @@ class CustomSlider(QLabel):
 
         pen = QPen(Qt.white, 1)
         painter.setPen(pen)
-        painter.setBrush(self.highlight_color)
+        painter.setBrush(QColor(self.highlight_color))
 
         r = self.indicator_width / 2
         painter.drawEllipse(QPoint((max(self.bar_width, self.indicator_width) + 2) // 2, self.y + self.indicator_width),
@@ -276,6 +275,53 @@ class CustomSlider(QLabel):
         self.value_changed.emit(self.value)
 
 
+class PreviewColorWidget(QWidget):
+    def __init__(self, color: QColor, parent=None):
+        super().__init__(parent)
+        self.color = color
+
+        container = QFrame()
+
+        self.layout = QStackedLayout(container)
+        self.layout.setStackingMode(QStackedLayout.StackingMode.StackAll)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
+        self._checker_frame = self.CheckerFrame()
+        self._color_frame = QFrame()
+        self._color_frame.setAutoFillBackground(False)
+        self._color_frame.setAttribute(Qt.WA_TransparentForMouseEvents)
+
+        self.set_color(color)
+
+        self.layout.addWidget(self._checker_frame)
+        self.layout.addWidget(self._color_frame)
+
+        self.setLayout(self.layout)
+
+    def set_color(self, color: QColor):
+        self.color = color
+        self._color_frame.setStyleSheet(f"background-color: \"{self.color.name(QColor.NameFormat.HexArgb)}\"; border: none;")  # border-radius: 2; border: 1px solid #616769;")
+        self.update()
+
+    class CheckerFrame(QFrame):
+        def __init__(self, size: int = 10, parent=None):
+            super().__init__(parent)
+            self.size = size
+            self.setStyleSheet("border: none;")
+
+        def paintEvent(self, event):
+            p = QPainter(self)
+            c1 = QColor(200, 200, 200)
+            c2 = QColor(240, 240, 240)
+
+            for y in range(0, self.height(), self.size):
+                for x in range(0, self.width(), self.size):
+                    p.fillRect(
+                        x, y, self.size, self.size,
+                        c1 if ((x // self.size + y // self.size) % 2 == 0) else c2
+                    )
+
+
 class ColorPickerWidget(QWidget):
     Color_Changed = Signal(QColor)
 
@@ -297,7 +343,7 @@ class ColorPickerWidget(QWidget):
         self.hue_slider.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
         # (self, value: int, bar_width: int, bar_height: int, indicator_width: int, background_color: QColor, highlight_color: QColor, parent=None):
-        self.a_slider = CustomSlider(color.alpha(), 5, 255, 12, QColor('#323232'), QColor('#aaaaaa'), 0, 255)
+        self.a_slider = CustomSlider(color.alpha(), 5, 255, 12, QColor('#4c5052'), QColor('#dddddd'), 0, 255)
         self.a_slider.value_changed.connect(self.alpha_changed)
 
         side_box = QVBoxLayout()
@@ -311,18 +357,22 @@ class ColorPickerWidget(QWidget):
         self.a_input.setRange(0, 255)
         self.a_input.setValue(255)
         self.a_input.valueChanged.connect(self.rgb_changed)
+        self.a_input.setToolTip('Set Alpha Value')
 
         self.r_input = QSpinBox()
         self.r_input.setRange(0, 255)
         self.r_input.valueChanged.connect(self.rgb_changed)
+        self.r_input.setToolTip('Set Red Value')
 
         self.g_input = QSpinBox()
         self.g_input.setRange(0, 255)
         self.g_input.valueChanged.connect(self.rgb_changed)
+        self.g_input.setToolTip('Set Green Value')
 
         self.b_input = QSpinBox()
         self.b_input.setRange(0, 255)
         self.b_input.valueChanged.connect(self.rgb_changed)
+        self.b_input.setToolTip('Set Blue Value')
 
         rgb_box.addWidget(self.a_input)
         rgb_box.addWidget(self.r_input)
@@ -336,15 +386,14 @@ class ColorPickerWidget(QWidget):
 
         self.hex_input = QLineEdit()
         self.hex_input.editingFinished.connect(self.hex_changed)
+        self.hex_input.setToolTip('Set ARGB Hex Value')
 
         hex_box.addWidget(self.hex_input)
 
         # make a preview box
-        self.preview = QFrame()
+        self.preview = PreviewColorWidget(color)  # QFrame()
         self.preview.setFixedHeight(115)
         self.preview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.preview.setStyleSheet(
-            f"background-color: \"{self.sv_image.color}\"; border-radius: 2; border: 1px solid #616769;")
 
         # build out the side box structure
         side_box.addStretch()
@@ -355,12 +404,11 @@ class ColorPickerWidget(QWidget):
 
         layout.addWidget(self.sv_image)
         layout.addWidget(self.hue_slider)
-        # layout.addWidget(self.alpha_slider)
         layout.addWidget(self.a_slider)
         layout.addLayout(side_box)
 
         self.setLayout(layout)
-        self.resize(500, 300)
+        self.setFixedSize(575, 300)
 
         self.color = None
         self.select_color(self.sv_image.color)
@@ -415,7 +463,7 @@ class ColorPickerWidget(QWidget):
 
         if self.hue_slider.hue != color.hue():
             self.hue_slider.set_hue(color.hue())
-            self.sv_image.generate_sv_image(self.hue_slider.hue)
+            self.sv_image.generate_sv_image(min(max(self.hue_slider.hue, 0), 359))
 
         if self.sv_image.color != color:
             self.sv_image.set_sv(color.saturation(), color.value())
@@ -428,7 +476,6 @@ class ColorPickerWidget(QWidget):
         self.hue_slider.blockSignals(False)
         self.sv_image.blockSignals(False)
 
-        self.preview.setStyleSheet(
-            f"background-color: \"{color.name(QColor.HexArgb)}\"; border-radius: 2; border: 1px solid #616769;")
+        self.preview.set_color(color)
         self.color = color
         self.Color_Changed.emit(color)  # emit the color

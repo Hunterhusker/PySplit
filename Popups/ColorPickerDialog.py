@@ -27,7 +27,8 @@ class ColorPickerDialog(QDialog):
         self.layout.addWidget(self.dialogButtons)
 
         self.setLayout(self.layout)
-        self.setWindowTitle('Settings')
+        self.setWindowTitle('Pick Color')
+        self.setFixedSize(595, 335)
 
     def button_event(self, button: QPushButton):
         role = self.dialogButtons.buttonRole(button)
