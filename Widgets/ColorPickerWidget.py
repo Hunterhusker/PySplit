@@ -25,7 +25,6 @@ class SVImage(QLabel):
         # manage the color data
         self.color = color
         self.dragging = False
-        self.calculate_color()
 
         self.setFixedSize(width, height)
         self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
