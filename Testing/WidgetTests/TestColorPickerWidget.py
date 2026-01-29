@@ -1,16 +1,11 @@
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QSignalSpy, QTest
-
-from Widgets.ColorPickerWidget import ColorPickerWidget
-from helpers.TimerFormat import format_wall_clock_from_ms
-from Main import Main
-from pathlib import Path
-from PySide6.QtGui import QFontDatabase, QColor
-from PySide6.QtWidgets import QApplication, QMessageBox, QWidget
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QApplication, QWidget
 from random import randint
 import sys
 import unittest
-from unittest.mock import patch
+from Widgets.ColorPickerWidget import ColorPickerWidget
 
 
 class TestColorPickerWidget(unittest.TestCase):
@@ -21,7 +16,7 @@ class TestColorPickerWidget(unittest.TestCase):
 
     def test_color_picker_widget_defaults(self):
         widget = ColorPickerWidget()
-        self.assertEqual(widget.color, QColor("#ffff0000"))
+        self.assertEqual(widget.color.name(QColor.NameFormat.HexArgb), "#ffff0000")
 
     def test_color_picker_widget_init(self):
         h = randint(0, 359)

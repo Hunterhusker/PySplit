@@ -14,6 +14,7 @@ class SVImage(QLabel):
         self.width = width
         self.height = height
         self.hue = max(min(color.hue(), 359), 0)
+        self.color = color
 
         # manage the location of the point
         self._marker_pos = QPoint(color.saturation(), 255 - color.value())
@@ -23,7 +24,6 @@ class SVImage(QLabel):
         self.generate_sv_image(self.hue, width, height)
 
         # manage the color data
-        self.color = color
         self.dragging = False
 
         self.setFixedSize(width, height)
@@ -35,8 +35,9 @@ class SVImage(QLabel):
     def calculate_color(self):
         saturation = max(min(255, self._marker_pos.x()), 0)
         value = 255 - max(min(255, self._marker_pos.y()), 0)
+        alpha = self.color.alpha()
 
-        self.color = QColor().fromHsv(self.hue, saturation, value)
+        self.color = QColor().fromHsv(self.hue, saturation, value, alpha)
 
     def mousePressEvent(self, event, /):
         self.calculate_color()
@@ -244,8 +245,7 @@ class CustomSlider(QLabel):
         painter.setBrush(QColor(self.highlight_color))
 
         r = self.indicator_width / 2
-        painter.drawEllipse(QPoint((max(self.bar_width, self.indicator_width) + 2) // 2, self.y + self.indicator_width),
-                            r, r)
+        painter.drawEllipse(QPoint((max(self.bar_width, self.indicator_width) + 2) // 2, self.y + self.indicator_width), r, r)
         painter.end()
 
     def mousePressEvent(self, event, /):
@@ -443,6 +443,8 @@ class ColorPickerWidget(QWidget):
         self.hex_input.blockSignals(True)
         self.hue_slider.blockSignals(True)
         self.sv_image.blockSignals(True)
+        self.a_input.blockSignals(True)
+        self.a_slider.blockSignals(True)
 
         if self.r_input.value() != color.red() and not self.r_input.hasFocus():
             self.r_input.setValue(color.red())
@@ -454,7 +456,9 @@ class ColorPickerWidget(QWidget):
             self.b_input.setValue(color.blue())
 
         # always update the color to have the alpha value, since the one on the SV image shouldn't have it
-        color.setAlpha(self.a_input.value())  # TODO : need to have a way to accept alpha values from hex sources  # ALSO Other bug that idk where to put its todo, setting 0, 0, 0 for rgb makes invalid hue
+        if color.alpha() != self.a_input.value():
+            self.a_input.setValue(color.alpha())
+            self.a_slider.set_value(color.alpha())
 
         if self.hex_input.text() != color.name():
             self.hex_input.setText(color.name(QColor.HexArgb))
@@ -473,6 +477,8 @@ class ColorPickerWidget(QWidget):
         self.hex_input.blockSignals(False)
         self.hue_slider.blockSignals(False)
         self.sv_image.blockSignals(False)
+        self.a_input.blockSignals(False)
+        self.a_slider.blockSignals(False)
 
         self.preview.set_color(color)
         self.color = color
