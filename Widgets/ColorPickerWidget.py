@@ -130,12 +130,12 @@ class HueSlider(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def calculate_hue(self) -> float:
-        self.hue = min(max((self.value / self.bar_height) * 360, 0), 359)
+        self.hue = int(min(max((self.value / self.bar_height) * 360, 0), 359))
         self.hue_changed.emit(self.hue)
 
     def set_hue(self, hue):
-        self.hue = hue
-        self.value = min(max((hue / 360) * self.bar_height, 0), 359)
+        self.hue = int(hue)
+        self.value = int(min(max((hue / 360) * self.bar_height, 0), 359))
         self.update()
 
         self.hue_changed.emit(self.hue)
@@ -226,8 +226,8 @@ class CustomSlider(QLabel):
         self.value_changed.emit(self.value)
 
     def set_value(self, value):
-        self.value = self.max_value - min(max(value, self.min_value), self.max_value)
-        self.y = (self.value * self.bar_height) / (self.max_value - self.min_value)
+        self.value = min(max(value, self.min_value), self.max_value)
+        self.y = ((self.max_value - self.value) * self.bar_height) / (self.max_value - self.min_value)
         self.update()
 
         self.value_changed.emit(self.value)
@@ -334,10 +334,10 @@ class ColorPickerWidget(QWidget):
         self.sv_image = SVImage(255, 255, color=color)
         self.sv_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.sv_image.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        self.sv_image.color_changed.connect(self.select_color)
+        self.sv_image.color_changed.connect(self.set_color)
         self.sv_image.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
-        self.hue_slider = HueSlider(min(max(color.hue(), 0), 359), 5, 255, 12)
+        self.hue_slider = HueSlider(color.hue(), 5, 255, 12)
         self.hue_slider.hue_changed.connect(self.hue_changed)
         self.hue_slider.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
@@ -354,7 +354,7 @@ class ColorPickerWidget(QWidget):
 
         self.a_input = QSpinBox()
         self.a_input.setRange(0, 255)
-        self.a_input.setValue(255)
+        self.a_input.setValue(color.alpha())
         self.a_input.valueChanged.connect(self.rgb_changed)
         self.a_input.setToolTip('Set Alpha Value')
 
@@ -410,25 +410,24 @@ class ColorPickerWidget(QWidget):
         self.setFixedSize(575, 300)
 
         self.color = None
-        self.select_color(self.sv_image.color)
+        self.set_color(self.sv_image.color)
 
     def hue_changed(self):
         self.sv_image.generate_sv_image(self.hue_slider.hue)
-        self.select_color(self.sv_image.color)
+        self.set_color(self.sv_image.color)
 
     def alpha_changed(self):
-        self.a_input.setValue(self.a_slider.value)
-        self.rgb_changed()
+        self.a_input.setValue(self.a_slider.value)  # this triggers the rgb_changed code all on its own
 
     def rgb_changed(self):
         new_color = QColor(self.r_input.value(), self.g_input.value(), self.b_input.value(), self.a_input.value())
-        self.select_color(new_color)
+        self.set_color(new_color)
 
     def hex_changed(self):
         hex_value = int(self.hex_input.text().strip('#'), 16)
 
         new_color = QColor.fromRgba(hex_value)
-        self.select_color(new_color)
+        self.set_color(new_color)
 
     def mousePressEvent(self, event):
         w = QApplication.focusWidget()
@@ -436,7 +435,7 @@ class ColorPickerWidget(QWidget):
             w.clearFocus()
         super().mousePressEvent(event)
 
-    def select_color(self, color: QColor):
+    def set_color(self, color: QColor):
         # turn off all the signals
         self.r_input.blockSignals(True)
         self.g_input.blockSignals(True)
@@ -455,7 +454,7 @@ class ColorPickerWidget(QWidget):
             self.b_input.setValue(color.blue())
 
         # always update the color to have the alpha value, since the one on the SV image shouldn't have it
-        color.setAlpha(self.a_input.value())
+        color.setAlpha(self.a_input.value())  # TODO : need to have a way to accept alpha values from hex sources  # ALSO Other bug that idk where to put its todo, setting 0, 0, 0 for rgb makes invalid hue
 
         if self.hex_input.text() != color.name():
             self.hex_input.setText(color.name(QColor.HexArgb))
