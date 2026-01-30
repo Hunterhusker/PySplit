@@ -1,8 +1,9 @@
 import re
 from PySide6.QtGui import QColor, QIcon, QFont
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
-    QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox
+    QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox, QDialog
 from PySide6.QtCore import Qt, Signal, QTime
+from Popups import ColorPickerDialog
 from helpers.ColorHelpers import *
 
 # a set of subclasses to remove the wheelEvent that I don't like on my "scrollable" boxes
@@ -187,7 +188,6 @@ class ClickableFrame(QFrame):
 
 
 class ColorPicker(QFrame):
-    # TODO : This should start using our own custom color picker
     def __init__(self, label: str, color: QColor, parent=None):
         super().__init__(parent=parent)
 
@@ -220,11 +220,11 @@ class ColorPicker(QFrame):
         self.setObjectName('SettingLine')
 
     def pick_color(self):
-        color = QColorDialog.getColor(self.color, self, "Pick A Color")
+        dialog = ColorPickerDialog.ColorPickerDialog(color=self.color)
 
-        if color.isValid():
-            self.color = color
-            self.color_name = color.name(QColor.HexArgb)
+        if dialog.exec() == QDialog.Accepted:
+            self.color = dialog.get_color()
+            self.color_name = dialog.get_color().name(QColor.HexArgb)
 
             self.hex_entry.setText(self.color_name)
 
