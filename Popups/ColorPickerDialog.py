@@ -43,3 +43,6 @@ class ColorPickerDialog(QDialog):
 
     def set_color(self, color: QColor):
         self.color = color
+
+    def get_color(self):
+        return self.color

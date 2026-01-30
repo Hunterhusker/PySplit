@@ -188,7 +188,6 @@ class ClickableFrame(QFrame):
 
 
 class ColorPicker(QFrame):
-    # TODO : This should start using our own custom color picker
     def __init__(self, label: str, color: QColor, parent=None):
         super().__init__(parent=parent)
 
@@ -221,13 +220,11 @@ class ColorPicker(QFrame):
         self.setObjectName('SettingLine')
 
     def pick_color(self):
-        #color = QColorDialog.getColor(self.color, self, "Pick A Color")
         dialog = ColorPickerDialog.ColorPickerDialog(color=self.color)
 
-        #if color.isValid():
         if dialog.exec() == QDialog.Accepted:
-            self.color = dialog.color
-            self.color_name = dialog.color.name(QColor.HexArgb)
+            self.color = dialog.get_color()
+            self.color_name = dialog.get_color().name(QColor.HexArgb)
 
             self.hex_entry.setText(self.color_name)
 

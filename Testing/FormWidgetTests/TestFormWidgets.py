@@ -9,6 +9,7 @@ from PySide6.QtCore import Qt, QPointF, QPoint
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from Main import Main
+from Widgets.ColorPickerWidget import ColorPickerWidget
 from Widgets.FormWidgets import *
 
 
@@ -106,7 +107,7 @@ class TestFormWidgets(unittest.TestCase):
         widget = LabeledSpinBox('label', 5)
 
         self.assertEqual(widget.value(), 5)
-        self.assertEqual(widget.input.y(), 5)
+        self.assertEqual(widget.input.value(), 5)
         self.assertEqual(widget.label.text(), 'label')
 
     def test_LabeledSpinBox_setValue(self):
@@ -116,7 +117,7 @@ class TestFormWidgets(unittest.TestCase):
         widget.setValue(25)
 
         self.assertEqual(widget.value(), 25)
-        self.assertEqual(widget.input.y(), 25)
+        self.assertEqual(widget.input.value(), 25)
         self.assertEqual(spy.count(), 1)
 
     def test_LabeledSpinBox_changeLabel(self):
@@ -132,12 +133,12 @@ class TestFormWidgets(unittest.TestCase):
         widget = LabeledSpinBox('label', 5)
 
         self.assertEqual(widget.value(), 5)
-        self.assertEqual(widget.input.y(), 5)
+        self.assertEqual(widget.input.value(), 5)
 
         self.send_wheel_event(widget.input)
 
         self.assertEqual(widget.value(), 5)
-        self.assertEqual(widget.input.y(), 5)
+        self.assertEqual(widget.input.value(), 5)
 
     def test_ClickableFrame(self):
         widget = ClickableFrame()
@@ -178,16 +179,21 @@ class TestFormWidgets(unittest.TestCase):
         self.assertEqual(widget.hex_entry.text(), '#ff00ff00')
 
     def test_ColorPicker_pick_color(self):
-        widget = ColorPicker('label', QColor('#ffff0000'))
-        spy = QSignalSpy(widget.color_preview.clicked)
+        def fake_exec(dialog):
+            dialog.color = QColor("#ff00ff00")
+            dialog.accept()
 
-        self.assertEqual(spy.count(), 0)
+            return QDialog.Accepted
 
-        with patch.object(QColorDialog, "getColor", return_value=QColor('#ff0000ff')):  # patch out the popup
+        with patch("Popups.ColorPickerDialog.ColorPickerDialog.exec", fake_exec):
+            widget = ColorPicker('label', QColor('#ffff0000'))
+            spy = QSignalSpy(widget.color_preview.clicked)
+
+            self.assertEqual(spy.count(), 0)
             QTest.mouseClick(widget.color_preview, Qt.LeftButton)
 
-        self.assertEqual(spy.count(), 1)
-        self.assertEqual(widget.hex_entry.text(), '#ff0000ff')
+            self.assertEqual(spy.count(), 1)
+            self.assertEqual(widget.hex_entry.text(), '#ff00ff00')
 
     def test_FontPicker(self):
         main_font = self._main.font()
@@ -197,7 +203,7 @@ class TestFormWidgets(unittest.TestCase):
         self.assertEqual(widget.font_combobox.currentFont(), main_font)
 
         self.assertEqual(widget.get_size(), 10)
-        self.assertEqual(widget.size_spinner.y(), 10)
+        self.assertEqual(widget.size_spinner.value(), 10)
 
     def test_FontPicker_set_size(self):
         main_font = self._main.font()
@@ -206,7 +212,7 @@ class TestFormWidgets(unittest.TestCase):
         widget.set_size(15)
 
         self.assertEqual(widget.get_size(), 15)
-        self.assertEqual(widget.size_spinner.y(), 15)
+        self.assertEqual(widget.size_spinner.value(), 15)
 
     def test_FontPicker_set_font(self):
         font_families = QFontDatabase.families()
