@@ -34,11 +34,9 @@ class ColorPickerDialog(QDialog):
         role = self.dialogButtons.buttonRole(button)
 
         if role == QDialogButtonBox.AcceptRole:
-            print('Accept')
             self.accept()
 
         else:
-            print('Reject')
             self.reject()
 
     def set_color(self, color: QColor):
