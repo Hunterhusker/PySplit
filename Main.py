@@ -12,6 +12,7 @@ from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.BasicSettingsTab import BasicSettingsTab
 from Popups.SettingsWindow import SettingsWindow
 from Popups.GameSettingsTab import GameSettingsTab
+from Timer.SplitTimer import SplitTimer
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
@@ -86,9 +87,12 @@ class Main(QWidget):
         self.game_timer.moveToThread(self.game_timer_thread)
         self.settings.game.GameUpdated.connect(self.game_timer.update_settings)
 
+        self.split_timer = SplitTimer(self.settings)
+        self.game_timer.tick.connect(self.split_timer.on_tick)
+
         # connect the game timer signals to the desired slots
-        self.game_timer.update.connect(self.main_timer_widget.update_time)
-        self.game_timer.update.connect(self.splits.update_split)
+        self.game_timer.tick.connect(self.main_timer_widget.update_time)
+        self.game_timer.tick.connect(self.splits.update_split)
         self.game_timer_thread.started.connect(self.game_timer.run)
         self.game_timer_thread.destroyed.connect(self.game_timer.stop_timer)
 
@@ -102,6 +106,7 @@ class Main(QWidget):
         # connect the timer controller to the timer
         self.timer_controller.ControlEvent.connect(self.game_timer.handle_control)
         self.timer_controller.ControlEvent.connect(self.splits.handle_control)
+        self.timer_controller.ControlEvent.connect(self.split_timer.handle_control)  # TODO : Make better
 
         # also connect the extra control events from the splits to the timer
         self.splits.SplitFinish.connect(self.game_timer.stop_timer)
