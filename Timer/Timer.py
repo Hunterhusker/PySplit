@@ -1,10 +1,9 @@
 from PySide6.QtCore import QElapsedTimer, QObject, QTimer, Slot, Signal
-
 from Styling.Settings import Settings
 
 
 class Timer(QObject):
-    update = Signal(int)
+    tick = Signal(int)
 
     paused = False
     running = False
@@ -39,7 +38,7 @@ class Timer(QObject):
         self.update_timer.setInterval(1)
         self.update_timer.timeout.connect(self.read)
 
-        self.update.emit(self.offset)
+        self.tick.emit(self.offset)
 
     @Slot(str)
     def handle_control(self, control_message: str):
@@ -68,7 +67,7 @@ class Timer(QObject):
             self.running = True
             self.paused = False
 
-            self.update.emit(self.offset)  # just started so it should be 0
+            self.tick.emit(self.offset)  # just started so it should be 0
 
     @Slot()
     def reset_timer(self):
@@ -79,7 +78,7 @@ class Timer(QObject):
         self.paused = False
         self.prevTime = 0  # prev time of 0 so we can't resume from here
 
-        self.update.emit(self.offset)  # reset to 0, since the timer was stopped
+        self.tick.emit(self.offset)  # reset to 0, since the timer was stopped
 
     @Slot()
     def stop_timer(self):
@@ -92,7 +91,7 @@ class Timer(QObject):
             self.paused = False
             self.prevTime = 0  # prev time of 0 so we can't resume from here
 
-            self.update.emit(curr)  # output the last value so it shows on the screen
+            self.tick.emit(curr)  # output the last value so it shows on the screen
 
     @Slot()
     def pause_timer(self):
@@ -101,7 +100,7 @@ class Timer(QObject):
             self.prevTime += curr  # save the curr to prev
 
             self.update_timer.stop()  # stop the update timer
-            self.update.emit(self.prevTime)
+            self.tick.emit(self.prevTime)
 
             # manage state, a paused timer is still running, just also paused
             self.paused = True
@@ -113,7 +112,7 @@ class Timer(QObject):
             self.timer.restart()
             self.update_timer.start()
 
-            self.update.emit(self.prevTime)
+            self.tick.emit(self.prevTime)
 
             # manage state
             self.paused = False
@@ -128,7 +127,7 @@ class Timer(QObject):
 
         s, ms = divmod(curr, 1000)
 
-        self.update.emit(f'{int(s)}.{int(ms)}')
+        self.tick.emit(f'{int(s)}.{int(ms)}')
 
     @Slot(int)
     def read(self):
@@ -138,10 +137,10 @@ class Timer(QObject):
         """
         if self.update_timer is not None and self.update_timer.isActive():
             curr = self.timer.elapsed()
-            self.update.emit(curr + self.prevTime + self.offset)
+            self.tick.emit(curr + self.prevTime + self.offset)
 
         else:
-            self.update.emit(self.prevTime + self.offset)
+            self.tick.emit(self.prevTime + self.offset)
 
     @Slot()
     def quit(self):
@@ -150,4 +149,4 @@ class Timer(QObject):
 
     def update_settings(self):
         self.offset = self.settings.game.start_offset * 1000
-        self.update.emit(self.offset)
+        self.tick.emit(self.offset)
