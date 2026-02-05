@@ -1,8 +1,7 @@
-from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QFrame
 from PySide6.QtCore import Slot, Qt
 
-from Widgets.SplitsWidget import SplitsWidget
+from Timer.SplitTimer import SplitTimer
 from helpers.TimerFormat import format_wall_clock_from_ms
 
 
@@ -19,12 +18,12 @@ class TimerWidget(QFrame):
         label.style().polish(label)
         label.update()
 
-    def __init__(self, splits_widget: SplitsWidget):
+    def __init__(self, split_timer: SplitTimer):
         super().__init__()
 
         self.layout = QVBoxLayout()
         self._negative = None
-        self._splits_widget = splits_widget
+        self._splits_timer = split_timer
 
         self.main_timer_label = QLabel("", self)
         self.main_timer_label.setObjectName('TimerLabel')
@@ -44,10 +43,10 @@ class TimerWidget(QFrame):
     def update_time(self, time: int):
         timer_string = format_wall_clock_from_ms(time)
 
-        if time < 0 and not self._negative and self._splits_widget.started:
+        if time < 0 and not self._negative and self._splits_timer.started:
             self.set_negative(True)
 
-        elif (self._negative and time >= 0) or not self._splits_widget.started:
+        elif (self._negative and time >= 0) or not self._splits_timer.started:
             self.set_negative(False)
 
         self.main_timer_label.setText(timer_string)

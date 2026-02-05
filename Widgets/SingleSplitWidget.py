@@ -10,6 +10,7 @@ from typing import Callable
 
 from helpers.TimerFormat import format_wall_clock_from_ms
 from Models.Game import Split
+from Timer.SplitTimer import SplitTimer
 
 
 class SingleSplitWidget(QFrame):
@@ -161,6 +162,42 @@ class SingleSplitWidget(QFrame):
         self.current_time_ms = 0
         self.current_segment_ms = 0
 
+    def end_split(self):
+        time_delta = self.current_time_ms - self.get_comparison_time()
+        time_delta_str = format_wall_clock_from_ms(time_delta)
+
+        if time_delta >= 0:
+            time_delta_str = '+' + time_delta_str
+
+        self.delta_label.setText(time_delta_str)  # update the +/- time delta label
+        self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))  # set the text to show the time taken
+
+        if self.current_segment_ms < self.split.gold_segment_ms:
+            # if we're ahead of the saved time, then a "gold" gold
+            if self.current_segment_ms < self.split.pb_segment_ms:
+                self.time_label.setStyleSheet(self.best_time_color_ahead)  # TODO : Figure out ahead / behind here too
+                self.delta_label.setStyleSheet(self.best_time_color_ahead)
+            else:  # we're behind, but we saved time, then we ought to color it a different color to note the gold but while not ahead
+                self.time_label.setStyleSheet(self.best_time_color_behind)
+                self.delta_label.setStyleSheet(self.best_time_color_behind)
+
+        elif self.current_segment_ms < self.split.pb_segment_ms:
+            self.time_label.setStyleSheet(self.saved_time_color_ahead)
+            self.delta_label.setStyleSheet(self.saved_time_color_ahead)
+
+        elif self.current_time_ms >= self.split.pb_time_ms:
+            self.time_label.setStyleSheet(self.lost_time_color_ahead)
+            self.delta_label.setStyleSheet(self.lost_time_color_ahead)
+
+        else:
+            self.time_label.setStyleSheet(self.saved_time_color_ahead)
+            self.delta_label.setStyleSheet(self.saved_time_color_ahead)
+
+    def undo_split(self):
+        self.delta_label.setText('')
+        self.delta_label.setStyleSheet('color: #bbbbbb;')
+        self.time_label.setStyleSheet('color: #bbbbbb;')
+
     @Slot()
     def export_data(self, indent: str = '    ', depth: int = 1):
         """
@@ -177,41 +214,41 @@ class SingleSplitWidget(QFrame):
 {indent * (depth + 1)}"gold_segment_ms": {self.split.gold_segment_ms}
 {indent * depth}}}"""
 
-    @Slot(str)
-    def handle_control(self, event: str):
-        if event == 'STARTSPLIT' and self.current_time_ms != 0:
-            time_delta = self.current_time_ms - self.get_comparison_time()
-            time_delta_str = format_wall_clock_from_ms(time_delta)
-
-            if time_delta >= 0:
-                time_delta_str = '+' + time_delta_str
-
-            self.delta_label.setText(time_delta_str)  # update the +/- time delta label
-            self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))  # set the text to show the time taken
-
-            if self.current_segment_ms < self.split.gold_segment_ms:
-                # if we're ahead of the saved time, then a "gold" gold
-                if self.current_segment_ms < self.split.pb_segment_ms:
-                    self.time_label.setStyleSheet(self.best_time_color_ahead)  # TODO : Figure out ahead / behind here too
-                    self.delta_label.setStyleSheet(self.best_time_color_ahead)
-                else:  # we're behind, but we saved time, then we ought to color it a different color to note the gold but while not ahead
-                    self.time_label.setStyleSheet(self.best_time_color_behind)
-                    self.delta_label.setStyleSheet(self.best_time_color_behind)
-
-            elif self.current_segment_ms < self.split.pb_segment_ms:
-                self.time_label.setStyleSheet(self.saved_time_color_ahead)
-                self.delta_label.setStyleSheet(self.saved_time_color_ahead)
-
-            elif self.current_time_ms >= self.split.pb_time_ms:
-                self.time_label.setStyleSheet(self.lost_time_color_ahead)
-                self.delta_label.setStyleSheet(self.lost_time_color_ahead)
-
-            else:
-                self.time_label.setStyleSheet(self.saved_time_color_ahead)
-                self.delta_label.setStyleSheet(self.saved_time_color_ahead)
-
-        elif event == 'RESET':
-            self.reset_split()
-
-        elif event == 'STOP':
-            self.finalize_split()
+    # @Slot(str)
+    # def handle_control(self, event: str):
+    #     if event == 'STARTSPLIT' and self.current_time_ms != 0:
+    #         time_delta = self.current_time_ms - self.get_comparison_time()
+    #         time_delta_str = format_wall_clock_from_ms(time_delta)
+    #
+    #         if time_delta >= 0:
+    #             time_delta_str = '+' + time_delta_str
+    #
+    #         self.delta_label.setText(time_delta_str)  # update the +/- time delta label
+    #         self.time_label.setText(format_wall_clock_from_ms(self.current_time_ms))  # set the text to show the time taken
+    #
+    #         if self.current_segment_ms < self.split.gold_segment_ms:
+    #             # if we're ahead of the saved time, then a "gold" gold
+    #             if self.current_segment_ms < self.split.pb_segment_ms:
+    #                 self.time_label.setStyleSheet(self.best_time_color_ahead)  # TODO : Figure out ahead / behind here too
+    #                 self.delta_label.setStyleSheet(self.best_time_color_ahead)
+    #             else:  # we're behind, but we saved time, then we ought to color it a different color to note the gold but while not ahead
+    #                 self.time_label.setStyleSheet(self.best_time_color_behind)
+    #                 self.delta_label.setStyleSheet(self.best_time_color_behind)
+    #
+    #         elif self.current_segment_ms < self.split.pb_segment_ms:
+    #             self.time_label.setStyleSheet(self.saved_time_color_ahead)
+    #             self.delta_label.setStyleSheet(self.saved_time_color_ahead)
+    #
+    #         elif self.current_time_ms >= self.split.pb_time_ms:
+    #             self.time_label.setStyleSheet(self.lost_time_color_ahead)
+    #             self.delta_label.setStyleSheet(self.lost_time_color_ahead)
+    #
+    #         else:
+    #             self.time_label.setStyleSheet(self.saved_time_color_ahead)
+    #             self.delta_label.setStyleSheet(self.saved_time_color_ahead)
+    #
+    #     elif event == 'RESET':
+    #         self.reset_split()
+    #
+    #     elif event == 'STOP':
+    #         self.finalize_split()

@@ -6,9 +6,12 @@ from helpers.TimerFormat import format_wall_clock_from_ms
 
 
 class SplitTimer(QObject):
-    SplitFinish = Signal()
-    SplitReset = Signal()
-    SplitUpdate = Signal()
+    SplitSkip = Signal()
+    SplitUnsplit = Signal()
+    SplitUpdate = Signal(int)
+
+    SplitsFinish = Signal()
+    SplitsReset = Signal()
 
     def __init__(self, settings: Settings):
         super().__init__()
@@ -64,8 +67,8 @@ class SplitTimer(QObject):
             segment_time = curr_time_ms - self.start_times[self.index]
 
         self.segment_times[self.index] = segment_time
-
         self.current_time_ms = curr_time_ms
+        self.SplitUpdate.emit(curr_time_ms)
 
     @Slot(str)
     def handle_control(self, event: str):
@@ -84,7 +87,7 @@ class SplitTimer(QObject):
 
                 if self.index == len(self.splits) - 1:  # if we are incrementing past the last split actually finish
                     self.started = False  # finish the splits
-                    self.SplitFinish.emit()  # notify subscribers we finished
+                    self.SplitsFinish.emit()  # notify subscribers we finished
                     return
 
                 self.index += 1  # if we get here we can increment
@@ -99,7 +102,7 @@ class SplitTimer(QObject):
 
             case 'RESET':
                 self.reset()
-                self.SplitReset.emit()
+                self.SplitsReset.emit()
 
             case 'STOP':
                 self.reset()
@@ -108,3 +111,8 @@ class SplitTimer(QObject):
                 self.end_times[self.index] = -1
                 self.segment_times[self.index] = -1
                 self.index += 1
+
+                self.SplitSkip.emit()
+
+            case 'UNSPLIT':
+                self.SplitUnsplit.emit()
