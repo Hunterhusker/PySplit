@@ -24,6 +24,8 @@ class TimerWidget(QFrame):
         self.layout = QVBoxLayout()
         self._negative = None
         self._splits_timer = split_timer
+        self._splits_timer.SplitUpdate.connect(self.update_time)
+        self._splits_timer.SplitsFinish.connect(self.finish)
 
         self.main_timer_label = QLabel("", self)
         self.main_timer_label.setObjectName('TimerLabel')
@@ -49,4 +51,10 @@ class TimerWidget(QFrame):
         elif (self._negative and time >= 0) or not self._splits_timer.started:
             self.set_negative(False)
 
+        if (self._splits_timer.started and not self._splits_timer.done) or self._splits_timer.current_time_ms <= 0:
+            self.main_timer_label.setText(timer_string)
+
+    @Slot()
+    def finish(self):
+        timer_string = format_wall_clock_from_ms(self._splits_timer.end_times[-1])
         self.main_timer_label.setText(timer_string)

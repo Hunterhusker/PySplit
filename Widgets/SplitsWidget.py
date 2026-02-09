@@ -11,16 +11,13 @@ class SplitsWidget(QWidget):
     """
     Assembler Widget that holds a list of all the splits we have in the run and listens to the controller for input
     """
-    SplitControlSignal = Signal(str)
-    SplitFinish = Signal()
-    SplitReset = Signal()
-
-    # TODO : Add better support for the strategy adoption
     def __init__(self, settings: Settings, split_timer: SplitTimer, parent: 'Main'):
         super().__init__()
         self.settings = settings
         self.split_timer = split_timer
         self.split_timer.SplitsReset.connect(self.reset_splits)
+        self.split_timer.SplitsFinish.connect(self.finish_splits)
+        self.split_timer.SplitSkip.connect(self.skip_current_split)
 
         self.visible_splits = self.settings.settings['visible_splits']
         self.main = parent
@@ -44,14 +41,8 @@ class SplitsWidget(QWidget):
 
         # we'll want to keep track of these
         self.splits = []
-        # self.index = 0  # a way to keep place in our list
-        # self.curr_time = 0.0
 
         self.last_index = None
-
-        # add in some bools to track state of the splits
-        # self.started = False
-        # self.done = False
 
         # load the splits in from the settings
         self.load_splits(self.settings.game)
@@ -76,56 +67,18 @@ class SplitsWidget(QWidget):
     def get_current_split(self):
         return self.splits[self.index]
 
-    # @Slot(int)
-    # def increment_split(self, inc: int):
-    #     """
-    #     Go to the next (or more) split(s) and return it
-    #
-    #     Args:
-    #         inc: (int) the number of splits to increment by
-    #
-    #     Returns:
-    #         (SingleSplitWidget): The split that is currently active
-    #     """
-    #     curr_time = self.splits[self.index].current_time_ms
-    #     self.splits[self.index].set_selected(False)
-    #
-    #     self.index += inc
-    #
-    #     self.splits[self.index].current_start_time = curr_time
-    #     self.splits[self.index].set_selected(True)
-    #
-    #     if self.index >= self.visible_splits:
-    #         sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-    #         sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
-    #
-    #     if self.index >= len(self.splits):  # don't let it leave the array
-    #         self.index = len(self.splits) - 1
-    #
-    #     return self.splits[self.index]
+    def increment_split(self):
+        timer_index = self.split_timer.index
 
-    # @Slot(int)
-    # def decrement_split(self, inc: int):
-    #     """
-    #     Go back a (or more) split(s) and return it
-    #
-    #     Args:
-    #         inc: (int) the number of splits to decrement, if it goes negative, hard stop at 0
-    #
-    #     Returns:
-    #         (SingleSplitWidget): The split that is currently active
-    #     """
-    #     self.splits[self.index].set_selected(False)
-    #
-    #     self.index -= inc
-    #     sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-    #     sb.setValue((self.splits[self.index].height() + 2) * self.index + 2)
-    #     self.splits[self.index].set_selected(True)
-    #
-    #     if self.index < 0:  # don't let it leave the array
-    #         self.index = 0
-    #
-    #     return self.splits[self.index]
+        if timer_index >= self.visible_splits:
+            sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+            sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
+
+    def decrement_split(self):
+        timer_index = self.split_timer.index
+
+        sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+        sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
 
     @Slot(int)
     def update_split(self, curr_time: int):
@@ -145,148 +98,68 @@ class SplitsWidget(QWidget):
 
             elif self.last_index < timer_index:
                 last_split = self.splits[self.last_index]
-                last_split.end_split()
+                last_split.end()
 
                 last_split.set_selected(False)
                 curr_split.set_selected(True)
 
-                if timer_index >= self.visible_splits:
-                    sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-                    sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
+                self.increment_split()
 
                 self.last_index = timer_index
 
             elif self.last_index > timer_index:
                 last_split = self.splits[self.last_index]
-                last_split.undo_split()
+                last_split.undo()
 
                 last_split.set_selected(False)
                 curr_split.set_selected(True)
 
-                sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-                sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
+                self.decrement_split()
+
                 self.splits[timer_index].set_selected(True)
 
                 self.last_index = timer_index
 
             curr_split.update_split(curr_time)
 
+    @Slot()
     def reset_splits(self):
         self.splits[self.split_timer.index].set_selected(False)
 
         self.split_timer.index = 0
         self.split_timer.started = False
+        self.last_index = None
 
         sb = self.scroll_area.verticalScrollBar()
         sb.setValue(0)
 
         for sp in self.splits:
-            sp.reset_split()
+            sp.reset()
             sp.set_selected(False)
 
-    # @Slot(str)
-    # def handle_control(self, event: str):
-    #     """
-    #     An event handler to send all the needed data to the splits themselves
-    #
-    #     Args:
-    #         event: (str) the event to handle from the user
-    #     """
-    #     current_split = self.get_current_split()
-    #
-    #     # pass the control on to the split itself
-    #     current_split.handle_control(str)
-    #
-    #     if event == 'STARTSPLIT':  # if we are splitting, then we ought to move on to the next one
-    #         if self.splits[self.index].current_time_ms < 0:
-    #             return  # ignore splits before the time offset finishes
-    #
-    #         self.splits[self.index].handle_control(event)
-    #
-    #         if not self.started:
-    #             self.index = 0
-    #             sb = self.scroll_area.verticalScrollBar()
-    #             sb.setValue(0)
-    #
-    #             self.settings.game.session_attempts += 1
-    #             self.settings.game.lifetime_attempts += 1
-    #             self.settings.game.GameUpdated.emit(self.settings.game)
-    #
-    #             if self.done:
-    #                 for sp in self.splits:
-    #                     sp.delta_label.setText('')
-    #                     sp.delta_label.setStyleSheet('color: #bbbbbb;')
-    #                     sp.time_label.setStyleSheet('color: #bbbbbb;')
-    #
-    #             self.started = True
-    #             self.done = False
-    #             self.splits[self.index].set_selected(True)  # highlight it once it starts
-    #
-    #         elif not self.done:
-    #             if self.index == len(self.splits) - 1:
-    #                 did_pb = self.splits[-1].split.pb_time_ms < self.splits[-1].current_time_ms
-    #
-    #                 for sp in self.splits:
-    #                     if did_pb:
-    #                         sp.split.pb_time_ms = sp.current_time_ms
-    #                         sp.split.pb_segment_ms = sp.current_segment_ms
-    #
-    #                     if sp.current_segment_ms < sp.split.gold_segment_ms:
-    #                         sp.split.gold_segment_ms = sp.current_segment_ms
-    #
-    #                     sp.current_time_ms = 0
-    #                     sp.current_segment_ms = 0
-    #
-    #                 # maintain state
-    #                 self.started = False
-    #                 self.done = True
-    #                 self.splits[self.index].set_selected(False)
-    #
-    #                 self.SplitFinish.emit()
-    #
-    #             else:
-    #                 self.increment_split(1)
-    #
-    #     elif event == 'UNSPLIT' and self.started and not self.done:
-    #         if self.index != 0:
-    #             self.decrement_split(1)
-    #             sp = self.splits[self.index + 1]
-    #
-    #             sp.current_time_ms = 0
-    #
-    #             sp.delta_label.setText('')
-    #             sp.delta_label.setStyleSheet('color: #bbbbbb;')
-    #             sp.time_label.setStyleSheet('color: #bbbbbb;')
-    #
-    #             self.splits[self.index].time_label.setStyleSheet('color: #bbbbbb;')
-    #
-    #     elif event == 'RESET':
-    #         self.splits[self.index].set_selected(False)
-    #
-    #         self.index = 0
-    #         self.started = False
-    #         self.done = False
-    #
-    #         sb = self.scroll_area.verticalScrollBar()
-    #         sb.setValue(0)
-    #
-    #         for sp in self.splits:
-    #             sp.reset_split()
-    #
-    #     elif event == 'STOP':
-    #         self.splits[self.index].set_selected(False)
-    #
-    #         self.index = 0
-    #         self.started = False
-    #         self.done = False
-    #
-    #         for sp in self.splits:
-    #             # sp.finalize_split()
-    #             if sp.current_segment_ms != 0 and sp.current_segment_ms < sp.split.gold_segment_ms:
-    #                 sp.split.gold_segment_ms = sp.current_segment_ms
-    #
-    #             sp.current_segment_ms = 0
-    #             sp.gold_segment_ms = 0
+    @Slot()
+    def finish_splits(self):
+        curr_split = self.splits[self.split_timer.index]
+        curr_split.end()
+        curr_split.set_selected(False)
+
+    @Slot()
+    def skip_current_split(self):
+        curr_split = self.splits[self.last_index]
+        curr_split.skip()
+
+        timer_index = self.split_timer.index
+
+        # make sure the correct split is highlighted
+        curr_split.set_selected(False)
+        self.splits[timer_index].set_selected(True)
+
+        self.last_index = timer_index
+
+        # manage the scroll
+        if timer_index >= self.visible_splits:
+            sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
+            sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
 
     def export_splits(self, indent: str = '    ', depth: int = 0) -> str:
         """
@@ -375,17 +248,6 @@ class SplitsWidget(QWidget):
 
         self.splits = []
 
-    # def reset_splits(self):
-    #     """
-    #     Resets the splits back to an unstarted state
-    #     """
-    #     self.index = 0
-    #     self.started = False
-    #     self.done = False
-    #
-    #     for sp in self.splits:
-    #         sp.reset_split()
-    #
     # def update_splits(self):
     #     """
     #     Update the splits to ensure they stay up to date as to the best times vs. current times

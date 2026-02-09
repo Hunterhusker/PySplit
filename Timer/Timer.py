@@ -91,7 +91,7 @@ class Timer(QObject):
             self.paused = False
             self.prevTime = 0  # prev time of 0 so we can't resume from here
 
-            self.tick.emit(curr)  # output the last value so it shows on the screen
+            self.tick.emit(curr + self.offset)  # output the last value so it shows on the screen
 
     @Slot()
     def pause_timer(self):
