@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from Popups.ABCSettingTab import ABCSettingTab
 from Styling.Settings import Settings
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
-from Models.Game import Game, Split
+from Models.Game import Game, SplitDefinition
 from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit, LabeledNoScrollQTimeEdit, \
     LabeledDoubleSpinBox
 
@@ -153,7 +153,7 @@ class GameSettingsTab(ABCSettingTab):
         """
         Adds a blank split for the user to fill out
         """
-        empty_split = Split('', 0, 0, 0, 0, 0)
+        empty_split = SplitDefinition('', 0, 0, 0, 0, 0)
         newSplit = SplitLine(empty_split, parent=self)
         self.split_area.addWidget(newSplit)
 
@@ -193,7 +193,7 @@ class GameSettingsTab(ABCSettingTab):
 
 
 class SplitLine(QFrame):
-    def __init__(self, split: Split, parent: GameSettingsTab = None):
+    def __init__(self, split: SplitDefinition, parent: GameSettingsTab = None):
         super().__init__(parent=parent)
 
         self.layout = QHBoxLayout()
