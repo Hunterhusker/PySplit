@@ -9,7 +9,7 @@ from PySide6.QtCore import Slot
 from typing import Callable
 
 from helpers.TimerFormat import format_wall_clock_from_ms
-from Models.Game import Split
+from Models.Game import SplitDefinition
 
 
 class SingleSplitWidget(QFrame):
@@ -25,7 +25,7 @@ class SingleSplitWidget(QFrame):
 
     selected = Property(bool, is_selected, set_selected)  # hate the formatting here
 
-    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent):
+    def __init__(self, split: SplitDefinition, comparison_strategy: Callable[[SplitDefinition], int], parent):
         """
         An individual split that can display the times from the PB and the comparison time
         Args:
@@ -45,7 +45,7 @@ class SingleSplitWidget(QFrame):
         self.lost_time_color_ahead = None
         self.lost_time_color_behind = None
 
-        self.get_colors_from_style()
+        self._get_colors_from_style()
 
         self._selected = False
         self._skipped = False
@@ -81,14 +81,11 @@ class SingleSplitWidget(QFrame):
         self.setLayout(self.layout)  # set the layout on the frame
         self.setFixedHeight(30)
 
-    def get_colors_from_style(self):
+    def _get_colors_from_style(self):
         """
         Gets the colors from the style and then saves them to vars
-
-        Returns:
-            None
         """
-        var_map = self.parent.main.settings.style.variable_map
+        var_map = self.parent.settings.style.variable_map
 
         self.best_time_color_ahead = f'color: {var_map['best-time-color-ahead']};'
         self.best_time_color_behind = f'color: {var_map['best-time-color-behind']};'
@@ -98,6 +95,12 @@ class SingleSplitWidget(QFrame):
 
         self.lost_time_color_ahead = f'color: {var_map['lost-time-color-ahead']};'
         self.lost_time_color_behind = f'color: {var_map['lost-time-color-behind']};'
+
+    def apply_settings(self):
+        """
+        Looks at the style of the parent, and applies those locally here where they apply (eg: Color Variations)
+        """
+        self._get_colors_from_style()
 
     @Slot(int)
     def update_split(self, curr_time_ms: int):

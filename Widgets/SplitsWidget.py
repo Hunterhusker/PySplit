@@ -1,4 +1,4 @@
-from Models.Game import Game, Split
+from Models.Game import Game, SplitDefinition
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
 
@@ -63,6 +63,9 @@ class SplitsWidget(QWidget):
         """
         self.visible_splits = self.settings.settings['visible_splits']
         self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
+
+        for split in self.splits:
+            split.apply_settings()
 
     def get_current_split(self):
         return self.splits[self.index]
@@ -191,7 +194,7 @@ class SplitsWidget(QWidget):
         """
         self.load_splits_from_list(game.splits)
 
-    def load_splits_from_list(self, splits: list[Split]):
+    def load_splits_from_list(self, splits: list[SplitDefinition]):
         """
         Loads in splits form a list of Models.Game.Split
         Args:
@@ -268,13 +271,13 @@ class SplitsWidget(QWidget):
 
 
 # different split display time strategies
-def split_pb_strategy(split: Split):
+def split_pb_strategy(split: SplitDefinition):
     return split.pb_time_ms
 
 
-def split_pb_segment_strategy(split: Split):
+def split_pb_segment_strategy(split: SplitDefinition):
     return split.pb_segment_total_ms
 
 
-def split_gold_segement_strategy(split: Split):
+def split_gold_segement_strategy(split: SplitDefinition):
     return split.gold_segment_total_ms
