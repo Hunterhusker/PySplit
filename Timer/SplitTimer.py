@@ -1,8 +1,8 @@
 from copy import deepcopy
 from PySide6.QtCore import Slot, Signal, QObject
-from Styling.Settings import Settings
+from PySide6.QtWidgets import QMessageBox
 
-from helpers.TimerFormat import format_wall_clock_from_ms
+from Styling.Settings import Settings
 
 
 class SplitTimer(QObject):
@@ -118,7 +118,7 @@ class SplitTimer(QObject):
                     self.done = True
                     self.SplitsFinish.emit()  # notify subscribers we finished
 
-                    # TODO : check if PB if PB we should ask about saving
+                    self.open_dialog()  # TODO : should this be here or how should we open the popup?
                     return
 
                 self.index += 1  # if we get here we can increment
@@ -147,3 +147,11 @@ class SplitTimer(QObject):
                     self.segment_times[self.index - 1] = -1
 
                     self.SplitSkip.emit()
+
+    def open_dialog(self):
+        dlg = QMessageBox()
+        dlg.setWindowTitle("A Simple Dialog")
+        dlg.setText("This is a simple message box.")
+        dlg.setIcon(QMessageBox.Information)  # Use an information icon
+        dlg.setStandardButtons(QMessageBox.Ok)  # Show only the OK button
+        dlg.exec()  # Use exec() to run the dialog modally
