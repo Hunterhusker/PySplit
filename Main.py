@@ -5,6 +5,8 @@ from PySide6.QtCore import Slot, Signal, QThread, Qt, QFile
 from PySide6.QtGui import QIcon
 import sys
 from time import sleep
+
+from Database.RunRepository import RunRepository
 from Listeners.AggregateListener import AggregateListener
 from Listeners.KeyboardListener import KeyboardListener
 from Popups.AdvancedStyleTab import AdvancedStyleTab
@@ -30,6 +32,8 @@ class Main(QWidget):
 
     def __init__(self, settings_path: str = 'conf/settings.json'):
         super().__init__()
+
+        # Set up the window itself we can add stuff
         self.setWindowTitle('PySplit v0.0')
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint)
 
@@ -40,13 +44,24 @@ class Main(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        # load the settings from the file
+        # load settings
         self.settings = Settings(settings_path)
+        self.runs = RunRepository('conf/testGame.db')
 
+        # Create the widgets
         self.title = TitleWidget.from_game(self.settings.game)
+        self.split_timer = SplitTimer(self.settings)
+        self.splits = SplitsWidget(self.settings, self.split_timer, parent=self)
+        self.main_timer_widget = TimerWidget(self.split_timer)
+        self.splitStats = TimeStatsWidget()
 
+        # connect widgets to the events they care of
+        self.settings.style.UpdateStyle.connect(self.set_style)
+        self.settings.SettingsUpdate.connect(self.splits.apply_settings)
+        self.split_timer.SplitUpdate.connect(self.splits.update_split)
+
+        # create our right click menu
         self.context_menu = QMenu(self)
-
         self.settings_action = self.context_menu.addAction('Settings')
         self.settings_action.triggered.connect(self.open_settings_popup)
 
@@ -58,19 +73,7 @@ class Main(QWidget):
         self.exit_action = self.context_menu.addAction('Exit')
         self.exit_action.triggered.connect(QApplication.instance().quit)
 
-        # use the configurations from the file
-        self.settings.style.UpdateStyle.connect(self.set_style)
-
-        self.split_timer = SplitTimer(self.settings)
-        self.splits = SplitsWidget(self.settings, self.split_timer, parent=self)
-        self.settings.SettingsUpdate.connect(self.splits.apply_settings)
-
-        self.split_timer.SplitUpdate.connect(self.splits.update_split)
-
-        self.main_timer_widget = TimerWidget(self.split_timer)
-
-        self.splitStats = TimeStatsWidget()
-
+        # Add our parts to the page itself
         layout.addWidget(self.title)
         layout.addWidget(self.splits)
         layout.addWidget(self.main_timer_widget)
