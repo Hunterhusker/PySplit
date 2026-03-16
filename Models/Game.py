@@ -179,5 +179,3 @@ class Game(QObject):
     def add_attempt(self):
         self.session_attempts += 1
         self.GameUpdated.emit(self)
-
-
