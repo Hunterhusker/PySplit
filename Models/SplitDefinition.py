@@ -12,6 +12,10 @@ class SplitDefinition:
         self.pb_segment_total_ms = pb_segment_total_ms
         self.gold_segment_total_ms = gold_segment_total_ms
 
+        # TODO Make these work
+        self.index = -1
+        self.id = -1
+
     @classmethod
     def from_json(cls, json_dict: dict, prev_pb_segment_total_ms: int = 0, prev_gold_segment_total_ms: int = 0):
         """
