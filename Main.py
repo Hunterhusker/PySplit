@@ -46,7 +46,6 @@ class Main(QWidget):
 
         # load settings
         self.settings = Settings(settings_path)
-        self.runs = RunRepository('conf/testGame.db')
 
         # Create the widgets
         self.title = TitleWidget.from_game(self.settings.game)

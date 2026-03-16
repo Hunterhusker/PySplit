@@ -1,6 +1,10 @@
 import sqlite3
 from pathlib import Path
 
+from Models.Game import Game
+from Models.Run import Run, RunSplit
+from Models.SplitDefinition import SplitDefinition
+
 
 class RunRepository:
     def __init__(self, database_path_string: str):
@@ -29,7 +33,7 @@ class RunRepository:
 
         cur.executescript("""
         CREATE TABLE game (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY CHECK (id = 1),
             title TEXT NOT NULL,
             sub_title TEXT,
             start_offset REAL DEFAULT 0,
@@ -72,6 +76,9 @@ class RunRepository:
         
         CREATE INDEX idx_split_order
         ON split_definitions(order_index);
+        
+        INSERT INTO game (title, sub_title, start_offset, display_pb, lifetime_attempts) 
+        VALUES ('', '', 0.0, 1, 0);
         """)
 
         self.conn.commit()
@@ -98,3 +105,91 @@ class RunRepository:
 
     def commit(self):
         self.conn.commit()
+
+    # Save methods for all of our objects to put them into the database
+    def save_game(self, game: Game):
+        cur = self.conn.cursor()
+
+        cur.execute("""
+        UPDATE game
+        SET title = ?,
+            sub_title = ?,
+            start_offset = ?,
+            display_pb = ?,
+            lifetime_attempts = ?
+        WHERE id = 1;
+        """, (
+            game.title,
+            game.sub_title,
+            game.start_offset,
+            game.display_pb,
+            game.lifetime_attempts
+        ))
+
+        self.conn.commit()
+
+    def save_split_definition(self, split_definition: SplitDefinition):
+        cur = self.conn.cursor()
+
+        cur.execute("""
+        UPDATE split_definitions
+        SET name = ?,
+            order_index = ?,
+            pb_segment_ms = ?,
+            gold_segment_ms = ?
+        WHERE id = ?;
+        """, (
+            split_definition.split_name,
+            split_definition.index,
+            split_definition.pb_segment_ms,
+            split_definition.gold_segment_ms,
+            split_definition.id
+        ))
+
+        self.conn.commit()
+
+
+    def save_run(self, run: Run):
+        cur = self.conn.cursor()
+
+        cur.execute("""
+        INSERT INTO runs (completed, total_time_ms, attempt_number, created_at)
+        VALUES (?, ?, ?, ?)
+        """, (
+            run.completed,
+            run.total_time_ms,
+            run.attempt_number,
+            run.created_at
+        ))
+
+        self.conn.commit()
+
+    def save_run_split(self, run_split: RunSplit):
+        cur = self.conn.cursor()
+
+        cur.execute("""
+        INSERT INTO splits (run_id, split_definition_id, segment_time_ms, cumulative_time_ms)
+        VALUES (?, ?, ?, ?)
+        """, (
+            run_split.run_id,
+            run_split.split_definition_id,
+            run_split.segment_time_ms,
+            run_split.cumulative_time_ms
+        ))
+
+        self.conn.commit()
+
+    # Loader methods that we use to get our objects out of the database
+    def load_game(self) -> Game:
+        cur = self.conn.cursor()
+
+        cur
+
+    def load_split_definitions(self) -> list[SplitDefinition]:
+        pass
+
+    def load_run(self) -> Run:
+        pass
+
+    def load_run_splits(self) -> list[RunSplit]:
+        pass
