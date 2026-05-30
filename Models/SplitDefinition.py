@@ -2,19 +2,17 @@ from __future__ import annotations
 import json
 
 
+# TODO : Make id field nullable and default to null so that we can load from a JSON w/o id fields or DB with id fields
 class SplitDefinition:
     """A class that represents a single split in a speedrun"""
-    def __init__(self, split_name: str, pb_time_ms: int, pb_segment_ms: int, gold_segment_ms: int, pb_segment_total_ms: int = 0, gold_segment_total_ms: int = 0):
+    def __init__(self, id: int, split_name: str, pb_time_ms: int, pb_segment_ms: int, gold_segment_ms: int, pb_segment_total_ms: int = 0, gold_segment_total_ms: int = 0):
+        self.id = id
         self.split_name = split_name
         self.pb_time_ms = pb_time_ms
         self.pb_segment_ms = pb_segment_ms
         self.gold_segment_ms = gold_segment_ms
         self.pb_segment_total_ms = pb_segment_total_ms
         self.gold_segment_total_ms = gold_segment_total_ms
-
-        # TODO Make these work
-        self.index = -1
-        self.id = -1
 
     @classmethod
     def from_json(cls, json_dict: dict, prev_pb_segment_total_ms: int = 0, prev_gold_segment_total_ms: int = 0):
@@ -32,7 +30,15 @@ class SplitDefinition:
         prev_pb_segment_total_ms += json_dict['pb_segment_ms']
         prev_gold_segment_total_ms += json_dict['gold_segment_ms']
 
-        return cls(json_dict['split_name'], json_dict['pb_time_ms'], json_dict['pb_segment_ms'], json_dict['gold_segment_ms'], prev_pb_segment_total_ms, prev_gold_segment_total_ms)
+        return cls(
+            json_dict['id'],
+            json_dict['split_name'],
+            json_dict['pb_time_ms'],
+            json_dict['pb_segment_ms'],
+            json_dict['gold_segment_ms'],
+            prev_pb_segment_total_ms,
+            prev_gold_segment_total_ms
+        )
 
     @classmethod
     def from_json_str(cls, json_str: str, prev_pb_segment_total_ms: int = 0, prev_gold_segment_total_ms: int = 0):
@@ -64,6 +70,7 @@ class SplitDefinition:
             (dict): the dictionary that has all the data for this object
         """
         return {
+            'id': self.id,
             'split_name': self.split_name,
             'pb_time_ms': self.pb_time_ms,
             'pb_segment_ms': self.pb_segment_ms,

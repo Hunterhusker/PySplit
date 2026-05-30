@@ -32,8 +32,8 @@ class RunRepository:
         cur = self.conn.cursor()
 
         cur.executescript("""
-        CREATE TABLE game (
-            id INTEGER PRIMARY KEY CHECK (id = 1),
+        CREATE TABLE games (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             sub_title TEXT,
             start_offset REAL DEFAULT 0,
@@ -41,25 +41,26 @@ class RunRepository:
             lifetime_attempts INTEGER DEFAULT 0
         );
         
-        
         CREATE TABLE split_definitions (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             order_index INTEGER NOT NULL,
-            pb_segment_ms INTEGER,
-            gold_segment_ms INTEGER
+            pb_segment_ms INTEGER DEFAULT 0,
+            gold_segment_ms INTEGER DEFAULT 0,
+            FOREIGN KEY (game_id) REFERENCES games(id)
         );
         
         CREATE TABLE runs (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             completed INTEGER DEFAULT 0,
             total_time_ms INTEGER,
             attempt_number INTEGER,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
         
-        CREATE TABLE splits (
-            id INTEGER PRIMARY KEY,
+        CREATE TABLE segments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             run_id INTEGER NOT NULL,
             split_definition_id INTEGER NOT NULL,
             segment_time_ms INTEGER,
@@ -72,13 +73,10 @@ class RunRepository:
         ON runs(completed);
         
         CREATE INDEX idx_run_splits_run
-        ON splits(run_id);
+        ON segments(run_id);
         
         CREATE INDEX idx_split_order
         ON split_definitions(order_index);
-        
-        INSERT INTO game (title, sub_title, start_offset, display_pb, lifetime_attempts) 
-        VALUES ('', '', 0.0, 1, 0);
         """)
 
         self.conn.commit()
@@ -92,33 +90,74 @@ class RunRepository:
         """)
 
         tables = {row[0] for row in cur.fetchall()}
-        my_tables = {'game', 'split_definitions', 'runs', 'splits'}
+        my_tables = {'games', 'split_definitions', 'runs', 'segments'}
 
         if not my_tables.issubset(tables):
             raise RuntimeError('Not all expected tables were found in game database!')
 
-    def cursor(self):
-        return self.conn.cursor()
+    def save_game(self, game: Game) -> int:
+        """
+        Updates or Inserts the Game object to the database
 
-    def close(self):
-        self.conn.close()
+        Args:
+            game: The Game to update/insert
 
-    def commit(self):
-        self.conn.commit()
+        Returns:
+            (int) game_id: The ID of the game that was updated
+        """
+        game_id = game.id  # just to make sure the variable is accessible outside the later ifs
 
-    # Save methods for all of our objects to put them into the database
-    def save_game(self, game: Game):
+        # if the game object doesn't have an id, insert it and save the id, else update it
+        if game_id is None:
+            game_id = self._insert_game(game)
+            game.id = game_id
+        else:
+            game_id = self._update_game(game)
+
+        # update all the splits in the game definition
+        for i in range(len(game.splits)):
+            split = game.splits[i]
+
+            self.save_split_definition(split, i, game_id)
+
+        return game_id  # return the id of the game that we updated
+
+    def _update_game(self, game: Game):
         cur = self.conn.cursor()
 
         cur.execute("""
-        UPDATE game
-        SET title = ?,
-            sub_title = ?,
-            start_offset = ?,
-            display_pb = ?,
-            lifetime_attempts = ?
-        WHERE id = 1;
-        """, (
+                UPDATE games
+                SET title = ?,
+                    sub_title = ?,
+                    start_offset = ?,
+                    display_pb = ?,
+                    lifetime_attempts = ?
+                WHERE id = ?;
+                """, (
+            game.title,
+            game.sub_title,
+            game.start_offset,
+            game.display_pb,
+            game.lifetime_attempts,
+            game.id
+        ))
+
+        self.conn.commit()
+
+        return game.id
+
+    def _insert_game(self, game: Game):
+        cur = self.conn.cursor()
+
+        cur.execute("""
+                INSERT INTO games (
+                    title,
+                    sub_title,
+                    start_offset,
+                    display_pb,
+                    lifetime_attempts
+                ) VALUES (?, ?, ?, ?, ?)
+                """, (
             game.title,
             game.sub_title,
             game.start_offset,
@@ -128,26 +167,67 @@ class RunRepository:
 
         self.conn.commit()
 
-    def save_split_definition(self, split_definition: SplitDefinition):
+        return cur.lastrowid
+
+    def save_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
+        split_id = split_definition.id
+
+        if split_id is None:
+            split_id = self._insert_split_definition(split_definition, split_index, game_id)
+        else:
+            self._update_split_definition(split_definition, split_index, game_id)
+
+        return split_id
+
+    def _update_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
         cur = self.conn.cursor()
 
+        print(f"UPDATE SPLIT {split_definition.split_name} AT {split_index} ")
+
         cur.execute("""
-        UPDATE split_definitions
-        SET name = ?,
-            order_index = ?,
-            pb_segment_ms = ?,
-            gold_segment_ms = ?
-        WHERE id = ?;
-        """, (
+                UPDATE split_definitions
+                SET name = ?,
+                    order_index = ?,
+                    pb_segment_ms = ?,
+                    gold_segment_ms = ?
+                WHERE id = ? AND game_id = ?;
+                """, (
             split_definition.split_name,
-            split_definition.index,
+            split_index,
             split_definition.pb_segment_ms,
             split_definition.gold_segment_ms,
-            split_definition.id
+            split_definition.id,
+            game_id
         ))
 
         self.conn.commit()
 
+        return split_definition.id
+
+    def _insert_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
+        cur = self.conn.cursor()
+
+        print(f"INSERT SPLIT {split_definition.split_name} AT {split_index} ")
+
+        cur.execute("""
+                INSERT INTO split_definitions (
+                    game_id,
+                    name,
+                    order_index,
+                    pb_segment_ms,
+                    gold_segment_ms
+                ) VALUES (?, ?, ?, ?, ?)
+                """, (
+            game_id,
+            split_definition.split_name,
+            split_index,
+            split_definition.pb_segment_ms,
+            split_definition.gold_segment_ms
+        ))
+
+        self.conn.commit()
+
+        return cur.lastrowid
 
     def save_run(self, run: Run):
         cur = self.conn.cursor()
@@ -168,7 +248,7 @@ class RunRepository:
         cur = self.conn.cursor()
 
         cur.execute("""
-        INSERT INTO splits (run_id, split_definition_id, segment_time_ms, cumulative_time_ms)
+        INSERT INTO segments (run_id, split_definition_id, segment_time_ms, cumulative_time_ms)
         VALUES (?, ?, ?, ?)
         """, (
             run_split.run_id,
@@ -180,13 +260,58 @@ class RunRepository:
         self.conn.commit()
 
     # Loader methods that we use to get our objects out of the database
-    def load_game(self) -> Game:
+    def load_game(self, game_id: int) -> Game:
+        # get the game data from the database
         cur = self.conn.cursor()
+        cur.execute("SELECT * FROM games WHERE id = ?", (game_id,))
+        row = cur.fetchone()
 
-        cur
+        # also grab the split definitions from their rows in the database
+        splits = self.load_split_definitions(game_id)
 
-    def load_split_definitions(self) -> list[SplitDefinition]:
-        pass
+        return Game(
+            id=game_id,
+            title=row["title"],
+            sub_title=row["sub_title"],
+            start_offset=row["start_offset"],
+            display_pb=row["display_pb"],
+            lifetime_attempts=row["lifetime_attempts"],
+            session_attempts=0,  # from the DB we're always going to assume it is a fresh session
+            splits=splits  # the splits loaded for this game id
+        )
+
+    def load_split_definitions(self, game_id: int) -> list[SplitDefinition]:
+        splits = []
+
+        cur = self.conn.cursor()
+        cur.execute("""
+            SELECT sd.*
+            FROM split_definitions sd
+            JOIN (
+                SELECT order_index, MAX(id) as max_id
+                FROM split_definitions
+                WHERE game_id = 1
+                GROUP BY order_index
+            ) latest
+            ON sd.order_index = latest.order_index
+            AND sd.id = latest.max_id
+            ORDER BY order_index;""")
+
+        rows = cur.fetchall()
+        local_total = 0
+
+        for row in rows:  # create the splits in order from the database
+            local_total += row['pb_segment_ms']  # add the pb segment to the total to get the accumulated time
+
+            splits.append(SplitDefinition(
+                id=row['id'],
+                split_name=row['name'],
+                pb_time_ms=local_total,
+                pb_segment_ms=row['pb_segment_ms'],
+                gold_segment_ms=row['gold_segment_ms']
+            ))
+
+        return splits
 
     def load_run(self) -> Run:
         pass

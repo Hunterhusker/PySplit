@@ -183,3 +183,7 @@ class TimerController(QObject):
     @Slot()
     def toggle_listening(self):
         self.listening = not self.listening
+
+    def stop_listening(self):
+        self.listening = False
+        self.listener.quit()

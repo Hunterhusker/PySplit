@@ -9,8 +9,10 @@ class Game(QObject):
     """A representation of a game and the splits we'd like to track during a run"""
     GameUpdated = Signal(QObject)
 
-    def __init__(self, title: str, sub_title: str, splits: list[SplitDefinition], lifetime_attempts: int, session_attempts: int, start_offset: float, display_pb: bool = True):
+    def __init__(self, id: int, title: str, sub_title: str, splits: list[SplitDefinition], lifetime_attempts: int, session_attempts: int, start_offset: float, display_pb: bool = True):
         super().__init__()
+
+        self.id = id
 
         self.title = title
         self.sub_title = sub_title
@@ -30,6 +32,7 @@ class Game(QObject):
         Returns:
             (Game) the game object that was detailed in the JSON
         """
+        id = json_dict['id']
         title = json_dict['title']
         sub_title = json_dict['sub_title']
         lifetime_attempts = json_dict['lifetime_attempts']
@@ -50,7 +53,7 @@ class Game(QObject):
             splits.append(new_split)
 
         # call the constructor on the data we extracted from the JSON
-        return cls(title, sub_title, splits, lifetime_attempts, session_attempts, start_offset)
+        return cls(id, title, sub_title, splits, lifetime_attempts, session_attempts, start_offset)
 
     @classmethod
     def from_json_str(cls, json_str: str) -> Game:
@@ -86,6 +89,7 @@ class Game(QObject):
         Args:
             json_dict: (dict) the JSON representation of the game
         """
+        self.id = json_dict['id']
         self.title = json_dict['title']
         self.sub_title = json_dict['sub_title']
         self.lifetime_attempts = json_dict['lifetime_attempts']
@@ -146,6 +150,7 @@ class Game(QObject):
             splits.append(split.to_dict())
 
         return {
+            'id': self.id,
             'title': self.title,
             'sub_title': self.sub_title,
             'lifetime_attempts': self.lifetime_attempts,

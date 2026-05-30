@@ -122,8 +122,8 @@ class Main(QWidget):
         self.settings_window.toggle_tab_visibility('Advanced')
 
         # connect up the closing signals to the closing slots
-        self.Quit.connect(self.game_timer.quit)
-        self.Quit.connect(self.timer_controller.listener.quit)
+        # self.Quit.connect(self.game_timer.quit)
+        # self.Quit.connect(self.timer_controller.listener.quit)
 
         self.setObjectName('MainWindow')
 
@@ -194,14 +194,16 @@ class Main(QWidget):
         result = save_box.exec()
 
         if result == QMessageBox.StandardButton.Yes:
-            self.settings.write_settings()
+            self.settings.save_settings()
             self.settings.game.to_json_file(self.settings.settings['game_path'])
 
-        # emit a close so the threads clean themselves up
-        self.Quit.emit()  # emit a quit signal
-        sleep(0.125)  # wait for the quits to go through, not my proudest work, but it works
+        self.Quit.emit()  # provide a Quit event to notify the system we are quitting
 
-        # stop the timer thread
+        # stop our non-thread objects
+        self.game_timer.quit()
+        self.timer_controller.stop_listening()
+
+        # stop thhreads
         self.game_timer_thread.quit()
         self.game_timer_thread.wait()
 
