@@ -32,7 +32,7 @@ class Game(QObject):
         Returns:
             (Game) the game object that was detailed in the JSON
         """
-        id = json_dict['id']
+        id = json_dict.get('id', None)
         title = json_dict['title']
         sub_title = json_dict['sub_title']
         lifetime_attempts = json_dict['lifetime_attempts']

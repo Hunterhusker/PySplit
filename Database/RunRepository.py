@@ -48,15 +48,17 @@ class RunRepository:
             order_index INTEGER NOT NULL,
             pb_segment_ms INTEGER DEFAULT 0,
             gold_segment_ms INTEGER DEFAULT 0,
-            FOREIGN KEY (game_id) REFERENCES games(id)
+            FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
         );
         
         CREATE TABLE runs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_id INTEGER NOT NULL,
             completed INTEGER DEFAULT 0,
             total_time_ms INTEGER,
             attempt_number INTEGER,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
         );
         
         CREATE TABLE segments (
@@ -65,8 +67,8 @@ class RunRepository:
             split_definition_id INTEGER NOT NULL,
             segment_time_ms INTEGER,
             cumulative_time_ms INTEGER,
-            FOREIGN KEY (run_id) REFERENCES runs(id),
-            FOREIGN KEY (split_definition_id) REFERENCES split_definitions(id)
+            FOREIGN KEY (run_id) REFERENCES runs(id) ON DELETE CASCADE,
+            FOREIGN KEY (split_definition_id) REFERENCES split_definitions(id) ON DELETE CASCADE
         );
         
         CREATE INDEX idx_runs_completed
@@ -169,6 +171,20 @@ class RunRepository:
 
         return cur.lastrowid
 
+    def delete_game(self, game_id: int):
+        # if we try to delete something that was never inserted, don't
+        if game_id is None:
+            return
+
+        # run the simple delete query, the cascades should take care of the rest
+        cur = self.conn.cursor()
+        cur.execute("""
+        DELETE FROM games
+        WHERE id = ?;
+        """,
+        (game_id,))
+        self.conn.commit()
+
     def save_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
         split_id = split_definition.id
 
@@ -179,10 +195,20 @@ class RunRepository:
 
         return split_id
 
+    def delete_split_definition(self, split_definition_id: int):
+        if split_definition_id is None:  # don't delete a split we haven't actually saved
+            return
+
+        cur = self.conn.cursor()  # delete the split and let cascades do the rest
+        cur.execute("""
+        DELETE FROM split_definitions
+        WHERE id = ?;
+        """,
+        (split_definition_id,))
+        self.conn.commit()
+
     def _update_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
         cur = self.conn.cursor()
-
-        print(f"UPDATE SPLIT {split_definition.split_name} AT {split_index} ")
 
         cur.execute("""
                 UPDATE split_definitions
@@ -206,8 +232,6 @@ class RunRepository:
 
     def _insert_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
         cur = self.conn.cursor()
-
-        print(f"INSERT SPLIT {split_definition.split_name} AT {split_index} ")
 
         cur.execute("""
                 INSERT INTO split_definitions (

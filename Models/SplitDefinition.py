@@ -31,7 +31,7 @@ class SplitDefinition:
         prev_gold_segment_total_ms += json_dict['gold_segment_ms']
 
         return cls(
-            json_dict['id'],
+            json_dict.get('id', None),
             json_dict['split_name'],
             json_dict['pb_time_ms'],
             json_dict['pb_segment_ms'],

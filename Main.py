@@ -195,7 +195,7 @@ class Main(QWidget):
 
         if result == QMessageBox.StandardButton.Yes:
             self.settings.save_settings()
-            self.settings.game.to_json_file(self.settings.settings['game_path'])
+            #self.settings.game.to_json_file(self.settings.settings['game_path'])
 
         self.Quit.emit()  # provide a Quit event to notify the system we are quitting
 

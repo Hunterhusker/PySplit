@@ -1,5 +1,4 @@
 {
-    "id": null,
     "title": "Game Test",
     "sub_title": "Any%",
     "lifetime_attempts": 18,
@@ -7,35 +6,30 @@
     "display_pb": true,
     "splits": [
         {
-            "id": null,
             "split_name": "test1",
             "pb_time_ms": 2230,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 1230
         },
         {
-            "id": null,
             "split_name": "test2",
             "pb_time_ms": 3630,
             "pb_segment_ms": 1400,
             "gold_segment_ms": 1100
         },
         {
-            "id": null,
             "split_name": "test3",
             "pb_time_ms": 6650,
             "pb_segment_ms": 3020,
             "gold_segment_ms": 2220
         },
         {
-            "id": null,
             "split_name": "test4",
             "pb_time_ms": 8880,
             "pb_segment_ms": 2230,
             "gold_segment_ms": 3330
         },
         {
-            "id": null,
             "split_name": "test5",
             "pb_time_ms": 10080,
             "pb_segment_ms": 2230,

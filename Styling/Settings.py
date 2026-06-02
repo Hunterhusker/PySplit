@@ -35,8 +35,8 @@ class Settings(QObject):
 
         # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
         self.style = StyleBuilder(self.style_path, self.var_path)
-        #self.game = Game.from_json_file(self.game_path)
-        self.game = self._repository.load_game(1)
+        self.game = Game.from_json_file(self.game_path)
+        #self.game = self._repository.load_game(1)
 
     def save_settings(self):
         """
