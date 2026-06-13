@@ -1,7 +1,7 @@
 import re
 from PySide6.QtGui import QColor, QIcon, QFont
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
-    QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox, QDialog
+    QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox, QDialog, QComboBox
 from PySide6.QtCore import Qt, Signal, QTime
 from Popups import ColorPickerDialog
 from helpers.ColorHelpers import *
@@ -174,6 +174,43 @@ class LabeledNoScrollQTimeEdit(QFrame):
         self.setLayout(self.timer_start_delay_input)
         self.setObjectName('SettingLine')
 
+
+class LabeledComboBox(QFrame):
+    def __init__(self, label: str, value_dict: dict[str, object], parent=None):
+        super().__init__(parent=parent)
+
+        self.layout = QHBoxLayout()
+
+        self.label = QLabel(label)
+        self.label.setMinimumWidth(125)
+        self.label.setFixedHeight(25)
+        self.label.setObjectName('SettingsLabel')
+
+        self.input = QComboBox()
+        self.input.setMinimumWidth(225)
+        self.input.setFixedHeight(25)
+        self.input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.currentIndexChanged = self.input.currentIndexChanged
+
+        # add all the keys from the set
+        for key, value in value_dict.items():
+            self.input.addItem(key, value)
+
+        self.layout.addWidget(self.label, stretch=1)
+        self.layout.addWidget(self.input, stretch=1)
+        self.layout.setContentsMargins(10, 0, 10, 0)
+
+        self.setLayout(self.layout)
+        self.setObjectName('SettingLine')
+
+    def currentData(self):
+        return self.input.currentData()
+
+    def currentText(self):
+        return self.input.currentText()
+
+    def addItem(self, text: str, userData: object):
+        self.input.addItem(text, userData)
 
 class ClickableFrame(QFrame):
     clicked = Signal()

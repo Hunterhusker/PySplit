@@ -3,7 +3,7 @@ import json
 
 
 # TODO : Make id field nullable and default to null so that we can load from a JSON w/o id fields or DB with id fields
-class SplitDefinition:
+class Split:
     """A class that represents a single split in a speedrun"""
     def __init__(self, id: int, split_name: str, pb_time_ms: int, pb_segment_ms: int, gold_segment_ms: int, pb_segment_total_ms: int = 0, gold_segment_total_ms: int = 0):
         self.id = id
@@ -13,6 +13,7 @@ class SplitDefinition:
         self.gold_segment_ms = gold_segment_ms
         self.pb_segment_total_ms = pb_segment_total_ms
         self.gold_segment_total_ms = gold_segment_total_ms
+        self.current_segment_ms = None  # all splits should initialize as none, as they haven't been run yet
 
     @classmethod
     def from_json(cls, json_dict: dict, prev_pb_segment_total_ms: int = 0, prev_gold_segment_total_ms: int = 0):

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from Models.Game import Game
 from Models.Run import Run, RunSplit
-from Models.SplitDefinition import SplitDefinition
+from Models.Split import Split
 
 
 class RunRepository:
@@ -185,7 +185,26 @@ class RunRepository:
         (game_id,))
         self.conn.commit()
 
-    def save_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
+    def list_games(self) -> list[dict]:
+        """
+        Creates a list of game names and their id numbers so that users can select which game to use
+        Returns:
+            (list[dict]): Returns a list of dictionaries as follows {title, subTitle, id}
+        """
+        cur = self.conn.cursor()
+        cur.execute("""
+        SELECT title, sub_title, id FROM games;
+        """)
+
+        rows = cur.fetchall()
+
+        game_options = []
+        for row in rows:
+            game_options.append({'title': row['title'], 'subTitle': row['sub_title'], 'id': row['id']})
+
+        return game_options
+
+    def save_split_definition(self, split_definition: Split, split_index: int, game_id: int):
         split_id = split_definition.id
 
         if split_id is None:
@@ -207,7 +226,7 @@ class RunRepository:
         (split_definition_id,))
         self.conn.commit()
 
-    def _update_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
+    def _update_split_definition(self, split_definition: Split, split_index: int, game_id: int):
         cur = self.conn.cursor()
 
         cur.execute("""
@@ -230,7 +249,7 @@ class RunRepository:
 
         return split_definition.id
 
-    def _insert_split_definition(self, split_definition: SplitDefinition, split_index: int, game_id: int):
+    def _insert_split_definition(self, split_definition: Split, split_index: int, game_id: int):
         cur = self.conn.cursor()
 
         cur.execute("""
@@ -304,7 +323,7 @@ class RunRepository:
             splits=splits  # the splits loaded for this game id
         )
 
-    def load_split_definitions(self, game_id: int) -> list[SplitDefinition]:
+    def load_split_definitions(self, game_id: int) -> list[Split]:
         splits = []
 
         cur = self.conn.cursor()
@@ -327,7 +346,7 @@ class RunRepository:
         for row in rows:  # create the splits in order from the database
             local_total += row['pb_segment_ms']  # add the pb segment to the total to get the accumulated time
 
-            splits.append(SplitDefinition(
+            splits.append(Split(
                 id=row['id'],
                 split_name=row['name'],
                 pb_time_ms=local_total,

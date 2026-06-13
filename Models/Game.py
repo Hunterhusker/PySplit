@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import json
 from PySide6.QtCore import Signal, QObject
-from Models.SplitDefinition import SplitDefinition
+from Models.Split import Split
 
 
 class Game(QObject):
     """A representation of a game and the splits we'd like to track during a run"""
     GameUpdated = Signal(QObject)
 
-    def __init__(self, id: int, title: str, sub_title: str, splits: list[SplitDefinition], lifetime_attempts: int, session_attempts: int, start_offset: float, display_pb: bool = True):
+    def __init__(self, id: int, title: str, sub_title: str, splits: list[Split], lifetime_attempts: int, session_attempts: int, start_offset: float, display_pb: bool = True):
         super().__init__()
 
         self.id = id
@@ -45,7 +45,7 @@ class Game(QObject):
         # build the splits from the JSON in the game dictionary
         splits = []
         for split in json_dict['splits']:
-            new_split = SplitDefinition.from_json(split, prev_pb_segment_total_ms, prev_gold_segment_total_ms)
+            new_split = Split.from_json(split, prev_pb_segment_total_ms, prev_gold_segment_total_ms)
 
             prev_pb_segment_total_ms = new_split.pb_segment_total_ms
             prev_gold_segment_total_ms = new_split.gold_segment_total_ms
@@ -102,7 +102,7 @@ class Game(QObject):
         # build the splits from the JSON in the game dictionary
         splits = []
         for split in json_dict['splits']:
-            new_split = SplitDefinition.from_json(split, prev_pb_segment_total_ms, prev_gold_segment_total_ms)
+            new_split = Split.from_json(split, prev_pb_segment_total_ms, prev_gold_segment_total_ms)
 
             prev_pb_segment_total_ms = new_split.pb_segment_total_ms
             prev_gold_segment_total_ms = new_split.gold_segment_total_ms

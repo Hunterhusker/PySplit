@@ -105,6 +105,8 @@ class Main(QWidget):
 
         # also connect the extra control events from the splits to the timer
         self.split_timer.SplitsFinish.connect(self.game_timer.stop_timer)
+        self.split_timer.SplitsFinish.connect(self.settings._repository.save_run)  # TODO : need to figure out how and what to pass in here
+
         self.split_timer.SplitsReset.connect(self.game_timer.reset_timer)
 
         self.settings.game.GameUpdated.connect(self.splits.load_splits_from_game)
@@ -120,10 +122,6 @@ class Main(QWidget):
         self.settings_window.add_tab(AdvancedStyleTab(self.settings, parent=self.settings_window), 'Advanced')
 
         self.settings_window.toggle_tab_visibility('Advanced')
-
-        # connect up the closing signals to the closing slots
-        # self.Quit.connect(self.game_timer.quit)
-        # self.Quit.connect(self.timer_controller.listener.quit)
 
         self.setObjectName('MainWindow')
 

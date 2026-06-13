@@ -9,7 +9,7 @@ from PySide6.QtCore import Slot
 from typing import Callable
 
 from helpers.TimerFormat import format_wall_clock_from_ms
-from Models.Game import SplitDefinition
+from Models.Game import Split
 
 
 class SingleSplitWidget(QFrame):
@@ -25,7 +25,7 @@ class SingleSplitWidget(QFrame):
 
     selected = Property(bool, is_selected, set_selected)  # hate the formatting here
 
-    def __init__(self, split: SplitDefinition, comparison_strategy: Callable[[SplitDefinition], int], parent):
+    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent):
         """
         An individual split that can display the times from the PB and the comparison time
         Args:
@@ -118,6 +118,7 @@ class SingleSplitWidget(QFrame):
 
         segment_time = curr_time_ms - self.current_start_time  # get the current change
         self.current_segment_ms = segment_time  # add the current change to the current segment value to get the size of the segment
+        self.split.current_segment_ms = segment_time  # update the split object to have the current time
 
         self.current_time_ms = curr_time_ms
 
@@ -155,6 +156,8 @@ class SingleSplitWidget(QFrame):
         self.current_time_ms = -1
         self.current_segment_ms = -1
         self.current_start_time = -1
+
+        self.split.current_segment_ms = None  # make the split not appear to have been run again
 
         self._finished = False
 
