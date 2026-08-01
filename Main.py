@@ -151,6 +151,7 @@ class Main(QWidget):
         )
 
         if save == QMessageBox.StandardButton.Yes:
+            self.settings.game.update_best_splits(False)
             self.settings.repository.save_run(self.settings.game)
 
     def lock_action(self, checked: bool):

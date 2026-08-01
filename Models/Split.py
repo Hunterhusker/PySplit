@@ -85,3 +85,14 @@ class Split:
             (str) the JSON object as a string
         """
         return json.dumps(self.to_dict(), indent=4)
+
+    def update_bests(self, is_pb: bool):
+        """
+        Updates the best split segments
+        """
+        # if the split was golded, save it
+        if self.current_segment_ms < self.gold_segment_ms:
+            self.gold_segment_ms = self.current_segment_ms
+
+        if is_pb:  # if this is the PB, then we should save that, doesn't matter if it was better
+            self.pb_segment_ms = self.current_segment_ms
