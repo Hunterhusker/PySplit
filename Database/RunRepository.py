@@ -1,8 +1,8 @@
+from datetime import datetime
 import sqlite3
 from pathlib import Path
 
 from Models.Game import Game
-from Models.Run import Run, RunSplit
 from Models.Split import Split
 
 
@@ -272,32 +272,48 @@ class RunRepository:
 
         return cur.lastrowid
 
-    def save_run(self, run: Run):
+    def save_run(self, game: Game):
         cur = self.conn.cursor()
+
+        # determine if the run completed
+        complete = game.splits[-1].current_segment_ms is not None
+
+        # find the sum of the segements to get the total time
+        total_time_ms = sum([split.current_segment_ms if split.current_segment_ms is not None else 0 for split in game.splits])
 
         cur.execute("""
         INSERT INTO runs (completed, total_time_ms, attempt_number, created_at)
         VALUES (?, ?, ?, ?)
         """, (
-            run.completed,
-            run.total_time_ms,
-            run.attempt_number,
-            run.created_at
+            complete,
+            total_time_ms,
+            game.lifetime_attempts,
+            datetime.now()
         ))
 
+        # commit the new run to the database
         self.conn.commit()
 
-    def save_run_split(self, run_split: RunSplit):
+        # save the last inserted row since that is our game
+        run_id = cur.lastrowid
+
+        cumulative_time = 0  # start off at 0, and we can add up the time as we go
+        for split in game.splits:
+            cumulative_time += split.current_segment_ms  # add it up
+            self.save_run_split(split, cumulative_time, run_id)  # save each split of the completed run
+
+
+    def save_run_split(self, split: Split, cumulative_time_ms: int, run_id: int):
         cur = self.conn.cursor()
 
         cur.execute("""
         INSERT INTO segments (run_id, split_definition_id, segment_time_ms, cumulative_time_ms)
         VALUES (?, ?, ?, ?)
         """, (
-            run_split.run_id,
-            run_split.split_definition_id,
-            run_split.segment_time_ms,
-            run_split.cumulative_time_ms
+            run_id,
+            split.id,
+            split.segment_time_ms,
+            cumulative_time_ms
         ))
 
         self.conn.commit()
@@ -355,9 +371,3 @@ class RunRepository:
             ))
 
         return splits
-
-    def load_run(self) -> Run:
-        pass
-
-    def load_run_splits(self) -> list[RunSplit]:
-        pass
