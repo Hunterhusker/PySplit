@@ -28,15 +28,15 @@ class Settings(QObject):
 
         self.style_path =  str(PROJECT_ROOT / self.settings['style_path'])
         self.var_path = str(PROJECT_ROOT / self.settings['var_path'])
-        self.game_path = str(PROJECT_ROOT / self.settings['game_path'])
+        #self.game_path = str(PROJECT_ROOT / self.settings['game_path'])
 
         self.db_path = str(PROJECT_ROOT / self.settings['db_path'])
-        self._repository = RunRepository(self.db_path)
+        self.repository = RunRepository(self.db_path)
 
         # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
         self.style = StyleBuilder(self.style_path, self.var_path)
-        self.game = Game.from_json_file(self.game_path)
-        #self.game = self._repository.load_game(1)
+        #self.game = Game.from_json_file(self.game_path)
+        self.game = self.repository.load_game(1)
 
     def save_settings(self):
         """
@@ -45,7 +45,7 @@ class Settings(QObject):
         self.style.export_style()
         self.style.export_vars()
 
-        self._repository.save_game(self.game)  # update the database
+        self.repository.save_game(self.game)  # update the database
 
         with open(self.settings_file_path, 'w') as f:
             f.write(json.dumps(self.settings, indent=4))
