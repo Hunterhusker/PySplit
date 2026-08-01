@@ -52,7 +52,7 @@ class GameSettingsTab(ABCSettingTab):
         self.title_group_layout = QVBoxLayout(self.title_group)
 
         # collect the available game infomation
-        raw_game_choices = self.settings._repository.list_games()
+        raw_game_choices = self.settings.repository.list_games()
         game_choices = {choice['title'] + '::' + choice['subTitle']: choice['id'] for choice in raw_game_choices}
         game_choices['New'] = None  # none means it is not in the database
 
@@ -138,7 +138,7 @@ class GameSettingsTab(ABCSettingTab):
 
         # if the game is from the database, then load it
         if game_index is not None:
-            new_game = self.settings._repository.load_game(game_index)
+            new_game = self.settings.repository.load_game(game_index)
         else:  # if not, then we should just make a blank game that we can set up in this GUI
             empty_split = Split(None, '', None, None, None)
             new_game = Game(None, '', '', [empty_split], 0, 0, 0)
