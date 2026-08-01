@@ -184,3 +184,7 @@ class Game(QObject):
     def add_attempt(self):
         self.session_attempts += 1
         self.GameUpdated.emit(self)
+
+    def update_best_splits(self, is_pb: bool):
+        for split in self.splits:
+            split.update_bests(is_pb=is_pb)
