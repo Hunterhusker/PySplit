@@ -117,8 +117,6 @@ class SplitTimer(QObject):
                     self.started = False  # finish the splits
                     self.done = True
                     self.SplitsFinish.emit()  # notify subscribers we finished
-
-                    self.open_dialog()  # TODO : should this be here or how should we open the popup?
                     return
 
                 self.index += 1  # if we get here we can increment
@@ -147,11 +145,3 @@ class SplitTimer(QObject):
                     self.segment_times[self.index - 1] = -1
 
                     self.SplitSkip.emit()
-
-    def open_dialog(self):
-        dlg = QMessageBox()
-        dlg.setWindowTitle("A Simple Dialog")
-        dlg.setText("This is a simple message box.")
-        dlg.setIcon(QMessageBox.Information)  # Use an information icon
-        dlg.setStandardButtons(QMessageBox.Ok)  # Show only the OK button
-        dlg.exec()  # Use exec() to run the dialog modally
