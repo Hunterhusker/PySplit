@@ -282,9 +282,10 @@ class RunRepository:
         total_time_ms = sum([split.current_segment_ms if split.current_segment_ms is not None else 0 for split in game.splits])
 
         cur.execute("""
-        INSERT INTO runs (completed, total_time_ms, attempt_number, created_at)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO runs (game_id, completed, total_time_ms, attempt_number, created_at)
+        VALUES (?, ?, ?, ?, ?)
         """, (
+            game.id,
             complete,
             total_time_ms,
             game.lifetime_attempts,
@@ -312,7 +313,7 @@ class RunRepository:
         """, (
             run_id,
             split.id,
-            split.segment_time_ms,
+            split.current_segment_ms,
             cumulative_time_ms
         ))
 
