@@ -3,7 +3,7 @@
     "var_path": "conf/vars.qvars",
     "game_path": "conf/testGame.json",
     "db_path": "conf/testGame.db",
-    "visible_splits": 3,
+    "visible_splits": 5,
     "inputs": [
         {
             "source": "pynput",
