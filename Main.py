@@ -105,7 +105,8 @@ class Main(QWidget):
 
         # also connect the extra control events from the splits to the timer
         self.split_timer.SplitsFinish.connect(self.game_timer.stop_timer)
-        self.split_timer.SplitsFinish.connect(self.settings._repository.save_run)  # TODO : need to figure out how and what to pass in here
+        #self.split_timer.SplitsFinish.connect(self.settings._repository.save_run)  # TODO : need to figure out how and what to pass in here
+        self.split_timer.SplitsFinish.connect(self.open_save_run_dialog)
 
         self.split_timer.SplitsReset.connect(self.game_timer.reset_timer)
 
@@ -140,6 +141,17 @@ class Main(QWidget):
 
         # unlock the splitter
         self.timer_controller.listening = True
+
+    def open_save_run_dialog(self):
+        save = QMessageBox.question(
+            self,
+            "Save Results?",
+            "Do you want to save this run?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if save == QMessageBox.StandardButton.Yes:
+            self.settings.repository.save_run(self.settings.game)
 
     def lock_action(self, checked: bool):
         self.timer_controller.toggle_listening()
