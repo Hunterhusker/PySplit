@@ -1,8 +1,6 @@
 from PySide6.QtCore import QObject, Signal
 import json
 
-from Database.Repository import Repository
-from Models.Game import Game
 from pathlib import Path
 from Settings.Style.styleBuilder import StyleBuilder
 

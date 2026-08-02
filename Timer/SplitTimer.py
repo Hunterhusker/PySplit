@@ -1,9 +1,7 @@
 from copy import deepcopy
 from PySide6.QtCore import Slot, Signal, QObject
-from PySide6.QtWidgets import QMessageBox
 
 from Settings.Session import Session
-from Settings.Settings import Settings
 
 
 class SplitTimer(QObject):

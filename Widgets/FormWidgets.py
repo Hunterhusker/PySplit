@@ -1,10 +1,9 @@
 import re
 from PySide6.QtGui import QColor, QIcon, QFont
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLineEdit, QSpinBox, QSizePolicy, QTimeEdit, QColorDialog, \
-    QFontComboBox, QPushButton, QFileDialog, QStyle, QDoubleSpinBox, QDialog, QComboBox
+    QFontComboBox, QPushButton, QFileDialog, QDoubleSpinBox, QDialog, QComboBox
 from PySide6.QtCore import Qt, Signal, QTime
 from Popups import ColorPickerDialog
-from helpers.ColorHelpers import *
 
 # a set of subclasses to remove the wheelEvent that I don't like on my "scrollable" boxes
 class NoScrollQSpinBox(QSpinBox):

@@ -1,9 +1,8 @@
 from Models.Game import Game, Split
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
-from PySide6.QtCore import Slot, Signal, Qt
+from PySide6.QtCore import Slot, Qt
 
 from Settings.Session import Session
-from Settings.Settings import Settings
 from Timer.SplitTimer import SplitTimer
 from Widgets.SingleSplitWidget import SingleSplitWidget
 

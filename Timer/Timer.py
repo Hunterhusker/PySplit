@@ -1,7 +1,6 @@
 from PySide6.QtCore import QElapsedTimer, QObject, QTimer, Slot, Signal
 
 from Settings.Session import Session
-from Settings.Settings import Settings
 
 
 class Timer(QObject):

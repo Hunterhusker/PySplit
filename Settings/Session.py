@@ -7,7 +7,7 @@ from pathlib import Path
 from Settings.Settings import Settings
 
 class Session(QObject):
-    def __init__(self, settings_path: str):
+    def __init__(self, settings_path: str, parent: Main):
         super().__init__()
 
         self.settings = Settings(settings_path)

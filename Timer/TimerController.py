@@ -1,12 +1,7 @@
 from PySide6.QtCore import QObject, Slot, Signal
-import json
 
 from Listeners.ABCListener import ABCListener, ABCListenedObject
 from Settings.Session import Session
-from Settings.Settings import Settings
-
-
-#from Listeners.KeyboardListener import KeyPressObject
 
 
 class TimerController(QObject):

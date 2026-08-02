@@ -14,7 +14,6 @@ from Popups.BasicSettingsTab import BasicSettingsTab
 from Popups.SettingsWindow import SettingsWindow
 from Popups.GameSettingsTab import GameSettingsTab
 from Settings.Session import Session
-from Settings.Settings import Settings
 from Timer.SplitTimer import SplitTimer
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
