@@ -7,7 +7,8 @@ from PySide6.QtCore import Qt, QTime
 from typing import TYPE_CHECKING
 
 from Popups.ABCSettingTab import ABCSettingTab
-from Styling.Settings import Settings
+from Settings.Session import Session
+from Settings.Settings import Settings
 from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
 from Models.Game import Game, Split
 from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit, LabeledNoScrollQTimeEdit, \
@@ -21,15 +22,14 @@ class GameSettingsTab(ABCSettingTab):
     """
     A tab to CRUD your splits
     """
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, session: Session, parent=None):
         super().__init__(parent)
         self.parent = parent
 
         self.layout = QVBoxLayout()
 
         # keep a copy of the game settings as our local copy that we can work with without effecting the original
-        self.settings = settings  # keep a link to the settings
-        self.game = settings.game
+        self.session = session # keep a link to the settings
 
         self.add_button = QPushButton()
         self.add_button.setIcon(QIcon(':/icons/Static/add.svg'))
@@ -52,7 +52,7 @@ class GameSettingsTab(ABCSettingTab):
         self.title_group_layout = QVBoxLayout(self.title_group)
 
         # collect the available game infomation
-        raw_game_choices = self.settings.repository.list_games()
+        raw_game_choices = self.session.repository.list_games()
         game_choices = {choice['title'] + '::' + choice['subTitle']: choice['id'] for choice in raw_game_choices}
         game_choices['New'] = None  # none means it is not in the database
 
@@ -62,19 +62,19 @@ class GameSettingsTab(ABCSettingTab):
         # hook the game selection box up to the reload method
         self.game_combobox.currentIndexChanged.connect(self.update_game_selection)
 
-        self.title_input = LabeledTextEntry("Title: ", self.game.title, parent=self)
+        self.title_input = LabeledTextEntry("Title: ", self.session.game.title, parent=self)
         self.title_input.setMinimumHeight(35)
 
-        self.sub_title_input = LabeledTextEntry("Sub-Title: ", self.game.sub_title, parent=self)
+        self.sub_title_input = LabeledTextEntry("Sub-Title: ", self.session.game.sub_title, parent=self)
         self.sub_title_input.setMinimumHeight(35)
 
-        self.session_attempts_input = LabeledSpinBox('Session Attempts: ', self.game.session_attempts, parent=self)
+        self.session_attempts_input = LabeledSpinBox('Session Attempts: ', self.session.game.session_attempts, parent=self)
         self.session_attempts_input.setMinimumHeight(35)
 
-        self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.game.lifetime_attempts, parent=self)
+        self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.session.game.lifetime_attempts, parent=self)
         self.lifetime_attempts_input.setMinimumHeight(35)
 
-        self.timer_start_delay_input = LabeledDoubleSpinBox('Timer Start Delay: ', self.game.start_offset, 3, 0.01, self)
+        self.timer_start_delay_input = LabeledDoubleSpinBox('Timer Start Delay: ', self.session.game.start_offset, 3, 0.01, self)
         self.timer_start_delay_input.setMinimumHeight(35)
 
         # populate the title group
@@ -92,7 +92,7 @@ class GameSettingsTab(ABCSettingTab):
         self.scroll_widget_layout.addWidget(self.splits_group)
 
         # import the splits to their layout
-        self.import_splits(self.game)
+        self.import_splits(self.session.game)
 
         # add a stretch to keep stuff sized right
         self.scroll_widget_layout.addStretch()
@@ -109,7 +109,7 @@ class GameSettingsTab(ABCSettingTab):
 
         # make our connections now that everything is displayed
         self.add_button.clicked.connect(self.addEmptySplit)
-        self.game.GameUpdated.connect(self.update_with_game)
+        self.session.game.GameUpdated.connect(self.update_with_game)
 
     def update_with_game(self, game: Game):
         """
@@ -118,8 +118,6 @@ class GameSettingsTab(ABCSettingTab):
         Args:
             game: (Models.Game) The game object that got updated
         """
-        self.game = game
-
         self.title_input.input.setText(game.title)
         self.sub_title_input.input.setText(game.sub_title)
         self.lifetime_attempts_input.input.setValue(game.lifetime_attempts)
@@ -127,7 +125,7 @@ class GameSettingsTab(ABCSettingTab):
         self.timer_start_delay_input.input.setValue(game.start_offset)
 
         self.clear_splits()
-        self.import_splits(self.game)
+        self.import_splits(self.session.game)
 
     def update_game_selection(self):
         """
@@ -138,7 +136,7 @@ class GameSettingsTab(ABCSettingTab):
 
         # if the game is from the database, then load it
         if game_index is not None:
-            new_game = self.settings.repository.load_game(game_index)
+            new_game = self.session.settings.repository.load_game(game_index)
         else:  # if not, then we should just make a blank game that we can set up in this GUI
             empty_split = Split(None, '', None, None, None)
             new_game = Game(None, '', '', [empty_split], 0, 0, 0)
@@ -200,22 +198,22 @@ class GameSettingsTab(ABCSettingTab):
         """
         Send the updates to the game object
         """
-        self.game.title = self.title_input.input.text()
-        self.game.sub_title = self.sub_title_input.input.text()
-        self.game.session_attempts = self.session_attempts_input.input.value()
-        self.game.lifetime_attempts = self.lifetime_attempts_input.input.value()
-        self.game.start_offset = self.timer_start_delay_input.input.value()
+        self.session.game.title = self.title_input.input.text()
+        self.session.game.sub_title = self.sub_title_input.input.text()
+        self.session.game.session_attempts = self.session_attempts_input.input.value()
+        self.session.game.lifetime_attempts = self.lifetime_attempts_input.input.value()
+        self.session.game.start_offset = self.timer_start_delay_input.input.value()
 
-        self.game.splits = []  # make this into an empty list
+        self.session.game.splits = []  # make this into an empty list
 
         # update the splits
         for i in range(self.split_area.count()):
             curr = self.split_area.itemAt(i).widget()
 
             curr.update_split()
-            self.game.splits.append(curr.split)
+            self.session.game.splits.append(curr.split)
 
-        self.game.GameUpdated.emit(self.game)
+        self.session.game.GameUpdated.emit(self.session.game)
 
     def open(self):
         pass

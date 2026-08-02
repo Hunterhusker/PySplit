@@ -2,7 +2,8 @@ from Models.Game import Game, Split
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
 from PySide6.QtCore import Slot, Signal, Qt
 
-from Styling.Settings import Settings
+from Settings.Session import Session
+from Settings.Settings import Settings
 from Timer.SplitTimer import SplitTimer
 from Widgets.SingleSplitWidget import SingleSplitWidget
 
@@ -11,15 +12,15 @@ class SplitsWidget(QWidget):
     """
     Assembler Widget that holds a list of all the splits we have in the run and listens to the controller for input
     """
-    def __init__(self, settings: Settings, split_timer: SplitTimer, parent: 'Main'):
+    def __init__(self, session: Session, split_timer: SplitTimer, parent: 'Main'):
         super().__init__()
-        self.settings = settings
+        self.session = session
         self.split_timer = split_timer
         self.split_timer.SplitsReset.connect(self.reset_splits)
         self.split_timer.SplitsFinish.connect(self.finish_splits)
         self.split_timer.SplitSkip.connect(self.skip_current_split)
 
-        self.visible_splits = self.settings.settings['visible_splits']
+        self.visible_splits = self.session.settings['visible_splits']
         self.main = parent
 
         # some basic layout setup to keep stuff off the top and bottom but not the sides
@@ -45,7 +46,7 @@ class SplitsWidget(QWidget):
         self.last_index = None
 
         # load the splits in from the settings
-        self.load_splits(self.settings.game)
+        self.load_splits(self.session.game)
 
         self.scroll_widget.setLayout(self.scroll_widget_layout)
 
@@ -61,7 +62,7 @@ class SplitsWidget(QWidget):
         """
         This method sets the size of the current window
         """
-        self.visible_splits = self.settings.settings['visible_splits']
+        self.visible_splits = self.session.settings['visible_splits']
         self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
 
         for split in self.splits:

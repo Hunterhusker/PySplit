@@ -2,7 +2,8 @@ from copy import deepcopy
 from PySide6.QtCore import Slot, Signal, QObject
 from PySide6.QtWidgets import QMessageBox
 
-from Styling.Settings import Settings
+from Settings.Session import Session
+from Settings.Settings import Settings
 
 
 class SplitTimer(QObject):
@@ -15,11 +16,11 @@ class SplitTimer(QObject):
     SplitsStop = Signal()
     SplitsStart = Signal()
 
-    def __init__(self, settings: Settings):
+    def __init__(self, session: Session):
         super().__init__()
-        self.settings = settings
+        self.session = session
 
-        self.splits = None # settings.game.splits
+        self.splits = None
         self.index = None  # 0  # start at the first split
         self.started = None
         self.done = None
@@ -33,7 +34,7 @@ class SplitTimer(QObject):
 
     @Slot()
     def reset(self):
-        self.splits = deepcopy(self.settings.game.splits)  # save a copy of the splits that we can safely mutate
+        self.splits = deepcopy(self.session.game.splits)  # save a copy of the splits that we can safely mutate
         self.index = 0
         self.started = False
         self.done = False
@@ -42,11 +43,11 @@ class SplitTimer(QObject):
         self.segment_times = [-1] * count
         self.start_times = [-1] * count
         self.end_times = [-1] * count
-        self.current_time_ms = self.settings.game.start_offset
+        self.current_time_ms = self.session.game.start_offset
 
     @Slot()
     def game_updated(self):
-        self.splits = deepcopy(self.settings.game.splits)
+        self.splits = deepcopy(self.session.game.splits)
         self.index = 0
         self.started = False
         self.done = False
@@ -80,7 +81,7 @@ class SplitTimer(QObject):
             segment_time = curr_time_ms - self.start_times[self.index]
 
         if self.index == 0:
-            segment_time += int(self.settings.game.start_offset * 1000)
+            segment_time += int(self.session.game.start_offset * 1000)
 
         if self.start_times[self.index] == -1:
             self.start_times[self.index] = curr_time_ms
@@ -130,6 +131,10 @@ class SplitTimer(QObject):
                     self.index -= 1
 
             case 'RESET':
+                if self.session.settings['ask_on_reset']:
+                    # open the popup and ask about saving
+                    pass
+
                 self.reset()
                 self.SplitsReset.emit()
 

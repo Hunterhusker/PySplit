@@ -6,18 +6,19 @@ from PySide6.QtGui import QColor, QFontDatabase, QFont
 from PySide6.QtWidgets import QVBoxLayout, QScrollArea, QWidget, QFrame, QLabel, QGroupBox, QCheckBox
 from PySide6.QtCore import Qt
 from Popups.SettingsWindow import SettingsWindow
-from Styling.Settings import Settings
+from Settings.Session import Session
+from Settings.Settings import Settings
 from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener, LabeledSpinBox, LabeledDoubleSpinBox
 
 
 # checkout QGroupBox for title and then box of settings items
 class BasicSettingsTab(ABCSettingTab):
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, session: Session, parent=None):
         super().__init__(parent)
         self.parent = parent
 
         self.layout = QVBoxLayout()
-        self.settings = settings
+        self.session = session
 
         self.scroll_widget = QWidget()
         self.scroll_widget_layout = QVBoxLayout()
@@ -29,10 +30,10 @@ class BasicSettingsTab(ABCSettingTab):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # create a group for selecting colors
-        self.timer_settings = _TimerSettings(self.settings, self.parent, parent=self)
-        self.text_group = _TextSettings(self.settings, parent=self)
-        self.color_group = _ColorSettings(self.settings, parent=self)
-        self.stats_settings = _StatsSettings(self.settings, parent=self)
+        self.timer_settings = _TimerSettings(self.session, self.parent, parent=self)
+        self.text_group = _TextSettings(self.session, parent=self)
+        self.color_group = _ColorSettings(self.session, parent=self)
+        self.stats_settings = _StatsSettings(self.session, parent=self)
 
         # add all the groups into the scroll
         self.scroll_widget_layout.addWidget(self.timer_settings)
@@ -64,7 +65,7 @@ class BasicSettingsTab(ABCSettingTab):
         for i in range(self.scroll_widget_layout.count() - 1):  # -1 so we don't apply on the stretch
             self.scroll_widget_layout.itemAt(i).widget().apply()  # for each thing added to the layout, run the apply method on them
 
-        self.settings.SettingsUpdate.emit()
+        self.session.settings.SettingsUpdate.emit()
 
     def opened(self):
         for i in range(self.scroll_widget_layout.count() - 1):  # -1 so we don't open the stretch
@@ -72,13 +73,13 @@ class BasicSettingsTab(ABCSettingTab):
 
 
 class _ColorSettings(ABCSettingGroupBox):
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, session: Session, parent=None):
         super().__init__('Color Settings', parent)
 
         self.layout = QVBoxLayout(self)
-        self.settings = settings
+        self.session = session
 
-        var_map = self.settings.style.variable_map
+        var_map = self.session.settings.style.variable_map
 
         self.backgroundColorPicker = ColorPicker('Background: ', QColor(var_map['primary-background']), parent=self)
         self.layout.addWidget(self.backgroundColorPicker)
@@ -123,7 +124,7 @@ class _ColorSettings(ABCSettingGroupBox):
         self.layout.addWidget(self.lostTimeBehindPicker)
 
     def apply(self):
-        var_map = self.settings.style.variable_map
+        var_map = self.session.settings.style.variable_map
 
         var_map['primary-background'] = self.backgroundColorPicker.color_name
         var_map['border-color'] = self.separatorColorPicker.color_name
@@ -145,10 +146,10 @@ class _ColorSettings(ABCSettingGroupBox):
 
         var_map['background-image'] = bg_img_path
 
-        self.settings.style.update_style(var_map=var_map)
+        self.session.settings.style.update_style(var_map=var_map)
 
     def opened(self):
-        var_map = self.settings.style.variable_map
+        var_map = self.session.settings.style.variable_map
 
         self.backgroundColorPicker.set_color(var_map['primary-background'])
         self.separatorColorPicker.set_color(var_map['border-color'])
@@ -166,13 +167,12 @@ class _ColorSettings(ABCSettingGroupBox):
 
 
 class _TextSettings(ABCSettingGroupBox):
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, session: Session, parent=None):
         super().__init__('Text Settings')
 
         self.layout = QVBoxLayout(self)
-        self.settings = settings
-
-        var_map = self.settings.style.variable_map
+        self.session = session
+        var_map = self.session.settings.style.variable_map
 
         self.title_font_picker = FontPicker('Title Font: ', var_map['title-font'], var_map['title-size'])
         self.title_color_picker = ColorPicker('Title Color: ', QColor(var_map['title-color']), parent=parent)
@@ -204,7 +204,7 @@ class _TextSettings(ABCSettingGroupBox):
         self.layout.addWidget(self.timer_negative_color_picker)
 
     def apply(self):
-        var_map = self.settings.style.variable_map
+        var_map = self.session.settings.style.variable_map
 
         var_map['title-font'] = self.title_font_picker.get_font_family()
         var_map['title-size'] = f'{self.title_font_picker.get_size()}px'
@@ -228,7 +228,7 @@ class _TextSettings(ABCSettingGroupBox):
         var_map['timer-color'] = self.timer_color_picker.color_name
         var_map['timer-negative-color'] = self.timer_negative_color_picker.color_name
 
-        self.settings.style.update_style(var_map=var_map)
+        self.session.settings.style.update_style(var_map=var_map)
 
     def opened(self):
         # if the selected font is not in the system, use whatever we are using for the application
@@ -258,14 +258,14 @@ class _TextSettings(ABCSettingGroupBox):
 
 
 class _TimerSettings(ABCSettingGroupBox):
-    def __init__(self, settings: Settings, settings_window: SettingsWindow, parent=None):
+    def __init__(self, session: Session, settings_window: SettingsWindow, parent=None):
         super().__init__('Timer Settings')
 
         self.layout = QVBoxLayout(self)
-        self.settings = settings
+        self.session = session
         self.settings_window = settings_window
 
-        self.enableAdvancedStyles = QCheckBox('Enable Advanced Styling')
+        self.enableAdvancedStyles = QCheckBox('Enable Advanced Settings')
         self.enableAdvancedStyles.setFixedHeight(40)  # just to make it look like our QFrames since we didn't need to make a custom for this one
         self.layout.addWidget(self.enableAdvancedStyles)
 
@@ -275,7 +275,7 @@ class _TimerSettings(ABCSettingGroupBox):
         # self.splits_file_chooser = FileDialogOpener('Splits File: ', file_path=self.settings.game_path)
         # self.layout.addWidget(self.splits_file_chooser)
 
-        self.splits_on_screen = LabeledSpinBox('Visible Splits: ', self.settings.settings['visible_splits'], self)
+        self.splits_on_screen = LabeledSpinBox('Visible Splits: ', self.session.settings['visible_splits'], self)
         self.splits_on_screen.input.setMinimum(1)
         self.layout.addWidget(self.splits_on_screen)
 
@@ -299,21 +299,21 @@ class _TimerSettings(ABCSettingGroupBox):
         if 'Advanced' in self.settings_window.tab_dict.keys():
             self.settings_window.set_tab_visibility('Advanced', self.enableAdvancedStyles.isChecked())
 
-        self.settings.settings['visible_splits'] = self.splits_on_screen.input.value()
+        self.session.settings['visible_splits'] = self.splits_on_screen.input.value()
 
         # self.settings.game.update_from_file(self.splits_file_chooser.file_path)
         # self.settings.game.GameUpdated.emit(self.settings.game)
 
     def opened(self):
-        self.splits_on_screen.input.setMaximum(len(self.settings.game.splits))
+        self.splits_on_screen.input.setMaximum(len(self.session.game.splits))
 
 
 class _StatsSettings(ABCSettingGroupBox):
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, session: Session, parent=None):
         super().__init__('Footer Settings')
 
         self.layout = QVBoxLayout(self)
-        self.settings = settings
+        self.session = session
 
         self.todo = QLabel('Gotta make the footer first eh?')
 

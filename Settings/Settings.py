@@ -1,10 +1,10 @@
 from PySide6.QtCore import QObject, Signal
 import json
 
-from Database.RunRepository import RunRepository
+from Database.Repository import Repository
 from Models.Game import Game
 from pathlib import Path
-from Styling.Style.styleBuilder import StyleBuilder
+from Settings.Style.styleBuilder import StyleBuilder
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -31,12 +31,12 @@ class Settings(QObject):
         #self.game_path = str(PROJECT_ROOT / self.settings['game_path'])
 
         self.db_path = str(PROJECT_ROOT / self.settings['db_path'])
-        self.repository = RunRepository(self.db_path)
+        #self.repository = Repository(self.db_path)
 
         # the configurator has a style builder, since it doesn't need to know how to build the styles, just how configure and pass style updates along to the configured
         self.style = StyleBuilder(self.style_path, self.var_path)
         #self.game = Game.from_json_file(self.game_path)
-        self.game = self.repository.load_game(1)
+        #self.game = self.parent.repository.load_game(1)
 
     def save_settings(self):
         """
@@ -45,7 +45,7 @@ class Settings(QObject):
         self.style.export_style()
         self.style.export_vars()
 
-        self.repository.save_game(self.game)  # update the database
+        # self.repository.save_game(self.game)  # update the database
 
         with open(self.settings_file_path, 'w') as f:
             f.write(json.dumps(self.settings, indent=4))
@@ -57,3 +57,10 @@ class Settings(QObject):
 
     def get_inputs(self):
         return self.settings.get('inputs', {})
+
+    # overload the get and set item dunders so we can access settings from this object directly
+    def __getitem__(self, key):
+        return self.settings[key]
+
+    def __setitem__(self, key, value):
+        self.settings[key] = value

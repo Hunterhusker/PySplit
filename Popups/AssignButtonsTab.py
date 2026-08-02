@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 
 from Listeners.KeyboardListener import key_to_str
 from Popups.ABCSettingTab import ABCSettingTab
-from Styling.Settings import Settings
+from Settings.Session import Session
+from Settings.Settings import Settings
 from Timer.TimerController import TimerController
 
 if TYPE_CHECKING:
@@ -16,13 +17,13 @@ class AssignButtonsTab(ABCSettingTab):
     """
     A custom dialog box that we will use the remap the keys and buttons to control the splitter
     """
-    def __init__(self, settings: Settings, timer_controller: TimerController, parent=None):  # TODO : Should the timer controller really be here? Could just do the settings obj tbh
+    def __init__(self, session: Session, timer_controller: TimerController, parent=None):  # TODO : Should the timer controller really be here? Could just do the settings obj tbh
         super().__init__(parent)
         self.parent = parent
 
         # basic window setup
         self.layout = QVBoxLayout()
-        self.settings = settings
+        self.session = session
         self.timer_controller = timer_controller
 
         self.scroll_widget = QWidget()
@@ -142,7 +143,7 @@ class AssignButtonsTab(ABCSettingTab):
             export_list.append(tmp)
 
         # update the settings with the storable keymap  # TODO : Probably want to redo this for multiple input listener support
-        self.settings.set_inputs(export_list)
+        self.session.settings.set_inputs(export_list)
 
     def opened(self):
         pass  # changes in other tabs do not affect the inputs, skipping this implementation for now

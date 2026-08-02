@@ -4,6 +4,7 @@
     "game_path": "conf/testGame.json",
     "db_path": "conf/testGame.db",
     "visible_splits": 5,
+    "ask_on_reset": true,
     "inputs": [
         {
             "source": "pynput",

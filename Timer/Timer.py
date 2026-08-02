@@ -1,5 +1,7 @@
 from PySide6.QtCore import QElapsedTimer, QObject, QTimer, Slot, Signal
-from Styling.Settings import Settings
+
+from Settings.Session import Session
+from Settings.Settings import Settings
 
 
 class Timer(QObject):
@@ -9,14 +11,14 @@ class Timer(QObject):
     running = False
     prevTime = 0
 
-    def __init__(self, settings: Settings):
+    def __init__(self, session: Session):
         super().__init__()
-        self.settings = settings
+        self.session = session
 
         self.timer = None
         self.update_timer = None
         self.prevTime = 0
-        self.offset = settings.game.start_offset * 1000
+        self.offset = self.session.game.start_offset * 1000
 
         # set up the function map so we can take in inputs
         self.event_map = {  # mapping is constant for now, we don't want them to remap these on the fly
@@ -147,6 +149,6 @@ class Timer(QObject):
         if self.update_timer.isActive():
             self.update_timer.stop()
 
-    def update_settings(self):
-        self.offset = self.settings.game.start_offset * 1000
+    def sync_timer_settings(self):
+        self.offset = self.session.game.start_offset * 1000
         self.tick.emit(self.offset)

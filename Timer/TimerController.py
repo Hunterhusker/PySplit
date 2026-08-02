@@ -2,7 +2,8 @@ from PySide6.QtCore import QObject, Slot, Signal
 import json
 
 from Listeners.ABCListener import ABCListener, ABCListenedObject
-from Styling.Settings import Settings
+from Settings.Session import Session
+from Settings.Settings import Settings
 
 
 #from Listeners.KeyboardListener import KeyPressObject
@@ -14,20 +15,20 @@ class TimerController(QObject):
     """
     ControlEvent = Signal(str)
 
-    def __init__(self, listener: ABCListener, settings: Settings):
+    def __init__(self, listener: ABCListener, session: Session):
         super().__init__()  # do the basic init
 
         # save our listeners to a list just in case
         self.event_map = {}
         self.listener = listener
         self.listening = True
-        self.settings = settings
+        self.session = session
 
         listener.listen()
         listener.on_event.connect(self.input_event)
 
-        self.settings.InputMapUpdate.connect(self.settings_update)
-        self.import_mapping(settings.get_inputs())
+        self.session.settings.InputMapUpdate.connect(self.settings_update)
+        self.import_mapping(self.session.settings.get_inputs())
 
         # find the format of the input map
         # if isinstance(event_map, dict):
@@ -48,7 +49,7 @@ class TimerController(QObject):
 
     @Slot()
     def settings_update(self):
-        self.import_mapping(self.settings.get_inputs())
+        self.import_mapping(self.session.settings.get_inputs())
 
     def update_mapping(self, event_map: dict[ABCListenedObject, str]):
         """

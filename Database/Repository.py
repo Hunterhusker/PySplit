@@ -2,11 +2,13 @@ from datetime import datetime
 import sqlite3
 from pathlib import Path
 
+from PySide6.QtWidgets import QMessageBox
+
 from Models.Game import Game
 from Models.Split import Split
 
 
-class RunRepository:
+class Repository:
     def __init__(self, database_path_string: str):
         db_path = Path(database_path_string)
         db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -372,3 +374,15 @@ class RunRepository:
             ))
 
         return splits
+
+    def open_save_dialog(self):
+        save = QMessageBox.question(
+            self.parent,
+            "Save Results?",
+            "Do you want to save this run?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if save == QMessageBox.StandardButton.Yes:
+            self.settings.game.update_best_splits(False)
+            self.settings.repository.save_run(self.settings.game)
