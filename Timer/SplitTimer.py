@@ -131,7 +131,7 @@ class SplitTimer(QObject):
             case 'RESET':
                 if self.session.settings['ask_on_reset']:
                     # open the popup and ask about saving
-                    pass
+                    self.session.open_save_run_dialog()
 
                 self.reset()
                 self.SplitsReset.emit()

@@ -44,7 +44,7 @@ class Main(QWidget):
         layout.setSpacing(0)
 
         # establish our session object
-        self.session = Session(settings_path)
+        self.session = Session(settings_path, self)
 
         # Create the widgets
         self.title = TitleWidget.from_game(self.session.game)
@@ -104,8 +104,7 @@ class Main(QWidget):
 
         # also connect the extra control events from the splits to the timer
         self.split_timer.SplitsFinish.connect(self.game_timer.stop_timer)
-        #self.split_timer.SplitsFinish.connect(self.settings._repository.save_run)  # TODO : need to figure out how and what to pass in here
-        self.split_timer.SplitsFinish.connect(self.session.repository.open_save_dialog)
+        self.split_timer.SplitsFinish.connect(self.session.open_save_run_dialog)
 
         self.split_timer.SplitsReset.connect(self.game_timer.reset_timer)
 
@@ -114,7 +113,7 @@ class Main(QWidget):
         self.session.game.GameUpdated.connect(self.title.update_from_game)
 
         self.settings_window = SettingsWindow(parent=self)
-        self.settings_window.setGeometry(900, 900, 600, 400)
+        self.settings_window.setGeometry(900, 900, 600, 410)
         self.settings_window.setMinimumSize(600, 400)
         self.settings_window.add_tab(AssignButtonsTab(self.session, timer_controller=self.timer_controller, parent=self.settings_window), 'Key Bindings')
         self.settings_window.add_tab(GameSettingsTab(self.session, parent=self.settings_window), 'Splits')
@@ -179,22 +178,27 @@ class Main(QWidget):
         save_box = QMessageBox(self)
         save_box.setWindowTitle('Save Changes?')
         save_box.setText('Would you like to save any configuration changes and new PBs?')
-        save_box.setStandardButtons(QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes)
+        save_box.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes)
         save_box.setIcon(QMessageBox.Icon.Question)
 
         # resize the buttons
-        save_no = save_box.button(QMessageBox.StandardButton.No)
-        save_no.setMinimumSize(75, 25)
-
-        save_yes = save_box.button(QMessageBox.StandardButton.Yes)
-        save_yes.setMinimumSize(75, 25)
+        save_box.button(QMessageBox.StandardButton.Cancel).setMinimumSize(75, 25)
+        save_box.button(QMessageBox.StandardButton.No).setMinimumSize(75, 25)
+        save_box.button(QMessageBox.StandardButton.Yes).setMinimumSize(75, 25)
 
         result = save_box.exec()
 
-        if result == QMessageBox.StandardButton.Yes:
+        if result == QMessageBox.StandardButton.Cancel:
+            event.ignore()
+
+            # re-enable the timer since we're not actually quitting
+            self.timer_controller.toggle_listening()
+
+            return # make sure nothing else runs
+
+        elif result == QMessageBox.StandardButton.Yes:
             self.session.repository.save_game(self.session.game)
             self.session.settings.save_settings()
-            #self.settings.game.to_json_file(self.settings.settings['game_path'])
 
         self.Quit.emit()  # provide a Quit event to notify the system we are quitting
 

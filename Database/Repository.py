@@ -109,6 +109,9 @@ class Repository:
         Returns:
             (int) game_id: The ID of the game that was updated
         """
+        # when saving the game, you have to
+        game.update_best_splits(False)  # how to tell if it was a PB or not
+
         game_id = game.id  # just to make sure the variable is accessible outside the later ifs
 
         # if the game object doesn't have an id, insert it and save the id, else update it
@@ -374,15 +377,3 @@ class Repository:
             ))
 
         return splits
-
-    def open_save_dialog(self):
-        save = QMessageBox.question(
-            self.parent,
-            "Save Results?",
-            "Do you want to save this run?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-
-        if save == QMessageBox.StandardButton.Yes:
-            self.settings.game.update_best_splits(False)
-            self.settings.repository.save_run(self.settings.game)
