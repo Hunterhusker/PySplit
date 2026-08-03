@@ -272,12 +272,12 @@ class SplitsWidget(QWidget):
 
 # different split display time strategies
 def split_pb_strategy(split: Split):
-    return split.pb_time_ms
+    return split.pb_segment_total_ms
 
 
 def split_pb_segment_strategy(split: Split):
     return split.pb_segment_total_ms
 
 
-def split_gold_segement_strategy(split: Split):
+def split_gold_segment_strategy(split: Split):
     return split.gold_segment_total_ms

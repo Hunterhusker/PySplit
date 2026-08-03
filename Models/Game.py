@@ -188,3 +188,5 @@ class Game(QObject):
     def update_best_splits(self, is_pb: bool):
         for split in self.splits:
             split.update_bests(is_pb=is_pb)
+
+        self.GameUpdated.emit(self)

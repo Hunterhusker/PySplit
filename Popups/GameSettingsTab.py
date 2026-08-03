@@ -74,7 +74,7 @@ class GameSettingsTab(ABCSettingTab):
         self.lifetime_attempts_input = LabeledSpinBox('Lifetime Attempts: ', self.session.game.lifetime_attempts, parent=self)
         self.lifetime_attempts_input.setMinimumHeight(35)
 
-        self.timer_start_delay_input = LabeledDoubleSpinBox('Timer Start Delay: ', self.session.game.start_offset, 3, 0.01, self)
+        self.timer_start_delay_input = LabeledDoubleSpinBox('Timer Start Delay: ', self.session.game.start_offset, 3, 0.01, parent=self)
         self.timer_start_delay_input.setMinimumHeight(35)
 
         # populate the title group
@@ -125,7 +125,7 @@ class GameSettingsTab(ABCSettingTab):
         self.timer_start_delay_input.input.setValue(game.start_offset)
 
         self.clear_splits()
-        self.import_splits(self.session.game)
+        self.import_splits(game)
 
     def update_game_selection(self):
         """
@@ -226,7 +226,7 @@ class SplitLine(QFrame):
         self.layout = QHBoxLayout()
         self.split = split
 
-        self.pb_time_ms = split.pb_time_ms
+        self.pb_segment_total_ms = split.pb_segment_total_ms
         self.pb_segment_ms = split.pb_segment_ms
         self.gold_segment_ms = split.gold_segment_ms
 
@@ -237,13 +237,13 @@ class SplitLine(QFrame):
 
         self.best_time_input = NoScrollQTimeEdit()
         self.best_time_input.setDisplayFormat('hh:mm:ss.zzz')
-        self.best_time_input.setTime(ms_to_qtime(self.pb_time_ms))
+        self.best_time_input.setTime(ms_to_qtime(self.pb_segment_total_ms))
         self.best_time_input.setBaseSize(100, 25)
         self.best_time_input.setMinimumSize(100, 25)
 
         self.best_segment_input = NoScrollQTimeEdit()
         self.best_segment_input.setDisplayFormat('hh:mm:ss.zzz')
-        self.best_segment_input.setTime(ms_to_qtime(self.pb_segment_ms))
+        self.best_segment_input.setTime(ms_to_qtime(self.pb_segment_total_ms))
         self.best_segment_input.setBaseSize(100, 25)
         self.best_segment_input.setMinimumSize(100, 25)
 
@@ -279,13 +279,13 @@ class SplitLine(QFrame):
         """
         return {
             'split_name': self.split_name_input.text(),
-            'pb_time_ms': qtime_to_ms(self.best_time_input.time()),
+            #'pb_time_ms': qtime_to_ms(self.best_time_input.time()),
             'gold_segment_ms': qtime_to_ms(self.gold_segment_input.time()),
             'pb_segment_ms': qtime_to_ms(self.best_segment_input.time())
         }
 
     def update_split(self):
         self.split.split_name = self.split_name_input.text()
-        self.split.pb_time_ms = qtime_to_ms(self.best_time_input.time())
+        self.split.pb_segment_total_ms = qtime_to_ms(self.best_time_input.time())
         self.split.gold_segment_ms = qtime_to_ms(self.gold_segment_input.time())
         self.split.pb_segment_ms = qtime_to_ms(self.best_segment_input.time())

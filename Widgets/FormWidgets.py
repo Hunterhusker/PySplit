@@ -119,6 +119,7 @@ class LabeledSpinBox(QFrame):
 class LabeledDoubleSpinBox(QFrame):
     def __init__(self, label: str, original_value: int, decimals: int, step: float, parent):
         super().__init__(parent=parent)
+        print(f'LDSB: Label : {label} :: Original Value: {original_value}')
 
         self.layout = QHBoxLayout()
 
@@ -130,11 +131,13 @@ class LabeledDoubleSpinBox(QFrame):
         self.input = NoScrollQDoubleSpinBox()
         self.input.setMinimumWidth(225)
         self.input.setFixedHeight(25)
-        self.input.setValue(original_value)
+        self.input.setMinimum(-9999)  # wish I did not have to set a minimum for this, try and find a way plz
         self.input.setDecimals(decimals)
         self.input.setSingleStep(step)
-        self.input.setMinimum(-9999)  # wish I did not have to set a minimum for this, try and find a way plz
         self.input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        # set value after initialization to ensure that the value makes it in uneffected by bad defaults
+        self.input.setValue(original_value)
 
         self.layout.addWidget(self.label, stretch=1)
         self.layout.addWidget(self.input, stretch=1)
@@ -142,6 +145,8 @@ class LabeledDoubleSpinBox(QFrame):
 
         self.setLayout(self.layout)
         self.setObjectName('SettingLine')
+
+        print(self.input.value())
 
     def setValue(self, value):
         self.input.setValue(value)

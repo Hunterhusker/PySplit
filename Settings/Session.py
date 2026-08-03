@@ -20,10 +20,16 @@ class Session(QObject):
         self.repository = Repository(self.settings.settings['db_path'])
         self.game = self.repository.load_game(1)
 
+        # session flags
+        self.dirty = True
+
     def open_save_run_dialog(self):
         """
         Opens a save dialog to save the run information
         """
+        if not self.dirty:
+            return
+
         save_box = QMessageBox(self.parent)
         save_box.setWindowTitle("Save Results?")
         save_box.setText("Do you want to save the results of your last run?")
@@ -36,4 +42,5 @@ class Session(QObject):
         result = save_box.exec()
 
         if result == QMessageBox.StandardButton.Yes:
-            self.repository.save_run(self.game)
+            self.game.update_best_splits(True)  # save the current bests from the game itself
+            self.repository.save_run(self.game)  # Saved game is a deep copy, need to determine how and why, and probably just mutate the one game object

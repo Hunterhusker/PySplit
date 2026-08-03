@@ -5,10 +5,9 @@ import json
 # TODO : Make id field nullable and default to null so that we can load from a JSON w/o id fields or DB with id fields
 class Split:
     """A class that represents a single split in a speedrun"""
-    def __init__(self, id: int, split_name: str, pb_time_ms: int, pb_segment_ms: int, gold_segment_ms: int, pb_segment_total_ms: int = 0, gold_segment_total_ms: int = 0):
+    def __init__(self, id: int, split_name: str, pb_segment_ms: int, gold_segment_ms: int, pb_segment_total_ms: int = 0, gold_segment_total_ms: int = 0):
         self.id = id
         self.split_name = split_name
-        self.pb_time_ms = pb_time_ms
         self.pb_segment_ms = pb_segment_ms
         self.gold_segment_ms = gold_segment_ms
         self.pb_segment_total_ms = pb_segment_total_ms
@@ -34,7 +33,6 @@ class Split:
         return cls(
             json_dict.get('id', None),
             json_dict['split_name'],
-            json_dict['pb_time_ms'],
             json_dict['pb_segment_ms'],
             json_dict['gold_segment_ms'],
             prev_pb_segment_total_ms,
@@ -73,7 +71,6 @@ class Split:
         return {
             'id': self.id,
             'split_name': self.split_name,
-            'pb_time_ms': self.pb_time_ms,
             'pb_segment_ms': self.pb_segment_ms,
             'gold_segment_ms': self.gold_segment_ms
         }
@@ -91,8 +88,26 @@ class Split:
         Updates the best split segments
         """
         # if the split was golded, save it
+        print(f'Updating: {self.split_name} w/ curr: {self.current_segment_ms} gold: {self.gold_segment_ms} pb: {self.pb_segment_ms}')
+
         if self.current_segment_ms < self.gold_segment_ms:
+            print(f'New gold!: {self.current_segment_ms} < {self.gold_segment_ms}')
+            # update the total while we still know the old gold
+            self.gold_segment_total_ms -= self.gold_segment_ms
+            self.gold_segment_total_ms += self.current_segment_ms
+
+            # update the gold segment time to the new current segment time
             self.gold_segment_ms = self.current_segment_ms
 
         if is_pb:  # if this is the PB, then we should save that, doesn't matter if it was better
+            # update the old PB totals
+            self.pb_segment_total_ms -= self.pb_segment_ms
+            self.pb_segment_total_ms += self.current_segment_ms
+
+            self.pb_time_ms -= self.pb_segment_ms
+            self.pb_time_ms += self.current_segment_ms
+
+            # update the pb segment time to the new current segment time
             self.pb_segment_ms = self.current_segment_ms
+
+        print(f'Updated: {self.split_name} to curr: {self.current_segment_ms} gold: {self.gold_segment_ms} pb: {self.pb_segment_ms}')

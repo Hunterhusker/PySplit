@@ -200,6 +200,25 @@ class Main(QWidget):
             self.session.repository.save_game(self.session.game)
             self.session.settings.save_settings()
 
+        # # TEMP CODE TO SEE SPLIT DATA
+        # print('Game Splits')
+        # for split in self.session.game.splits:
+        #     print(f'    {split}')
+        # print('----------')
+        #
+        # print('Split Widget Splits')
+        # for split in self.splits.splits:
+        #     print(f'    {split.split}')
+        # print('----------')
+        #
+        # print('Split Match')
+        # for i in range(len(self.session.game.splits)):
+        #     wsplit = self.splits.splits[i].split
+        #     ssplit = self.session.game.splits[i]
+        #
+        #     print(wsplit == ssplit)
+        # # ----------------------------------------
+
         self.Quit.emit()  # provide a Quit event to notify the system we are quitting
 
         # stop our non-thread objects

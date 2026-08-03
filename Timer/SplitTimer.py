@@ -32,7 +32,7 @@ class SplitTimer(QObject):
 
     @Slot()
     def reset(self):
-        self.splits = deepcopy(self.session.game.splits)  # save a copy of the splits that we can safely mutate
+        self.splits = self.session.game.splits  # deepcopy(self.session.game.splits)  # save a copy of the splits that we can safely mutate
         self.index = 0
         self.started = False
         self.done = False
@@ -45,31 +45,31 @@ class SplitTimer(QObject):
 
     @Slot()
     def game_updated(self):
-        self.splits = deepcopy(self.session.game.splits)
+        self.splits = self.session.game.splits  # deepcopy(self.session.game.splits)
         self.index = 0
         self.started = False
         self.done = False
 
-    def update_game(self):
-        last_split = self.splits[-1]
-        final_time = self.end_times[-1]
-
-        is_pb = False
-        if final_time < last_split.pb_time_ms:
-            is_pb = True
-
-        for i in range(len(self.splits)):
-            split = self.splits[i]
-
-            if is_pb:
-                split.pb_time_ms = self.end_times[i]
-                split.pb_segment_ms = self.segment_times[i]
-
-            if self.segment_times[i] < split.gold_segment_ms:
-                split.gold_segment_ms = self.segment_times[i]
-
-        # TODO : When to update, probably want to spawn a dialog??
-        #self.settings.game.splits = deepcopy(self.splits)  # turned off for now
+    # def update_game(self):
+    #     last_split = self.splits[-1]
+    #     final_time = self.end_times[-1]
+    #
+    #     is_pb = False
+    #     if final_time < last_split.pb_time_ms:
+    #         is_pb = True
+    #
+    #     for i in range(len(self.splits)):
+    #         split = self.splits[i]
+    #
+    #         if is_pb:
+    #             split.pb_time_ms = self.end_times[i]
+    #             split.pb_segment_ms = self.segment_times[i]
+    #
+    #         if self.segment_times[i] < split.gold_segment_ms:
+    #             split.gold_segment_ms = self.segment_times[i]
+    #
+    #     # TODO : When to update, probably want to spawn a dialog??
+    #     #self.settings.game.splits = deepcopy(self.splits)  # turned off for now
 
     @Slot(int)
     def on_tick(self, curr_time_ms):

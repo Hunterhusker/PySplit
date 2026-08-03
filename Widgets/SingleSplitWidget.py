@@ -25,7 +25,7 @@ class SingleSplitWidget(QFrame):
 
     selected = Property(bool, is_selected, set_selected)  # hate the formatting here
 
-    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent):
+    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent: "SplitsWidget"):
         """
         An individual split that can display the times from the PB and the comparison time
         Args:
@@ -122,7 +122,7 @@ class SingleSplitWidget(QFrame):
 
         self.current_time_ms = curr_time_ms
 
-        time_delta = self.current_time_ms - self.split.pb_time_ms
+        time_delta = self.current_time_ms - self.split.pb_segment_total_ms
 
         if time_delta >= -1000.0:
             time_delta_str = format_wall_clock_from_ms(time_delta)
@@ -189,7 +189,7 @@ class SingleSplitWidget(QFrame):
             self.time_label.setStyleSheet(self.saved_time_color_ahead)
             self.delta_label.setStyleSheet(self.saved_time_color_ahead)
 
-        elif self.current_time_ms >= self.split.pb_time_ms:
+        elif self.current_time_ms >= self.split.pb_segment_total_ms:
             self.time_label.setStyleSheet(self.lost_time_color_ahead)
             self.delta_label.setStyleSheet(self.lost_time_color_ahead)
 
@@ -227,7 +227,6 @@ class SingleSplitWidget(QFrame):
         # indentation gets weird here due to the multiline string, but it stays a one-liner so whatever
         return f"""{indent * depth}{{
 {indent * (depth + 1)}"split_name": "{self.split.split_name}",
-{indent * (depth + 1)}"pb_time_ms": {self.split.pb_time_ms},
 {indent * (depth + 1)}"pb_segment_ms": {self.split.pb_segment_ms},
 {indent * (depth + 1)}"gold_segment_ms": {self.split.gold_segment_ms}
 {indent * depth}}}"""

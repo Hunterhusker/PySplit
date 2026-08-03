@@ -305,8 +305,13 @@ class Repository:
 
         cumulative_time = 0  # start off at 0, and we can add up the time as we go
         for split in game.splits:
-            cumulative_time += split.current_segment_ms  # add it up
-            self.save_run_split(split, cumulative_time, run_id)  # save each split of the completed run
+            time = None  # default to None so we don't have cumulative time on unfinished runs
+
+            if split.current_segment_ms is not None:
+                cumulative_time += split.current_segment_ms  # add it up
+                time = cumulative_time  # use it as the cumulative time taken
+
+            self.save_run_split(split, time, run_id)  # save each split of the completed run
 
 
     def save_run_split(self, split: Split, cumulative_time_ms: int, run_id: int):
@@ -363,17 +368,20 @@ class Repository:
             ORDER BY order_index;""")
 
         rows = cur.fetchall()
-        local_total = 0
+        local_pb_total = 0
+        local_gold_total = 0
 
         for row in rows:  # create the splits in order from the database
-            local_total += row['pb_segment_ms']  # add the pb segment to the total to get the accumulated time
+            local_pb_total += row['pb_segment_ms']  # add the pb segment to the total to get the accumulated time
+            local_gold_total += row['gold_segment_ms']
 
             splits.append(Split(
                 id=row['id'],
                 split_name=row['name'],
-                pb_time_ms=local_total,
                 pb_segment_ms=row['pb_segment_ms'],
-                gold_segment_ms=row['gold_segment_ms']
+                gold_segment_ms=row['gold_segment_ms'],
+                pb_segment_total_ms=local_pb_total,
+                gold_segment_total_ms=local_gold_total
             ))
 
         return splits
