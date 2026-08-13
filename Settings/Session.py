@@ -43,4 +43,7 @@ class Session(QObject):
 
         if result == QMessageBox.StandardButton.Yes:
             self.game.update_best_splits(True)  # save the current bests from the game itself
+
             self.repository.save_run(self.game)  # Saved game is a deep copy, need to determine how and why, and probably just mutate the one game object
+
+            self.repository.save_game(self.game)

@@ -42,8 +42,8 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(str(game.session_attempts), title.session_attempts_label.text())
         self.assertEqual(str(game.lifetime_attempts), title.lifetime_attempts_label.text())
 
-        splits_widget = self.main.splits.splits
-        game_splits = game.splits
+        splits_widget = self.main.splits.single_split_widgets
+        game_splits = game.single_split_widgets
 
         self.assertEqual(len(game_splits), len(splits_widget))
 
@@ -85,8 +85,8 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(str(game.session_attempts), title.session_attempts_label.text())
         self.assertEqual(str(game.lifetime_attempts), title.lifetime_attempts_label.text())
 
-        splits_widget = self.main.splits.splits
-        game_splits = game.splits
+        splits_widget = self.main.splits.single_split_widgets
+        game_splits = game.single_split_widgets
 
         self.assertEqual(len(game_splits), len(splits_widget))
 

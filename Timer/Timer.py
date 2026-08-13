@@ -31,6 +31,13 @@ class Timer(QObject):
             'LOCK': self.doNothing
         }
 
+    @Slot()
+    def update_configuration(self):
+        """
+        Called to set up the timer configuration after a change to the session object
+        """
+        self.offset = self.session.game.start_offset * 1000
+
     def run(self):
         self.timer = QElapsedTimer()
         self.timer.start()
@@ -39,7 +46,7 @@ class Timer(QObject):
         self.update_timer.setInterval(1)
         self.update_timer.timeout.connect(self.read)
 
-        self.tick.emit(self.offset)
+        self.tick.emit(self.offset)  # causes the starting value to be displayed on startup
 
     @Slot(str)
     def handle_control(self, control_message: str):

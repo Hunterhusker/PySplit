@@ -40,7 +40,7 @@ class SplitsWidget(QWidget):
         self.scroll_area.setFrameStyle(QFrame.NoFrame)
 
         # we'll want to keep track of these
-        self.splits = []
+        self.single_split_widgets = []
 
         self.last_index = None
 
@@ -50,7 +50,7 @@ class SplitsWidget(QWidget):
         self.scroll_widget.setLayout(self.scroll_widget_layout)
 
         self.scroll_area.setWidget(self.scroll_widget)
-        self.scroll_area.verticalScrollBar().setSingleStep(self.splits[0].height())
+        self.scroll_area.verticalScrollBar().setSingleStep(self.single_split_widgets[0].height())
 
         self.apply_settings()
 
@@ -62,26 +62,26 @@ class SplitsWidget(QWidget):
         This method sets the size of the current window
         """
         self.visible_splits = self.session.settings['visible_splits']
-        self.setFixedHeight((self.splits[0].height() + 2) * self.visible_splits + 2)
+        self.setFixedHeight((self.single_split_widgets[0].height() + 2) * self.visible_splits + 2)
 
-        for split in self.splits:
+        for split in self.single_split_widgets:
             split.apply_settings()
 
     def get_current_split(self):
-        return self.splits[self.index]
+        return self.single_split_widgets[self.index]
 
     def increment_split(self):
         timer_index = self.split_timer.index
 
         if timer_index >= self.visible_splits:
             sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-            sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
+            sb.setValue((self.single_split_widgets[timer_index].height() + 2) * timer_index + 2)
 
     def decrement_split(self):
         timer_index = self.split_timer.index
 
         sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-        sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
+        sb.setValue((self.single_split_widgets[timer_index].height() + 2) * timer_index + 2)
 
     @Slot(int)
     def update_split(self, curr_time: int):
@@ -92,7 +92,7 @@ class SplitsWidget(QWidget):
             curr_time: (int) the current time of the timer in milliseconds
         """
         timer_index = self.split_timer.index
-        curr_split = self.splits[timer_index]
+        curr_split = self.single_split_widgets[timer_index]
 
         if self.split_timer.started:
             if self.last_index is None:
@@ -100,7 +100,7 @@ class SplitsWidget(QWidget):
                 curr_split.set_selected(True)
 
             elif self.last_index < timer_index:
-                last_split = self.splits[self.last_index]
+                last_split = self.single_split_widgets[self.last_index]
                 last_split.end()
 
                 last_split.set_selected(False)
@@ -111,7 +111,7 @@ class SplitsWidget(QWidget):
                 self.last_index = timer_index
 
             elif self.last_index > timer_index:
-                last_split = self.splits[self.last_index]
+                last_split = self.single_split_widgets[self.last_index]
                 last_split.undo()
 
                 last_split.set_selected(False)
@@ -119,7 +119,7 @@ class SplitsWidget(QWidget):
 
                 self.decrement_split()
 
-                self.splits[timer_index].set_selected(True)
+                self.single_split_widgets[timer_index].set_selected(True)
 
                 self.last_index = timer_index
 
@@ -127,7 +127,9 @@ class SplitsWidget(QWidget):
 
     @Slot()
     def reset_splits(self):
-        self.splits[self.split_timer.index].set_selected(False)
+        print(self.session.game)
+
+        self.single_split_widgets[self.split_timer.index].set_selected(False)
 
         self.split_timer.index = 0
         self.split_timer.started = False
@@ -136,33 +138,33 @@ class SplitsWidget(QWidget):
         sb = self.scroll_area.verticalScrollBar()
         sb.setValue(0)
 
-        for sp in self.splits:
+        for sp in self.single_split_widgets:
             sp.reset()
             sp.set_selected(False)
 
     @Slot()
     def finish_splits(self):
-        curr_split = self.splits[self.split_timer.index]
+        curr_split = self.single_split_widgets[self.split_timer.index]
         curr_split.end()
         curr_split.set_selected(False)
 
     @Slot()
     def skip_current_split(self):
-        curr_split = self.splits[self.last_index]
+        curr_split = self.single_split_widgets[self.last_index]
         curr_split.skip()
 
         timer_index = self.split_timer.index
 
         # make sure the correct split is highlighted
         curr_split.set_selected(False)
-        self.splits[timer_index].set_selected(True)
+        self.single_split_widgets[timer_index].set_selected(True)
 
         self.last_index = timer_index
 
         # manage the scroll
         if timer_index >= self.visible_splits:
             sb = self.scroll_area.verticalScrollBar()  # doing this will allow us to scroll to the next widget
-            sb.setValue((self.splits[timer_index].height() + 2) * timer_index + 2)
+            sb.setValue((self.single_split_widgets[timer_index].height() + 2) * timer_index + 2)
 
     def export_splits(self, indent: str = '    ', depth: int = 0) -> str:
         """
@@ -177,10 +179,10 @@ class SplitsWidget(QWidget):
         """
         tmp = f'{{\n{indent * (depth + 1)}"splits": [\n'
 
-        for i in range(len(self.splits)):
-            tmp += self.splits[i].export_data(indent=indent, depth=depth + 2)
+        for i in range(len(self.single_split_widgets)):
+            tmp += self.single_split_widgets[i].export_data(indent=indent, depth=depth + 2)
 
-            if i != len(self.splits) - 1:  # if not the last split, add a comma
+            if i != len(self.single_split_widgets) - 1:  # if not the last split, add a comma
                 tmp += ',\n'
 
         return tmp + f'\n{indent * (depth + 1)}]\n}}'
@@ -216,7 +218,7 @@ class SplitsWidget(QWidget):
             tmp.pb_segment_total = pb_segment_total
             tmp.gold_segment_total = gold_segment_total
 
-            self.splits.append(tmp)
+            self.single_split_widgets.append(tmp)
             self.scroll_widget_layout.addWidget(tmp)
 
     def load_splits_from_game(self, game: Game):
@@ -237,19 +239,19 @@ class SplitsWidget(QWidget):
             tmp.pb_segment_total = pb_segment_total
             tmp.gold_segment_total = gold_segment_total
 
-            self.splits.append(tmp)
+            self.single_split_widgets.append(tmp)
             self.scroll_widget_layout.addWidget(tmp)
 
     def remove_all_splits(self):
         """
         clear out the splits from the widget
         """
-        for split in self.splits:
+        for split in self.single_split_widgets:
             self.scroll_widget_layout.removeWidget(split)
             split.setParent(None)
             split.deleteLater()
 
-        self.splits = []
+        self.single_split_widgets = []
 
     # def update_splits(self):
     #     """

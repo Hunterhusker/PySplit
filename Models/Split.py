@@ -88,26 +88,41 @@ class Split:
         Updates the best split segments
         """
         # if the split was golded, save it
-        print(f'Updating: {self.split_name} w/ curr: {self.current_segment_ms} gold: {self.gold_segment_ms} pb: {self.pb_segment_ms}')
+        #print(f'Updating: {self.split_name} w/ curr: {self.current_segment_ms} gold: {self.gold_segment_ms} pb: {self.pb_segment_ms}')
+
+        print(
+            f"{self.split_name}: "
+            f"current={self.current_segment_ms} "
+            f"pb={self.pb_segment_ms} "
+            f"pb_total={self.pb_segment_total_ms} "
+            f"gold={self.gold_segment_ms} "
+            f"gold_total={self.gold_segment_total_ms}"
+        )
+
+        if self.current_segment_ms is None:
+            return
 
         if self.current_segment_ms < self.gold_segment_ms:
-            print(f'New gold!: {self.current_segment_ms} < {self.gold_segment_ms}')
-            # update the total while we still know the old gold
-            self.gold_segment_total_ms -= self.gold_segment_ms
-            self.gold_segment_total_ms += self.current_segment_ms
-
-            # update the gold segment time to the new current segment time
             self.gold_segment_ms = self.current_segment_ms
 
-        if is_pb:  # if this is the PB, then we should save that, doesn't matter if it was better
-            # update the old PB totals
-            self.pb_segment_total_ms -= self.pb_segment_ms
-            self.pb_segment_total_ms += self.current_segment_ms
-
-            self.pb_time_ms -= self.pb_segment_ms
-            self.pb_time_ms += self.current_segment_ms
-
-            # update the pb segment time to the new current segment time
+        if is_pb:
             self.pb_segment_ms = self.current_segment_ms
 
-        print(f'Updated: {self.split_name} to curr: {self.current_segment_ms} gold: {self.gold_segment_ms} pb: {self.pb_segment_ms}')
+        # if self.current_segment_ms is not None and self.current_segment_ms < self.gold_segment_ms:
+        #     #print(f'New gold!: {self.current_segment_ms} < {self.gold_segment_ms}')
+        #     # update the total while we still know the old gold
+        #     self.gold_segment_total_ms -= self.gold_segment_ms
+        #     self.gold_segment_total_ms += self.current_segment_ms
+        #
+        #     # update the gold segment time to the new current segment time
+        #     self.gold_segment_ms = self.current_segment_ms
+        #
+        # if is_pb:  # if this is the PB, then we should save that, doesn't matter if it was better
+        #     # update the old PB totals
+        #     self.pb_segment_total_ms -= self.pb_segment_ms
+        #     self.pb_segment_total_ms += self.current_segment_ms
+        #
+        #     # update the pb segment time to the new current segment time
+        #     self.pb_segment_ms = self.current_segment_ms
+
+        #print(f'Updated: {self.split_name} to curr: {self.current_segment_ms} gold: {self.gold_segment_ms} pb: {self.pb_segment_ms}')

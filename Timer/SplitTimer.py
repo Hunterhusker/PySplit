@@ -2,6 +2,7 @@ from copy import deepcopy
 from PySide6.QtCore import Slot, Signal, QObject
 
 from Settings.Session import Session
+from Timer import Timer
 
 
 class SplitTimer(QObject):
@@ -14,9 +15,10 @@ class SplitTimer(QObject):
     SplitsStop = Signal()
     SplitsStart = Signal()
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, timer: Timer):
         super().__init__()
         self.session = session
+        self.timer = timer  # tmp have a timer reference
 
         self.splits = None
         self.index = None  # 0  # start at the first split
@@ -73,19 +75,20 @@ class SplitTimer(QObject):
 
     @Slot(int)
     def on_tick(self, curr_time_ms):
-        if curr_time_ms < 0:
-            segment_time = 0
-        else:
-            segment_time = curr_time_ms - self.start_times[self.index]
-
-        if self.index == 0:
-            segment_time += int(self.session.game.start_offset * 1000)
-
         if self.start_times[self.index] == -1:
             self.start_times[self.index] = curr_time_ms
 
+        if self.index == 0:
+            segment_time = curr_time_ms if curr_time_ms > 0 else 0 # += int(self.session.game.start_offset * 1000)
+        else:
+            segment_time = curr_time_ms - self.start_times[self.index]
+
         self.segment_times[self.index] = segment_time
         self.current_time_ms = curr_time_ms
+
+        self.splits[self.index].current_segment_ms = segment_time
+        self.splits[self.index].current_time_ms = curr_time_ms
+
         self.SplitUpdate.emit(curr_time_ms)
 
     @Slot(str)
@@ -119,6 +122,12 @@ class SplitTimer(QObject):
                     return
 
                 self.index += 1  # if we get here we can increment
+                print(
+                    "SPLIT:",
+                    "cached =", self.current_time_ms,
+                    "timer elapsed =", self.timer.timer.elapsed(),
+                    "timer display =", self.timer.timer.elapsed() + self.timer.offset
+                )
                 self.start_times[self.index] = self.current_time_ms  # and we should save the start of this split here
                 return
 

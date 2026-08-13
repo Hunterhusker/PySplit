@@ -189,4 +189,15 @@ class Game(QObject):
         for split in self.splits:
             split.update_bests(is_pb=is_pb)
 
+        # rebuild cumulative totals here
+        pb_total = 0
+        gold_total = 0
+
+        for split in self.splits:
+            pb_total += split.pb_segment_ms
+            gold_total += split.gold_segment_ms
+
+            split.pb_segment_total_ms = pb_total
+            split.gold_segment_total_ms = gold_total
+
         self.GameUpdated.emit(self)

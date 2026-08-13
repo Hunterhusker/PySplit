@@ -109,9 +109,6 @@ class Repository:
         Returns:
             (int) game_id: The ID of the game that was updated
         """
-        # when saving the game, you have to
-        game.update_best_splits(False)  # how to tell if it was a PB or not
-
         game_id = game.id  # just to make sure the variable is accessible outside the later ifs
 
         # if the game object doesn't have an id, insert it and save the id, else update it

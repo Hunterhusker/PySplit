@@ -46,9 +46,15 @@ class Main(QWidget):
         # establish our session object
         self.session = Session(settings_path, self)
 
+        # tmp moved up here for testing
+        self.game_timer = Timer(self.session)
+        self.game_timer_thread = QThread()
+        self.game_timer.moveToThread(self.game_timer_thread)
+        self.session.game.GameUpdated.connect(self.game_timer.sync_timer_settings)
+
         # Create the widgets
         self.title = TitleWidget.from_game(self.session.game)
-        self.split_timer = SplitTimer(self.session)
+        self.split_timer = SplitTimer(self.session, self.game_timer)
         self.splits = SplitsWidget(self.session, self.split_timer, parent=self)
         self.main_timer_widget = TimerWidget(self.split_timer)
         self.splitStats = TimeStatsWidget()
@@ -81,10 +87,10 @@ class Main(QWidget):
         self.setGeometry(800, 800, 225, 200)
 
         # create and connect to the timer thread
-        self.game_timer = Timer(self.session)
-        self.game_timer_thread = QThread()
-        self.game_timer.moveToThread(self.game_timer_thread)
-        self.session.game.GameUpdated.connect(self.game_timer.sync_timer_settings)
+        # self.game_timer = Timer(self.session)
+        # self.game_timer_thread = QThread()
+        # self.game_timer.moveToThread(self.game_timer_thread)
+        # self.session.game.GameUpdated.connect(self.game_timer.sync_timer_settings)
 
         # connect the game timer signals to the desired slots
         self.game_timer.tick.connect(self.split_timer.on_tick)
@@ -111,6 +117,7 @@ class Main(QWidget):
         self.session.game.GameUpdated.connect(self.splits.load_splits_from_game)
         self.session.game.GameUpdated.connect(self.split_timer.reset)
         self.session.game.GameUpdated.connect(self.title.update_from_game)
+        self.session.game.GameUpdated.connect(self.game_timer.update_configuration)
 
         self.settings_window = SettingsWindow(parent=self)
         self.settings_window.setGeometry(900, 900, 600, 410)

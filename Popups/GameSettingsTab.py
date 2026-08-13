@@ -204,14 +204,14 @@ class GameSettingsTab(ABCSettingTab):
         self.session.game.lifetime_attempts = self.lifetime_attempts_input.input.value()
         self.session.game.start_offset = self.timer_start_delay_input.input.value()
 
-        self.session.game.splits = []  # make this into an empty list
+        self.session.game.single_split_widgets = []  # make this into an empty list
 
         # update the splits
         for i in range(self.split_area.count()):
             curr = self.split_area.itemAt(i).widget()
 
             curr.update_split()
-            self.session.game.splits.append(curr.split)
+            self.session.game.single_split_widgets.append(curr.split)
 
         self.session.game.GameUpdated.emit(self.session.game)
 
@@ -243,7 +243,7 @@ class SplitLine(QFrame):
 
         self.best_segment_input = NoScrollQTimeEdit()
         self.best_segment_input.setDisplayFormat('hh:mm:ss.zzz')
-        self.best_segment_input.setTime(ms_to_qtime(self.pb_segment_total_ms))
+        self.best_segment_input.setTime(ms_to_qtime(self.pb_segment_ms))
         self.best_segment_input.setBaseSize(100, 25)
         self.best_segment_input.setMinimumSize(100, 25)
 
