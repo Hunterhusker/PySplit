@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+import resources_rc  # do not remove, enables SVG resources
 from Listeners.AggregateListener import AggregateListener
 from Listeners.KeyboardListener import KeyboardListener
 from Popups.AdvancedStyleTab import AdvancedStyleTab
