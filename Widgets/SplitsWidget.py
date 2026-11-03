@@ -94,6 +94,8 @@ class SplitsWidget(QWidget):
         timer_index = self.split_timer.index
         curr_split = self.single_split_widgets[timer_index]
 
+        print(f'Updating Split {curr_split.split_name_label.text()} to : {curr_time}, it is currently : {curr_split.current_time_ms}')
+
         if self.split_timer.started:
             if self.last_index is None:
                 self.last_index = 0
@@ -101,7 +103,7 @@ class SplitsWidget(QWidget):
 
             elif self.last_index < timer_index:
                 last_split = self.single_split_widgets[self.last_index]
-                last_split.end()
+                last_split.end(curr_time)
 
                 last_split.set_selected(False)
                 curr_split.set_selected(True)
@@ -143,10 +145,12 @@ class SplitsWidget(QWidget):
             sp.set_selected(False)
 
     @Slot()
-    def finish_splits(self):
+    def finish_splits(self, curr_time):
         curr_split = self.single_split_widgets[self.split_timer.index]
-        curr_split.end()
+        curr_split.end(curr_time)
         curr_split.set_selected(False)
+
+        print(f'Last Split Finished at : {curr_split.current_time_ms}, now : {curr_time}')
 
     @Slot()
     def skip_current_split(self):

@@ -117,8 +117,11 @@ class SingleSplitWidget(QFrame):
             self.current_start_time = curr_time_ms
 
         self.current_time_ms = curr_time_ms
+        print(f'Setting {self.split_name_label.text()} to {curr_time_ms} ms!')
 
         time_delta = self.current_time_ms - self.split.pb_segment_total_ms
+
+        # TODO : If I don't write to the self.split object here, then how tf is it updating???
 
         if time_delta >= -1000.0:
             time_delta_str = format_wall_clock_from_ms(time_delta)
@@ -157,7 +160,8 @@ class SingleSplitWidget(QFrame):
 
         self._finished = False
 
-    def end(self):
+    def end(self, curr_time):
+        print(f'end called on {self.split_name_label.text()} at {curr_time}')
         self._finished = True
 
         if self._skipped:

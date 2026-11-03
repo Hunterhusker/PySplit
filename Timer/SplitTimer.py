@@ -10,7 +10,7 @@ class SplitTimer(QObject):
     SplitUnsplit = Signal()
     SplitUpdate = Signal(int)  # current milliseconds
 
-    SplitsFinish = Signal()
+    SplitsFinish = Signal(int)
     SplitsReset = Signal()
     SplitsStop = Signal()
     SplitsStart = Signal()
@@ -43,14 +43,15 @@ class SplitTimer(QObject):
         self.segment_times = [-1] * count
         self.start_times = [-1] * count
         self.end_times = [-1] * count
-        self.current_time_ms = self.session.game.start_offset
+        self.current_time_ms = self.session.game.start_offset * 1000
 
-    @Slot()
-    def game_updated(self):
-        self.splits = self.session.game.splits  # deepcopy(self.session.game.splits)
-        self.index = 0
-        self.started = False
-        self.done = False
+    # @Slot()
+    # def game_updated(self):
+    #     # self.splits = self.session.game.splits  # deepcopy(self.session.game.splits)
+    #     # self.index = 0
+    #     # self.started = False
+    #     # self.done = False
+    #     self.reset
 
     # def update_game(self):
     #     last_split = self.splits[-1]
@@ -75,6 +76,10 @@ class SplitTimer(QObject):
 
     @Slot(int)
     def on_tick(self, curr_time_ms):
+        # only run when we need to
+        if not self.started or self.done:
+            return
+
         if self.start_times[self.index] == -1:
             self.start_times[self.index] = curr_time_ms
 
@@ -118,7 +123,7 @@ class SplitTimer(QObject):
                 if self.index == len(self.splits) - 1:  # if we are incrementing past the last split actually finish
                     self.started = False  # finish the splits
                     self.done = True
-                    self.SplitsFinish.emit()  # notify subscribers we finished
+                    self.SplitsFinish.emit(self.current_time_ms)  # notify subscribers we finished
                     return
 
                 self.index += 1  # if we get here we can increment
