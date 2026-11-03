@@ -2,7 +2,7 @@ The contents of this repo are not finished, and subject to change at any minute.
 
 # PySplit v0.0
 
-PySplit is a speedrun timer built on Python and PyQt6 with the aim of being a fully cross-platform speedrun timing solution.
+PySplit is a speedrun timer built on Python and PySide6 with the aim of being a fully cross-platform speedrun timing solution.
 
 ## Description
 
