@@ -1,0 +1,46 @@
+[project]
+name = "pysplit"
+version = "0.1.0"
+description = "A speedrun timer application"
+requires-python = ">=3.12"
+
+dependencies = [
+    "PySide6",
+    "pynput",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-qt",
+    "ruff",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "I",  # Import sorting
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "Models",
+    "Settings",
+    "Timer",
+    "Widgets",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
