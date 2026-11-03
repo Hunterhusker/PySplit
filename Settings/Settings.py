@@ -1,9 +1,9 @@
-from PySide6.QtCore import QObject, Signal
 import json
-
 from pathlib import Path
-from Settings.Style.styleBuilder import StyleBuilder
 
+from PySide6.QtCore import QObject, Signal
+
+from Settings.Style.styleBuilder import StyleBuilder
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 

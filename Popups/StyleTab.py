@@ -1,6 +1,15 @@
-from PySide6.QtCore import Slot, Qt, Signal
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea
 from typing import TYPE_CHECKING
+
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtWidgets import (
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
+)
 
 from Popups.ABCSettingTab import ABCSettingTab
 

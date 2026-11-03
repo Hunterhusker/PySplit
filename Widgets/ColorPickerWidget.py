@@ -1,7 +1,18 @@
-from PySide6.QtCore import Qt, Signal, QPoint
-from PySide6.QtGui import QImage, QColor, Qt, QPixmap, QPainter, QPen
-from PySide6.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QVBoxLayout, QSpinBox, QGroupBox, QLineEdit, \
-    QFrame, QSizePolicy, QStackedLayout
+from PySide6.QtCore import QPoint, Qt, Signal
+from PySide6.QtGui import QColor, QImage, QPainter, QPen, QPixmap, Qt
+from PySide6.QtWidgets import (
+    QApplication,
+    QFrame,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QSizePolicy,
+    QSpinBox,
+    QStackedLayout,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class SVImage(QLabel):

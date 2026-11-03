@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import json
 
 
@@ -102,8 +103,7 @@ class Split:
         if self.current_segment_ms is None:
             return
 
-        if self.current_segment_ms < self.gold_segment_ms:
-            self.gold_segment_ms = self.current_segment_ms
+        self.gold_segment_ms = min(self.gold_segment_ms, self.current_segment_ms)
 
         if is_pb:
             self.pb_segment_ms = self.current_segment_ms

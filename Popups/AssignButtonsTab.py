@@ -1,16 +1,21 @@
 import copy
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox, QFrame, QWidget, QScrollArea
-from PySide6.QtCore import Slot, Signal, Qt
-from typing import TYPE_CHECKING
+
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtWidgets import (
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
+)
 
 from Listeners.KeyboardListener import key_to_str
 from Popups.ABCSettingTab import ABCSettingTab
 from Settings.Session import Session
-from Settings.Settings import Settings
 from Timer.TimerController import TimerController
-
-if TYPE_CHECKING:
-    from Main import Main
 
 
 class AssignButtonsTab(ABCSettingTab):

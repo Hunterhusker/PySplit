@@ -1,5 +1,4 @@
-from copy import deepcopy
-from PySide6.QtCore import Slot, Signal, QObject
+from PySide6.QtCore import QObject, Signal, Slot
 
 from Settings.Session import Session
 from Timer import Timer
@@ -84,7 +83,7 @@ class SplitTimer(QObject):
             self.start_times[self.index] = curr_time_ms
 
         if self.index == 0:
-            segment_time = curr_time_ms if curr_time_ms > 0 else 0 # += int(self.session.game.start_offset * 1000)
+            segment_time = max(0, curr_time_ms) # += int(self.session.game.start_offset * 1000)
         else:
             segment_time = curr_time_ms - self.start_times[self.index]
 

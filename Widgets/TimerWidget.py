@@ -1,8 +1,8 @@
-from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QFrame
-from PySide6.QtCore import Slot, Qt
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtWidgets import QFrame, QLabel, QSizePolicy, QVBoxLayout
 
-from Timer.SplitTimer import SplitTimer
 from helpers.TimerFormat import format_wall_clock_from_ms
+from Timer.SplitTimer import SplitTimer
 
 
 class TimerWidget(QFrame):

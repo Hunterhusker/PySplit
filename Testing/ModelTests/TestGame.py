@@ -1,10 +1,10 @@
 """
 A completely useless test file that let me play with unittest and mock to learn them more before I touched something important
 """
-import Models.Game
 import unittest
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
+import Models.Game
 
 TEST_GAME_JSON_STRING = """{
     "title": "TEST",
@@ -78,7 +78,7 @@ class TestGame(unittest.TestCase):
         gold_total = 0
         pb_total = 0
 
-        for i in range(0, len(game.splits)):
+        for i in range(len(game.splits)):
             curr = game.splits[i]
 
             self.assertEqual(curr.split_name, f'test_{i}', f'The split at index {i} on the test game loaded from json has the incorrect name: "{curr.split_name}".')
@@ -108,7 +108,7 @@ class TestGame(unittest.TestCase):
         gold_total = 0
         pb_total = 0
 
-        for i in range(0, len(game.splits)):
+        for i in range(len(game.splits)):
             curr = game.splits[i]
 
             self.assertEqual(curr.split_name, f'test_{i}', f'The split at index {i} on the test game loaded from json has the incorrect name: "{curr.split_name}".')
@@ -137,7 +137,7 @@ class TestGame(unittest.TestCase):
         gold_total = 0
         pb_total = 0
 
-        for i in range(0, len(game.splits)):
+        for i in range(len(game.splits)):
             curr = game.splits[i]
 
             self.assertEqual(curr.split_name, f'test_{i}', f'The split at index {i} on the test game loaded from json has the incorrect name: "{curr.split_name}".')

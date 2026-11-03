@@ -1,6 +1,6 @@
-from PySide6.QtCore import QObject, Slot, Signal
+from PySide6.QtCore import QObject, Signal, Slot
 
-from Listeners.ABCListener import ABCListener, ABCListenedObject
+from Listeners.ABCListener import ABCListenedObject, ABCListener
 from Settings.Session import Session
 
 

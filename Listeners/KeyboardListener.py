@@ -1,10 +1,10 @@
 from abc import ABC
 
 #import Xlib.error
-from pynput.keyboard import Listener, Key, KeyCode
+from pynput.keyboard import Key, KeyCode, Listener
 from PySide6.QtCore import Slot
-from Listeners.ABCListener import ABCListener, ABCListenedObject
 
+from Listeners.ABCListener import ABCListenedObject, ABCListener
 
 # I want them to share sources, but I also don't want to tie them together like that
 KEY_PRESS_SOURCE = 'pynput'
@@ -159,7 +159,7 @@ def key_to_str(key: Key) -> str:
         key_str = key.name
 
     else:
-        raise TypeError(f'The provided key "{str(key)}" was not one of the supported key types for this Listener!')
+        raise TypeError(f'The provided key "{key!s}" was not one of the supported key types for this Listener!')
 
     return key_str
 
@@ -183,7 +183,7 @@ def str_to_key(key_str: str) -> Key:
 
             return key
 
-        except AttributeError as e:
+        except AttributeError:
             raise AttributeError(f'AttributeError: "{key_str}" is not a char or a special character, thus we cannot parse it')
 
     else:

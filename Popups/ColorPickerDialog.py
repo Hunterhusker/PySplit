@@ -1,5 +1,6 @@
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QVBoxLayout, QDialog, QDialogButtonBox, QPushButton
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QPushButton, QVBoxLayout
+
 from Widgets.ColorPickerWidget import ColorPickerWidget
 
 

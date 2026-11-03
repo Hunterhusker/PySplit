@@ -1,14 +1,25 @@
 from __future__ import annotations
 
-import copy
-from Popups.ABCSettingTab import ABCSettingTab, ABCSettingGroupBox
-from PySide6.QtGui import QColor, QFontDatabase, QFont
-from PySide6.QtWidgets import QVBoxLayout, QScrollArea, QWidget, QFrame, QLabel, QGroupBox, QCheckBox
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QFontDatabase
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QFrame,
+    QLabel,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
+)
+
+from Popups.ABCSettingTab import ABCSettingGroupBox, ABCSettingTab
 from Popups.SettingsWindow import SettingsWindow
 from Settings.Session import Session
-from Settings.Settings import Settings
-from Widgets.FormWidgets import ColorPicker, FontPicker, FileDialogOpener, LabeledSpinBox, LabeledDoubleSpinBox
+from Widgets.FormWidgets import (
+    ColorPicker,
+    FileDialogOpener,
+    FontPicker,
+    LabeledSpinBox,
+)
 
 
 # checkout QGroupBox for title and then box of settings items

@@ -1,7 +1,8 @@
-from PySide6.QtCharts import QLineSeries, QChart, QChartView
+from PySide6.QtCharts import QChart, QChartView, QLineSeries
 from PySide6.QtCore import QPointF
 from PySide6.QtGui import QPainter
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtWidgets import QVBoxLayout, QWidget
+
 # Just brought over some test code here that I used to mock up what this will look like when it is ready
 
 

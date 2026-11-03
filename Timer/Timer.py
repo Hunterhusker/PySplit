@@ -1,4 +1,4 @@
-from PySide6.QtCore import QElapsedTimer, QObject, QTimer, Slot, Signal
+from PySide6.QtCore import QElapsedTimer, QObject, QTimer, Signal, Slot
 
 from Settings.Session import Session
 
@@ -57,7 +57,6 @@ class Timer(QObject):
         """
         A simple method that does nothing to fill in slots in the timer that shouldn't do anything
         """
-        pass
 
     @Slot()
     def startsplit_timer(self):

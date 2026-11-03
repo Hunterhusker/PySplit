@@ -3,13 +3,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from PySide6.QtGui import QWheelEvent, QFontDatabase
+from PySide6.QtCore import QPoint, QPointF, Qt
+from PySide6.QtGui import QFontDatabase, QWheelEvent
 from PySide6.QtTest import QSignalSpy, QTest
-from PySide6.QtCore import Qt, QPointF, QPoint
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from Main import Main
-from Widgets.ColorPickerWidget import ColorPickerWidget
 from Widgets.FormWidgets import *
 
 

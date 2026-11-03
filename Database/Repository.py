@@ -1,8 +1,6 @@
-from datetime import datetime
 import sqlite3
+from datetime import datetime
 from pathlib import Path
-
-from PySide6.QtWidgets import QMessageBox
 
 from Models.Game import Game
 from Models.Split import Split

@@ -1,5 +1,4 @@
 import unittest
-from sys import intern
 
 from helpers.TimerFormat import *
 

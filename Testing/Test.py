@@ -1,5 +1,5 @@
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 if __name__ == '__main__':
     loader = unittest.TestLoader()

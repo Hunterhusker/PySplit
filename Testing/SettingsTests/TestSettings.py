@@ -1,11 +1,13 @@
-from helpers.TimerFormat import format_wall_clock_from_ms
-from Main import Main
-from pathlib import Path
-from PySide6.QtGui import QFontDatabase, QColor
-from PySide6.QtWidgets import QApplication, QMessageBox
 import sys
 import unittest
+from pathlib import Path
 from unittest.mock import patch
+
+from PySide6.QtGui import QColor, QFontDatabase
+from PySide6.QtWidgets import QApplication, QMessageBox
+
+from helpers.TimerFormat import format_wall_clock_from_ms
+from Main import Main
 
 
 def _get_a_main():

@@ -1,13 +1,12 @@
-from abc import abstractmethod, ABCMeta, ABC
+from abc import ABC, ABCMeta, abstractmethod
+
 from PySide6.QtCore import QObject, Signal, Slot
-from typing import ClassVar
 
 
 class ABCQObjectMeta(type(QObject), ABCMeta):
     """
     A generic QObject Meta Class that we can use to make Custom QObject templates
     """
-    ...
 
 
 class ABCListener(QObject, ABC, metaclass=ABCQObjectMeta):

@@ -1,7 +1,4 @@
-from PySide6.QtWidgets import QWidget, QLabel, QSizePolicy, QVBoxLayout, QFrame
-from PySide6.QtCore import Slot
-
-from helpers.TimerFormat import format_wall_clock_from_ms
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 
 class TimeStatsWidget(QWidget):

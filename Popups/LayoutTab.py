@@ -1,5 +1,3 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget, QLineEdit, QScrollArea
-from PySide6.QtCore import Slot, Qt
 from typing import TYPE_CHECKING
 
 from Popups.ABCSettingTab import ABCSettingTab
@@ -16,7 +14,6 @@ class LayoutTab(ABCSettingTab):
     """
     def __init__(self, mainWindow: 'Main' = None):
         super().__init__(parent=mainWindow)
-        ...
 
     def apply(self):
         pass

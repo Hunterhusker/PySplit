@@ -1,10 +1,12 @@
-from PySide6.QtCore import Qt
-from PySide6.QtTest import QSignalSpy, QTest
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QApplication, QWidget
-from random import randint
 import sys
 import unittest
+from random import randint
+
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
+from PySide6.QtTest import QSignalSpy, QTest
+from PySide6.QtWidgets import QApplication, QWidget
+
 from Widgets.ColorPickerWidget import ColorPickerWidget
 
 

@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import os
 
-from PySide6.QtWidgets import QSplitter, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPlainTextEdit
 from PySide6.QtCore import Qt
-from typing import TYPE_CHECKING
+from PySide6.QtWidgets import (
+    QPlainTextEdit,
+    QSplitter,
+    QVBoxLayout,
+)
 
 from Popups.ABCSettingTab import ABCSettingTab
 from Settings.Session import Session
-from Settings.Settings import Settings
 
 
 class AdvancedStyleTab(ABCSettingTab):

@@ -3,10 +3,10 @@ This class defines the way that a single split can be displayed on the screen
 """
 from __future__ import annotations
 
-from PySide6.QtWidgets import QFrame, QLabel, QHBoxLayout
-from PySide6.QtCore import Qt, Property
-from PySide6.QtCore import Slot
-from typing import Callable
+from collections.abc import Callable
+
+from PySide6.QtCore import Property, Qt, Slot
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QWidget
 
 from helpers.TimerFormat import format_wall_clock_from_ms
 from Models.Game import Split
@@ -25,7 +25,7 @@ class SingleSplitWidget(QFrame):
 
     selected = Property(bool, is_selected, set_selected)  # hate the formatting here
 
-    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent: "SplitsWidget"):
+    def __init__(self, split: Split, comparison_strategy: Callable[[Split], int], parent: QWidget):
         """
         An individual split that can display the times from the PB and the comparison time
         Args:

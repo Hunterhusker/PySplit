@@ -1,25 +1,29 @@
-import resources_rc  # imports the static SVGs
-
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QMessageBox, QMainWindow
-from PySide6.QtCore import Slot, Signal, QThread, Qt, QFile
-from PySide6.QtGui import QIcon
 import sys
 
-from Database.Repository import Repository
+from PySide6.QtCore import Qt, QThread, Signal, Slot
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
+    QApplication,
+    QMenu,
+    QMessageBox,
+    QVBoxLayout,
+    QWidget,
+)
+
 from Listeners.AggregateListener import AggregateListener
 from Listeners.KeyboardListener import KeyboardListener
 from Popups.AdvancedStyleTab import AdvancedStyleTab
 from Popups.AssignButtonsTab import AssignButtonsTab
 from Popups.BasicSettingsTab import BasicSettingsTab
-from Popups.SettingsWindow import SettingsWindow
 from Popups.GameSettingsTab import GameSettingsTab
+from Popups.SettingsWindow import SettingsWindow
 from Settings.Session import Session
 from Timer.SplitTimer import SplitTimer
 from Timer.Timer import Timer
 from Timer.TimerController import TimerController
 from Widgets.SplitsWidget import SplitsWidget
-from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TimerWidget import TimerWidget
+from Widgets.TimeStatsWidget import TimeStatsWidget
 from Widgets.TitleWidget import TitleWidget
 
 

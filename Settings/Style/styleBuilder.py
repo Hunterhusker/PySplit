@@ -1,7 +1,8 @@
 import copy
 import os
 from os import linesep
-from PySide6.QtCore import Signal, QObject
+
+from PySide6.QtCore import QObject, Signal
 
 
 class StyleBuilder(QObject):

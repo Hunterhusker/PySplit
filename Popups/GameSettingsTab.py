@@ -1,21 +1,29 @@
 from __future__ import annotations
 
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLineEdit, QTimeEdit, QPushButton, QBoxLayout, \
-    QScrollArea, QWidget, QGroupBox, QLabel
-from PySide6.QtCore import Qt, QTime
-from typing import TYPE_CHECKING
+from PySide6.QtWidgets import (
+    QFrame,
+    QGroupBox,
+    QHBoxLayout,
+    QLineEdit,
+    QPushButton,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
+)
 
+from helpers.TimerFormat import ms_to_qtime, qtime_to_ms
+from Models.Game import Game, Split
 from Popups.ABCSettingTab import ABCSettingTab
 from Settings.Session import Session
-from Settings.Settings import Settings
-from helpers.TimerFormat import qtime_to_ms, ms_to_qtime
-from Models.Game import Game, Split
-from Widgets.FormWidgets import LabeledTextEntry, LabeledSpinBox, NoScrollQTimeEdit, LabeledNoScrollQTimeEdit, \
-    LabeledDoubleSpinBox, LabeledComboBox
-
-if TYPE_CHECKING:
-    from Main import Main
+from Widgets.FormWidgets import (
+    LabeledComboBox,
+    LabeledDoubleSpinBox,
+    LabeledSpinBox,
+    LabeledTextEntry,
+    NoScrollQTimeEdit,
+)
 
 
 class GameSettingsTab(ABCSettingTab):

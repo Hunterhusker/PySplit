@@ -1,7 +1,9 @@
-from Models.Game import Game, Split
-from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QScrollArea
-from PySide6.QtCore import Slot, Qt
+from __future__ import annotations
 
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtWidgets import QFrame, QScrollArea, QVBoxLayout, QWidget
+
+from Models.Game import Game, Split
 from Settings.Session import Session
 from Timer.SplitTimer import SplitTimer
 from Widgets.SingleSplitWidget import SingleSplitWidget
@@ -11,7 +13,7 @@ class SplitsWidget(QWidget):
     """
     Assembler Widget that holds a list of all the splits we have in the run and listens to the controller for input
     """
-    def __init__(self, session: Session, split_timer: SplitTimer, parent: 'Main'):
+    def __init__(self, session: Session, split_timer: SplitTimer, parent: QWidget | None = None):
         super().__init__()
         self.session = session
         self.split_timer = split_timer
@@ -20,7 +22,7 @@ class SplitsWidget(QWidget):
         self.split_timer.SplitSkip.connect(self.skip_current_split)
 
         self.visible_splits = self.session.settings['visible_splits']
-        self.main = parent
+        self.parent = parent
 
         # some basic layout setup to keep stuff off the top and bottom but not the sides
         self.layout = QVBoxLayout()

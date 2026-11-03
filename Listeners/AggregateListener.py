@@ -1,10 +1,11 @@
 """
 This is a listener that listens to listeners so that we only need to bring one listener into any object to take input in various forms
 """
-from PySide6.QtCore import Slot, Signal
-
 from abc import ABC
-from Listeners.ABCListener import ABCListener, ABCListenedObject
+
+from PySide6.QtCore import Slot
+
+from Listeners.ABCListener import ABCListener
 
 
 class AggregateListener(ABCListener, ABC):

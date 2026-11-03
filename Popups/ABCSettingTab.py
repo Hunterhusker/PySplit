@@ -1,5 +1,7 @@
-from abc import abstractmethod, ABC
-from PySide6.QtWidgets import QWidget, QGroupBox
+from abc import ABC, abstractmethod
+
+from PySide6.QtWidgets import QGroupBox, QWidget
+
 from helpers.QtABCMetas import QWidgetABCMeta
 
 
@@ -18,7 +20,6 @@ class ABCSettingTab(QWidget, ABC, metaclass=QWidgetABCMeta):
         """
         A method that we can run each time a window is opened that way we resync the settings and ensure that changes from other tabs are known
         """
-        ...
 
 
 class ABCSettingGroupBox(QGroupBox, ABC, metaclass=QWidgetABCMeta):
@@ -36,4 +37,3 @@ class ABCSettingGroupBox(QGroupBox, ABC, metaclass=QWidgetABCMeta):
         """
         A method that we can run each time a window is opened that way we resync the settings and ensure that changes from other tabs are known
         """
-        ...
